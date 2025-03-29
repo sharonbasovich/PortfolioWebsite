@@ -32,13 +32,15 @@ const Resume = () => {
         </div>
       )}
       {data.showCursor && <Cursor />}
+
       <div
         className={`container mx-auto mb-10 ${
           data.showCursor && "cursor-none"
         }`}
       >
         <Header isBlog />
-        {mount && (
+
+        {/* {mount && (
           <div className="mt-10 w-full flex flex-col items-center">
             <div
               className={`w-full ${
@@ -125,7 +127,21 @@ const Resume = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
+      </div>
+      <div className="w-full h-screen overflow-auto">
+        <object
+          data="/Sharon_Basovich_Resume.pdf"
+          type="application/pdf"
+          width="100%"
+          height="100vh"
+          className="w-full h-full"
+        >
+          {/* <p>
+            Alternative text - this is my resume
+            <a href="/Sharon_Basovich_Resume.pdf">Link to the PDF!</a>
+          </p> */}
+        </object>
       </div>
     </>
   );
