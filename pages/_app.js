@@ -13,10 +13,12 @@ const App = ({ Component, pageProps }) => {
   }, [resolvedTheme, setTheme]);
 
   return (
-    <ThemeProvider attribute="class">
+    
       <Component {...pageProps} />
-    </ThemeProvider>
+    
   );
 };
 
 export default App;
+
+//<ThemeProvider attribute="class">
