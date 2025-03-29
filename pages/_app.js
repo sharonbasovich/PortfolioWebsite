@@ -1,9 +1,19 @@
+import { ThemeProvider, useTheme } from "next-themes";
+import { useEffect } from "react";
 import "../styles/globals.css";
-import { ThemeProvider } from "next-themes";
 
 const App = ({ Component, pageProps }) => {
+  const { setTheme, resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    // Set the theme to light only if no theme is resolved.
+    if (resolvedTheme === undefined) {
+      setTheme("light");
+    }
+  }, [resolvedTheme, setTheme]);
+
   return (
-    <ThemeProvider>
+    <ThemeProvider attribute="class">
       <Component {...pageProps} />
     </ThemeProvider>
   );
