@@ -24,8 +24,8 @@
   "projects": [
     {
       "id": "1",
-      "title": "Data Automation",
-      "description": "Working with Data Automation and Physics Simulations at Magna International",
+      "title": "Data Automation at Magna",
+      "description": "Working with Data Automation, Physics Simulations, and CAD at Magna International Mechatronics Department",
       "imageSrc": "https://i.postimg.cc/Gp3VfRDj/magna.jpg",
       "url": "http://chetanverma.com/"
     },
@@ -47,7 +47,7 @@
       "id": "4",
       "title": "HorizonHacks",
       "description": "Lead Website Developer for HorizonHacks hackathon",
-      "imageSrc": "https://i.postimg.cc/N0wf25Wj/horizonhacks.png",
+      "imageSrc": "https://i.postimg.cc/ZYgmyWNz/horizonhacks.png",
       "url": "https://www.horizonhacks.ca/"
     },
     {
@@ -68,26 +68,26 @@
   "services": [
     {
       "id": "1",
-      "title": "Art Direction",
-      "description": "We help with the creation and development of online advertising ideas, with particular focus on their visual appearance."
+      "title": "Programming",
+      "description": "Nine years of full-stack experience in TypeScript, Java, C++, Python, and Git, including programming particle filter localization, odometry, and PID for competitive robotics"
     },
     {
       "id": "2",
-      "title": "Branding",
-      "description": "We design key brand elements such as the logo, color scheme, typography, and other design components that makes your brand stand out from competitors."
+      "title": "Leadership & Collaboration",
+      "description": "Extensive experience working and effectively collaborating in programming teams, including in leadership positions"
     },
     {
       "id": "3",
-      "title": "Web Design",
-      "description": "We build and optimize your online presence.  Website is the digital entry point into your business and a powerful revenue channel."
+      "title": "Hardware",
+      "description": "Experience with design, building, and electronics including building 3D printers and nitro RC cars"
     },
     {
       "id": "4",
-      "title": "3D Design",
-      "description": "We combine creative design and technical skills to build striking 3D visualisations that bring your project to life."
+      "title": "Trilingual",
+      "description": "Native in English and Russian, fluent in French"
     }
   ],
-  "aboutpara": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+  "aboutpara": "Hi, my name is Sharon. I'm a high-school student who loves programming, robotics, and engineering. I am extremely motivated to continue developing my skills, especially in a workplace setting. In my free time, I also enjoy skiing and reading.",
   "resume": {
     "tagline": "👋  I'm a software engineer, product designer.",
     "description": "I have delivered world-class user experiences to millions of people. Well-versed with React, Javascript, and most of the Web frameworks.",
