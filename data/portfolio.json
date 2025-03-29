@@ -31,38 +31,38 @@
     },
     {
       "id": "2",
-      "title": "Project Two",
-      "description": "Web Development",
-      "imageSrc": "https://images.unsplash.com/photo-1605153864431-a2795a1b2f95?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MXwyNTY3ODl8fGVufDB8fHw%3D&auto=format&fit=crop&w=400&q=60",
-      "url": "http://chetanverma.com/"
+      "title": "Competitive Robotics",
+      "description": "10x Award Winning, 2x World Qualifying Teamp Captain and Programming Lead of 82855S",
+      "imageSrc": "https://i.postimg.cc/8zXm1g34/robotics.jpg",
+      "url": "https://stlrobotics.com/"
     },
     {
       "id": "3",
-      "title": "Project Three",
-      "description": "Design",
-      "imageSrc": "https://images.unsplash.com/photo-1504083898675-c896ecdae86e?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxzZWFyY2h8MjJ8fHBhc3RlbHxlbnwwfHwwfA%3D%3D&auto=format&fit=crop&w=400&q=60",
-      "url": "http://chetanverma.com/"
+      "title": "CMU's picoCTF",
+      "description": "113th out of 10460 teams in Carnegie Mellon University's Cybersecurity Competition",
+      "imageSrc": "https://i.postimg.cc/7PXGvMjM/picoctf.png",
+      "url": "https://play.picoctf.org/teams/13745"
     },
     {
       "id": "4",
-      "title": "Project Four",
-      "description": "Marketing",
-      "imageSrc": "https://images.unsplash.com/photo-1492171983775-a51717616c0d?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxzZWFyY2h8NjB8fHBhc3RlbHxlbnwwfHwwfA%3D%3D&auto=format&fit=crop&w=400&q=60",
-      "url": "http://chetanverma.com/"
+      "title": "HorizonHacks",
+      "description": "Lead Website Developer for HorizonHacks hackathon",
+      "imageSrc": "https://i.postimg.cc/N0wf25Wj/horizonhacks.png",
+      "url": "https://www.horizonhacks.ca/"
     },
     {
       "id": "5",
-      "title": "Project Five",
-      "description": "Development",
-      "imageSrc": "https://images.unsplash.com/photo-1534239143101-1b1c627395c5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxzZWFyY2h8NzZ8fHBhc3RlbHxlbnwwfHwwfA%3D%3D&auto=format&fit=crop&w=400&q=60",
-      "url": "http://chetanverma.com/"
+      "title": "Scrapyard Hackathon",
+      "description": "First overall for building an IoT project",
+      "imageSrc": "https://i.postimg.cc/Jh1CWJfZ/scrapyard.jpg",
+      "url": "https://scrapyard.hackclub.com/"
     },
     {
       "id": "6",
-      "title": "Project Six",
-      "description": "Design & Development",
-      "imageSrc": "https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTAyfHxwYXN0ZWx8ZW58MHx8MHw%3D&auto=format&fit=crop&w=400&q=60",
-      "url": "http://chetanverma.com/"
+      "title": "Apocalypse Hackathon",
+      "description": "Fourth overall for building a remote-controlled dronie carrier with a CV-enabled drone",
+      "imageSrc": "https://i.postimg.cc/wMKdZPgT/image.png",
+      "url": "https://apocalypse.hackclub.com/"
     }
   ],
   "services": [
