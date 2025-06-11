@@ -12,11 +12,7 @@ const App = ({ Component, pageProps }) => {
     }
   }, [resolvedTheme, setTheme]);
 
-  return (
-    
-      <Component {...pageProps} />
-    
-  );
+  return <Component class="overflow-x-hidden" {...pageProps} />;
 };
 
 export default App;

@@ -9,7 +9,16 @@
 }
 
 body {
-  @apply dark:bg-black dark:text-white;
+  /* @apply dark:bg-black dark:text-white; */
+
+}
+
+@layer base {
+  html, body {
+    @apply overflow-x-hidden;
+    /* overflow-x: "hidden"; */
+    width: 100vw; /* Prevent accidental overflows */
+  }
 }
 
 .gradient-circle {
