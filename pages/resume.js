@@ -131,7 +131,7 @@ const Resume = () => {
       </div>
       <div className="w-full h-screen overflow-auto">
         <object
-          data="/Sharon_Basovich_Resume.pdf"
+          data="/Sharon_Latex_Resume.pdf"
           type="application/pdf"
           width="100%"
           height="100vh"
