@@ -38,16 +38,16 @@
     },
     {
       "id": "3",
-      "title": "CMU's picoCTF",
-      "description": "113th out of 10460 teams (Top 1%) in Carnegie Mellon University's Cybersecurity Competition",
+      "title": "Carnegie Mellon University's PicoCTF",
+      "description": "113th out of 10460 teams (Top 1%) in CMU's Cybersecurity Competition",
       "imageSrc": "https://i.postimg.cc/7PXGvMjM/picoctf.png",
       "url": "https://play.picoctf.org/teams/13745"
     },
     {
       "id": "4",
       "title": "Hackathons",
-      "description": "Hackathons: 4x International Winner, 3x Toronto Winner, 5x Event Organizer",
-      "imageSrc": "https://i.postimg.cc/ZYgmyWNz/horizonhacks.png",
+      "description": "4x International Winner, 3x Toronto Winner, 5x Event Organizer",
+      "imageSrc": "https://i.postimg.cc/LXbfHxLw/PXL-20250712-172444368.jpg",
       "url": "https://www.horizonhacks.ca/"
     },
     {
