@@ -35,7 +35,7 @@ const projects = [
       "A high-altitude telemetry system flown to 30 km, with a 915 MHz LoRa/Meshtastic link spanning 70 km. I built the flight software, ground-station pipeline, and automated SDR spectrum capture for RF analysis.",
     metrics: ["30 km altitude", "70 km link", "30 MHz–1.5 GHz sweeps"],
     stack: ["Python", "LoRa", "Meshtastic", "NMEA", "RTL-SDR", "RF"],
-    href: "https://github.com/sharonbasovich",
+    href: "https://github.com/knivier/SkyCell",
   },
   {
     index: "02",
@@ -45,7 +45,7 @@ const projects = [
       "A CV-enabled drone and autonomous carrier. I built a real-time Python vision pipeline for target classification, waypoint navigation, ultrasonic avoidance, and an ESP32-CAM streaming/control system.",
     metrics: ["Real-time CV", "Autonomous carrier", "WebSocket video"],
     stack: ["Python", "OpenCV", "PyAV", "MediaPipe", "ESP32", "WebSockets"],
-    href: "https://github.com/sharonbasovich",
+    href: "https://github.com/sharonbasovich/USSApocalypse",
   },
   {
     index: "03",
@@ -55,7 +55,7 @@ const projects = [
       "A physical robot that plays and draws Tic-Tac-Toe moves in sync with a web app. The control layer uses queued COBS-encoded binary serial packets and a context-aware LLM chat interface.",
     metrics: ["Physical + web sync", "Binary serial protocol", "LLM interface"],
     stack: ["React", "TypeScript", "Flask", "COBS", "Serial", "LLM"],
-    href: "https://github.com/sharonbasovich",
+    href: "https://github.com/sharonbasovich/undercity",
   },
 ];
 
