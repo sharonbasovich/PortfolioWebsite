@@ -41,6 +41,9 @@ html,body{overflow-x:clip}
 @media(max-width:700px){.motion-scene{padding:28px 22px;min-height:auto}.motion-panels{grid-template-columns:1fr;margin-bottom:50px}.motion-panel{min-height:220px}.motion-panel strong{font-size:75px}.motion-floor>span:last-child{display:none}.motion-story.has-motion .motion-scene{min-height:580px}.has-motion .motion-words{left:22px;right:22px;top:23%}.has-motion .motion-word{font-size:clamp(48px,12vw,84px)}.has-motion .motion-panels{left:22px;right:22px;top:44%;bottom:14%}.has-motion .motion-panel{width:100%;padding:20px}.has-motion .motion-panel strong{font-size:clamp(76px,19vw,112px)}.has-motion .motion-floor{left:22px;right:22px;bottom:24px}.motion-panel p{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.motion-progress span{transform:scaleX(1)}}
 
+/* Supporting detail for the hackathon highlight. */
+.proof .proof-note{margin-top:5px;font-size:12px;line-height:1.5}
+
 /* Give the other contact routes the same clear place as email. */
 .contact-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:780px;margin-top:42px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .contact-links a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 18px 20px 0;font-family:var(--display);font-size:18px;font-weight:700;line-height:1.3;text-decoration:none;transition:color .2s ease,background .2s ease}
