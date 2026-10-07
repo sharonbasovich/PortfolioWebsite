@@ -65,17 +65,24 @@ if (renderer) {
   addEventListener('pointermove',e=>{if(e.pointerType!=='touch'){pointer.x=e.clientX/innerWidth-.5;pointer.y=e.clientY/innerHeight-.5;}},{passive:true});
   const lenis=new Lenis({duration:1.05,smoothWheel:true,syncTouch:false,anchors:true});
   lenis.on('scroll',ScrollTrigger.update);
+  // Four chapters: sphere → RBC lattice → project knot → back to sphere.
+  // The helix is only a brief transition between engineering and projects.
   const tl=gsap.timeline({scrollTrigger:{trigger:'main',start:'top top',end:'bottom bottom',scrub:1.2},defaults:{ease:'power2.inOut'}});
   tl.to(state,{morph:1,rx:.45,ry:1.4,rz:.3,x:small.matches?.4:2.3,z:9.8,orbit:.05,duration:1})
-    .to(state,{morph:2,rx:-.4,ry:3.4,rz:-.55,x:small.matches?.6:2.9,z:10.6,orbit:.15,duration:1})
-    .to(state,{morph:3,rx:1,ry:5.6,rz:.4,x:small.matches?-.4:-2.6,z:9.5,orbit:.7,duration:1.15})
-    .to(state,{morph:0,rx:.2,ry:7.8,rz:0,x:0,z:8.5,scale:1.2,orbit:1,duration:.85});
-  const statusLabels=['CONNECT','ENGINEER','ANALYZE','BUILD','COLLABORATE'];
-  const sections=[...document.querySelectorAll('.chapter')];
+    .to(state,{morph:2,rx:-.12,ry:2.35,rz:-.18,x:small.matches?.5:2.6,z:10.2,orbit:.1,duration:.18})
+    .to(state,{morph:3,rx:1,ry:5.6,rz:.4,x:small.matches?-.4:-2.6,z:9.5,orbit:.7,duration:.82})
+    .to(state,{morph:4,rx:.2,ry:7.8,rz:0,x:0,z:8.5,scale:1.2,orbit:1,duration:1});
+  const statusLabels=['CONNECT','ENGINEER','BUILD','CONNECT'];
+  const sections=[...document.querySelectorAll('main .chapter')];
+  const statusIndex=document.querySelector('.status-index');
+  const statusLabel=document.querySelector('.status-label');
+  const total=String(sections.length).padStart(2,'0');
+  statusIndex.textContent=`01 / ${total}`;
+  statusLabel.textContent=statusLabels[0];
   sections.forEach((section,i)=>{
     const label=()=>{
-      document.querySelector('.status-index').textContent=`0${i+1} / 05`;
-      document.querySelector('.status-label').textContent=statusLabels[i];
+      statusIndex.textContent=`${String(i+1).padStart(2,'0')} / ${total}`;
+      statusLabel.textContent=statusLabels[i] || 'CONNECT';
     };
     ScrollTrigger.create({trigger:section,start:'top center',end:'bottom center',onEnter:label,onEnterBack:label});
   });
