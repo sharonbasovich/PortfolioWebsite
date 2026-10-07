@@ -1,55 +1,231 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#090c10">
-  <title>Sharon Basovich</title>
-  <meta name="description" content="Sharon Basovich. Computer Science at Waterloo, previously at Magna and RBC. A little about what I build, what I'm curious about, and the people I'd like to meet.">
-  <meta property="og:title" content="Sharon Basovich"><meta property="og:description" content="Computer Science at Waterloo. Previously at Magna and RBC. Always curious to meet people doing interesting things."><meta property="og:type" content="website">
-  <meta property="og:url" content="https://basovichsharon.vercel.app/">
-  <link rel="canonical" href="https://basovichsharon.vercel.app/">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23090c10'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='%23d0ff71'%3Esb%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=20261007-personal">
-  <script src="vendor/gsap/gsap.min.js" defer></script><script src="vendor/gsap/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="scene.js?v=20261007-personal"></script>
-</head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-<div class="scene-wrap" aria-hidden="true"><canvas id="scene"></canvas><div class="scene-fade"></div></div>
-<div class="progress" aria-hidden="true"><span></span></div>
-<header><a class="brand" href="#top" aria-label="Sharon Basovich, top">sb<span>/</span></a><nav aria-label="Main navigation"><a href="#work">Work</a><a href="#projects">Projects</a><a class="resume" href="resume.pdf">Resume ↗</a></nav></header>
-<aside class="scene-status" aria-hidden="true"><span class="status-index">01 / 04</span><span class="status-label">CONNECT</span></aside>
-<button class="motion" type="button" aria-pressed="false" hidden>Pause motion</button>
-<main id="main">
-<section class="hero chapter" id="top" data-scene="0">
-  <div class="eyebrow">WATERLOO CS / CO-OP</div>
-  <h1>Sharon<br><em>Basovich.</em></h1>
-  <div class="hero-bottom"><p>I'm studying Computer Science at the University of Waterloo. I've previously built software at Magna and RBC. Outside of code, I'm into horology, science fiction, and skiing.</p></div>
-  <div class="hero-links"><span>Always up for meeting cool people.</span><a href="mailto:sharon@basovich.com">Let's talk ↗</a></div>
-</section>
-<section class="chapter experience" id="work" data-scene="1">
-  <div class="chapter-label"><span>01 / ENGINEERING AT SCALE</span><span>RBC · SUMMER 2026</span></div>
-  <h2>Many sources.<br><em>One view.</em></h2>
-  <div class="content-block"><p class="lead">Engineering intelligence for the people keeping banking services healthy.</p><p>I shipped a platform used by <strong>200+ banking applications across 1,200 repositories</strong>. Scheduled GraphQL/REST pipelines bring SonarQube, DAST, GitHub, and Snyk data into MongoDB.</p><p>A React dashboard gives service owners and managers a shared view of health scores, saving <strong>12,000+ hours annually</strong>.</p><div class="stack">REACT / NX / MONGODB / VITEST / PLAYWRIGHT</div></div>
-  <div class="fact"><strong>1,200</strong><span>repositories.<br>A clearer picture.</span></div>
-</section>
-<section class="chapter project-chapter" id="projects" data-scene="2">
-  <div class="chapter-label"><span>02 / BEYOND THE SCREEN</span><span>SELECTED PROJECTS</span></div>
-  <h2>Bits meet<br><em>the real world.</em></h2>
-  <div class="project-list">
-  <article><div class="project-meta">01 / FULL-STACK + HARDWARE <span>TOP 10 · UNDERCITY</span></div><h3>Tic-Tac-Toe Drawing Robot</h3><p>A React/TypeScript game and Flask backend synchronized with a physical plotter. Queued COBS-encoded serial commands drive the robot; context-aware LLM chat gives it a voice.</p><a href="https://github.com/sharonbasovich/undercity">Source & architecture ↗</a></article>
-  <article><div class="project-meta">02 / RADIO + TELEMETRY <span>1ST PLACE · APEX</span></div><h3>SkyCell</h3><p>A balloon mission reaching 30 km altitude with a 70 km radio link. Python software parses GPS, integrates sensors, and recovers radio connections; the ground station decodes, stores, and visualizes telemetry.</p><a href="https://github.com/sharonbasovich/skycell">Dashboard source ↗</a></article>
-  <article><div class="project-meta">03 / DATA + RESEARCH <span>MARBLE INVESTMENTS</span></div><h3>Structure from noise.</h3><p>A React graph persisting roughly 500 companies and 1,500+ relationships for an investment team. A news pipeline processes roughly 1,000–2,000 articles daily, deduplicates the feed, and extracts structured fields using an LLM.</p><a href="resume.pdf">Details in my resume ↗</a></article>
-  </div>
-</section>
-<section class="closing chapter" id="contact" data-scene="3">
-  <div class="chapter-label"><span>03 / SAY HELLO</span><span>ALWAYS UP FOR A CONVERSATION</span></div>
-  <h2>Let's<br><em>talk.</em></h2>
-  <p class="lead">I'm always curious to meet people doing interesting things. If that's you, reach out for a chat.</p>
-  <a class="email" href="mailto:sharon@basovich.com">sharon@basovich.com <span>↗</span></a>
-  <div class="about"><p>I'm Sharon, a Computer Science co-op student at the University of Waterloo. I've built engineering automation at Magna and tools for engineering teams at RBC.</p><p>Off-screen: horology, science fiction, skiing, cooking, and mechanical keyboards.</p></div>
-  <footer><div><a href="https://github.com/sharonbasovich">GitHub ↗</a><a href="https://www.linkedin.com/in/sharon-basovich">LinkedIn ↗</a><a href="resume.pdf">Resume ↗</a></div></footer>
-  <p class="credits">Built with Three.js, GSAP & Lenis. <a href="resources.html">Resources & credits</a></p>
-</section>
-</main>
-</body></html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#090c10" />
+    <title>Sharon Basovich</title>
+    <meta
+      name="description"
+      content="Sharon Basovich. Computer Science at Waterloo, previously at Magna and RBC. A little about what I build, what I'm curious about, and the people I'd like to meet."
+    />
+    <meta property="og:title" content="Sharon Basovich" />
+    <meta
+      property="og:description"
+      content="Computer Science at Waterloo. Previously at Magna and RBC. Always curious to meet people doing interesting things."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://basovichsharon.vercel.app/" />
+    <link rel="canonical" href="https://basovichsharon.vercel.app/" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23090c10'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='%23d0ff71'%3Esb%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css?v=20261007-motion" />
+    <script src="vendor/gsap/gsap.min.js" defer></script>
+    <script src="vendor/gsap/ScrollTrigger.min.js" defer></script>
+    <script src="vendor/gsap/SplitText.min.js" defer></script>
+    <script type="module" src="scene.js?v=20261007-motion"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="scene-wrap" aria-hidden="true">
+      <canvas id="scene"></canvas>
+      <div class="scene-fade"></div>
+    </div>
+    <div class="progress" aria-hidden="true"><span></span></div>
+    <header>
+      <a class="brand" href="#top" aria-label="Sharon Basovich, top"
+        >sb<span>/</span></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#work">Work</a><a href="#projects">Projects</a
+        ><a class="resume" href="resume.pdf">Resume ↗</a>
+      </nav>
+    </header>
+    <aside class="scene-status" aria-hidden="true">
+      <span class="status-index">01 / 04</span
+      ><span class="status-label">CONNECT</span>
+    </aside>
+    <button class="motion" type="button" aria-pressed="false" hidden>
+      Pause motion
+    </button>
+    <main id="main">
+      <section class="hero chapter" id="top" data-scene="0">
+        <div class="eyebrow">WATERLOO CS / CO-OP</div>
+        <h1>
+          Sharon<br />
+          <em>Basovich.</em>
+        </h1>
+        <div class="hero-bottom">
+          <p>
+            I'm studying Computer Science at the University of Waterloo. I've
+            previously built software at Magna and RBC. Outside of code, I'm
+            into horology, science fiction, and skiing.
+          </p>
+        </div>
+        <div class="hero-links">
+          <span>Always up for meeting cool people.</span
+          ><a href="mailto:sharon@basovich.com">Let's talk ↗</a>
+        </div>
+      </section>
+      <section class="chapter experience" id="work" data-scene="1">
+        <div class="chapter-label">
+          <span>01 / ENGINEERING AT SCALE</span><span>RBC · SUMMER 2026</span>
+        </div>
+        <h2>
+          Many sources.<br />
+          <em>One view.</em>
+        </h2>
+        <div class="content-block">
+          <p class="lead">
+            Engineering intelligence for the people keeping banking services
+            healthy.
+          </p>
+          <p>
+            I shipped a platform used by
+            <strong>200+ banking applications across 1,200 repositories</strong
+            >. Scheduled GraphQL/REST pipelines bring SonarQube, DAST, GitHub,
+            and Snyk data into MongoDB.
+          </p>
+          <p>
+            A React dashboard gives service owners and managers a shared view of
+            health scores, saving <strong>12,000+ hours annually</strong>.
+          </p>
+          <div class="stack">REACT / NX / MONGODB / VITEST / PLAYWRIGHT</div>
+        </div>
+        <div class="fact">
+          <strong>1,200</strong
+          ><span>repositories.<br />A clearer picture.</span>
+        </div>
+      </section>
+      <section class="chapter project-chapter" id="projects" data-scene="2">
+        <div class="chapter-label">
+          <span>02 / BEYOND THE SCREEN</span><span>SELECTED PROJECTS</span>
+        </div>
+        <div class="project-stage">
+          <div class="project-heading">
+            <h2>
+              Bits meet<br />
+              <em>the real world.</em>
+            </h2>
+            <div
+              class="project-controls"
+              role="group"
+              aria-label="Choose a project"
+              hidden
+            >
+              <button
+                type="button"
+                data-project="0"
+                aria-label="View project 1: Tic-Tac-Toe Drawing Robot"
+                aria-pressed="true"
+              >
+                <span>01</span>
+              </button>
+              <button
+                type="button"
+                data-project="1"
+                aria-label="View project 2: SkyCell"
+                aria-pressed="false"
+              >
+                <span>02</span>
+              </button>
+              <button
+                type="button"
+                data-project="2"
+                aria-label="View project 3: Marble Investments"
+                aria-pressed="false"
+              >
+                <span>03</span>
+              </button>
+            </div>
+          </div>
+          <div class="project-list">
+            <article>
+              <div class="project-meta">
+                01 / FULL-STACK + HARDWARE <span>TOP 10 · UNDERCITY</span>
+              </div>
+              <h3>Tic-Tac-Toe Drawing Robot</h3>
+              <p>
+                A React/TypeScript game and Flask backend synchronized with a
+                physical plotter. Queued COBS-encoded serial commands drive the
+                robot; context-aware LLM chat gives it a voice.
+              </p>
+              <a href="https://github.com/sharonbasovich/undercity"
+                >Source & architecture ↗</a
+              >
+            </article>
+            <article>
+              <div class="project-meta">
+                02 / RADIO + TELEMETRY <span>1ST PLACE · APEX</span>
+              </div>
+              <h3>SkyCell</h3>
+              <p>
+                A balloon mission reaching 30 km altitude with a 70 km radio
+                link. Python software parses GPS, integrates sensors, and
+                recovers radio connections; the ground station decodes, stores,
+                and visualizes telemetry.
+              </p>
+              <a href="https://github.com/sharonbasovich/skycell"
+                >Dashboard source ↗</a
+              >
+            </article>
+            <article>
+              <div class="project-meta">
+                03 / DATA + RESEARCH <span>MARBLE INVESTMENTS</span>
+              </div>
+              <h3>Structure from noise.</h3>
+              <p>
+                A React graph persisting roughly 500 companies and 1,500+
+                relationships for an investment team. A news pipeline processes
+                roughly 1,000–2,000 articles daily, deduplicates the feed, and
+                extracts structured fields using an LLM.
+              </p>
+              <a href="resume.pdf">Details in my resume ↗</a>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="closing chapter" id="contact" data-scene="3">
+        <div class="chapter-label">
+          <span>03 / SAY HELLO</span><span>ALWAYS UP FOR A CONVERSATION</span>
+        </div>
+        <h2>
+          Let's<br />
+          <em>talk.</em>
+        </h2>
+        <p class="lead">
+          I'm always curious to meet people doing interesting things. If that's
+          you, reach out for a chat.
+        </p>
+        <a class="email" href="mailto:sharon@basovich.com"
+          >sharon@basovich.com <span>↗</span></a
+        >
+        <div class="about">
+          <p>
+            I'm Sharon, a Computer Science co-op student at the University of
+            Waterloo. I've built engineering automation at Magna and tools for
+            engineering teams at RBC.
+          </p>
+          <p>
+            Off-screen: horology, science fiction, skiing, cooking, and
+            mechanical keyboards.
+          </p>
+        </div>
+        <footer>
+          <div>
+            <a href="https://github.com/sharonbasovich">GitHub ↗</a
+            ><a href="https://www.linkedin.com/in/sharon-basovich">LinkedIn ↗</a
+            ><a href="resume.pdf">Resume ↗</a>
+          </div>
+        </footer>
+        <p class="credits">
+          Built with Three.js, GSAP & Lenis.
+          <a href="resources.html">Resources & credits</a>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
