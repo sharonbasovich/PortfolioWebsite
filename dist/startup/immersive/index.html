@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eef1fa" />
+    <title>Sharon Basovich</title>
+    <meta
+      name="description"
+      content="Sharon Basovich. Computer Science at Waterloo, previously at Magna and RBC. Software, physical systems, and a little curiosity."
+    />
+    <meta property="og:title" content="Sharon Basovich" />
+    <meta
+      property="og:description"
+      content="Computer Science at Waterloo. Previously at Magna and RBC. Always curious to meet people doing interesting things."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://basovichsharon.vercel.app/immersive/"
+    />
+    <link rel="canonical" href="https://basovichsharon.vercel.app/immersive/" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232d43ff'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='white'%3Esb%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="../vendor/gsap/gsap.min.js" defer></script>
+    <script src="../vendor/gsap/ScrollTrigger.min.js" defer></script>
+    <script src="../vendor/gsap/SplitText.min.js" defer></script>
+    <script type="importmap">
+      { "imports": { "three": "../vendor/three/three.module.js" } }
+    </script>
+    <script type="module" src="main.js"></script>
+    <noscript
+      ><style>
+        .world-frame,
+        .art-window {
+          display: none;
+        }
+        .work-layout,
+        .contact-layout,
+        .project-panel {
+          grid-template-columns: 1fr;
+        }
+        .project-panel {
+          min-height: auto;
+        }
+        .hero {
+          min-height: 70svh;
+        }
+      </style></noscript
+    >
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="world-frame" aria-hidden="true">
+      <div class="world-cover"></div>
+      <canvas id="world"></canvas>
+    </div>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Sharon Basovich, home"
+        ><span class="brand-mark" aria-hidden="true"></span>Sharon Basovich</a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#work">Work</a>
+        <a href="#projects">Projects</a>
+        <a href="../resume.pdf">Resume <span aria-hidden="true">↗</span></a>
+        <a class="nav-contact" href="mailto:sharon@basovich.com"
+          >Let's talk <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </header>
+    <aside class="scene-status" aria-hidden="true">
+      <span class="status-index">01 / 04</span
+      ><span class="status-label">CONNECT</span>
+    </aside>
+    <button class="motion" type="button" aria-pressed="false" hidden>
+      Pause motion
+    </button>
+
+    <main id="main" tabindex="-1">
+      <section
+        class="hero chapter"
+        id="top"
+        data-scene="0"
+        aria-labelledby="name"
+      >
+        <div class="hero-overview">
+          <h1 id="name"><span>Sharon</span> <span>Basovich.</span></h1>
+          <div class="hero-intro">
+            <p>
+              I'm studying Computer Science at the University of Waterloo. I've
+              previously built software at Magna and RBC. Outside of code, I'm
+              into horology, science fiction, and skiing.
+            </p>
+          </div>
+        </div>
+        <div class="hero-window art-window" data-world-window>
+          <div class="hero-interaction">
+            <button
+              class="scene-burst"
+              type="button"
+              aria-label="Take the 3D object apart"
+              hidden
+            >
+              Take it apart <span aria-hidden="true">↗</span>
+            </button>
+            <p class="hero-hint">
+              <span class="cursor-hint">Move your cursor. Take it apart.</span
+              ><span class="touch-hint">An idea, in motion.</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="work chapter"
+        id="work"
+        data-scene="1"
+        aria-labelledby="work-title"
+      >
+        <div class="work-layout">
+          <div class="work-story">
+            <div class="work-heading">
+              <p class="section-kicker">Selected work</p>
+              <h2 id="work-title">Many sources.<br />One view.</h2>
+            </div>
+            <article class="work-record">
+              <div class="record-heading">
+                <h3>RBC</h3>
+                <span>Summer 2026</span>
+              </div>
+              <p class="record-role">Software Engineer</p>
+              <p>
+                I shipped a platform used by
+                <strong
+                  >200+ banking applications across 1,200 repositories</strong
+                >. Scheduled GraphQL/REST pipelines bring SonarQube, DAST,
+                GitHub, and Snyk data into MongoDB.
+              </p>
+              <dl class="work-metrics">
+                <div>
+                  <dt>Banking applications</dt>
+                  <dd>200<span>+</span></dd>
+                </div>
+                <div>
+                  <dt>Repositories</dt>
+                  <dd>1,200</dd>
+                </div>
+                <div>
+                  <dt>Hours saved annually</dt>
+                  <dd>12,000<span>+</span></dd>
+                </div>
+              </dl>
+              <p>
+                A React dashboard gives service owners and managers a shared
+                view of health scores, saving
+                <strong>12,000+ hours annually</strong>.
+              </p>
+              <ul class="technology-list" aria-label="RBC technologies">
+                <li>React</li>
+                <li>Nx</li>
+                <li>MongoDB</li>
+                <li>Vitest</li>
+                <li>Playwright</li>
+              </ul>
+            </article>
+            <article class="work-record">
+              <div class="record-heading">
+                <h3>Magna</h3>
+                <span>Summer 2024</span>
+              </div>
+              <p class="record-role">Software Automation Engineer</p>
+              <p>
+                I automated force and leverage analysis with
+                <strong>VBA, Excel, and CATIA V5</strong>, generating reports
+                for engineers.
+              </p>
+              <p>
+                I also streamlined materials data for Teamcenter PLM, built
+                wiring-harness prototypes, and tested hood-latch system failures
+                in a validation lab.
+              </p>
+              <ul class="technology-list" aria-label="Magna technologies">
+                <li>VBA</li>
+                <li>CATIA V5</li>
+                <li>Excel</li>
+                <li>Teamcenter PLM</li>
+              </ul>
+            </article>
+          </div>
+          <div
+            class="work-window art-window"
+            data-world-window
+            aria-hidden="true"
+          ></div>
+        </div>
+      </section>
+
+      <section
+        class="projects chapter"
+        id="projects"
+        data-scene="2"
+        aria-labelledby="projects-title"
+      >
+        <div class="projects-heading">
+          <p class="section-kicker">Selected projects</p>
+          <h2 id="projects-title">Bits meet<br />the real world.</h2>
+        </div>
+        <div class="project-gallery">
+          <div class="project-panels">
+            <article
+              class="project-panel"
+              data-project="0"
+              aria-labelledby="robot-title"
+            >
+              <div
+                class="project-window art-window"
+                data-world-window
+                aria-hidden="true"
+              ></div>
+              <div class="project-copy">
+                <div class="project-index">
+                  <span>01 / 03</span><span>Top 10 at Undercity</span>
+                </div>
+                <h3 id="robot-title">Tic-Tac-Toe<br />Drawing Robot</h3>
+                <p>
+                  A React/TypeScript game and Flask backend synchronized with a
+                  physical plotter. Queued COBS-encoded serial commands drive
+                  the robot; context-aware LLM chat gives it a voice.
+                </p>
+                <ul
+                  class="technology-list"
+                  aria-label="Drawing robot technologies"
+                >
+                  <li>React / TypeScript</li>
+                  <li>Flask</li>
+                  <li>Serial control</li>
+                </ul>
+                <a
+                  class="project-link"
+                  href="https://github.com/sharonbasovich/undercity"
+                  >Source & architecture <span aria-hidden="true">↗</span></a
+                >
+              </div>
+            </article>
+            <article
+              class="project-panel"
+              data-project="1"
+              aria-labelledby="skycell-title"
+            >
+              <div
+                class="project-window art-window"
+                data-world-window
+                aria-hidden="true"
+              ></div>
+              <div class="project-copy">
+                <div class="project-index">
+                  <span>02 / 03</span><span>1st place at APEX</span>
+                </div>
+                <h3 id="skycell-title">SkyCell</h3>
+                <p>
+                  A balloon mission reaching 30 km altitude with a 70 km radio
+                  link. Python software parses GPS, integrates sensors, and
+                  recovers radio connections; the ground station decodes,
+                  stores, and visualizes telemetry.
+                </p>
+                <ul class="technology-list" aria-label="SkyCell technologies">
+                  <li>Python</li>
+                  <li>LoRa / Meshtastic</li>
+                  <li>NMEA GPS</li>
+                </ul>
+                <a
+                  class="project-link"
+                  href="https://github.com/sharonbasovich/skycell"
+                  >Dashboard source <span aria-hidden="true">↗</span></a
+                >
+              </div>
+            </article>
+            <article
+              class="project-panel"
+              data-project="2"
+              aria-labelledby="marble-title"
+            >
+              <div
+                class="project-window art-window"
+                data-world-window
+                aria-hidden="true"
+              ></div>
+              <div class="project-copy">
+                <div class="project-index">
+                  <span>03 / 03</span><span>Marble Investments</span>
+                </div>
+                <h3 id="marble-title">Structure<br />from noise.</h3>
+                <p>
+                  A React graph persisting roughly 500 companies and 1,500+
+                  relationships for an investment team. A news pipeline
+                  processes roughly 1,000–2,000 articles daily, deduplicates the
+                  feed, and extracts structured fields using an LLM.
+                </p>
+                <ul class="technology-list" aria-label="Marble technologies">
+                  <li>React</li>
+                  <li>Python</li>
+                  <li>LLM extraction</li>
+                </ul>
+                <a class="project-link" href="../resume.pdf"
+                  >Details in my resume <span aria-hidden="true">↗</span></a
+                >
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="contact chapter"
+        id="contact"
+        data-scene="3"
+        aria-labelledby="contact-title"
+      >
+        <div class="contact-layout">
+          <div class="contact-copy">
+            <p class="section-kicker">Say hello</p>
+            <h2 id="contact-title">Let's talk.</h2>
+            <p class="contact-lead">
+              I'm always curious to meet people doing interesting things. If
+              that's you, reach out for a chat.
+            </p>
+            <a class="email" href="mailto:sharon@basovich.com"
+              >sharon@basovich.com <span aria-hidden="true">↗</span></a
+            >
+            <nav class="contact-links" aria-label="More ways to connect">
+              <a href="https://github.com/sharonbasovich"
+                >GitHub <span aria-hidden="true">↗</span></a
+              >
+              <a href="https://www.linkedin.com/in/sharon-basovich"
+                >LinkedIn <span aria-hidden="true">↗</span></a
+              >
+              <a href="../resume.pdf"
+                >Resume <span aria-hidden="true">↗</span></a
+              >
+            </nav>
+            <div class="contact-about">
+              <p>
+                I'm Sharon, a Computer Science co-op student at the University
+                of Waterloo. I've built engineering automation at Magna and
+                tools for engineering teams at RBC.
+              </p>
+              <p>
+                Off-screen: horology, science fiction, skiing, cooking, and
+                mechanical keyboards.
+              </p>
+            </div>
+          </div>
+          <div
+            class="contact-window art-window"
+            data-world-window
+            aria-hidden="true"
+          ></div>
+        </div>
+        <footer>
+          <span>Sharon Basovich</span
+          ><a href="resources.html"
+            >Resources & credits <span aria-hidden="true">↗</span></a
+          >
+        </footer>
+      </section>
+    </main>
+  </body>
+</html>

@@ -10,3 +10,5 @@ This repository contains two static portfolios, deployed from `main` to separate
 Each project uses the `vercel.json` in its own root. The creative version includes its own résumé at `dist/startup/resume.pdf` and rendering libraries in `vendor/`. The earlier Next.js source remains in the repository for history and rollback.
 
 Preview locally by serving `dist/` over HTTP. The main portfolio is at `/`, and the experimental version is at `/startup/`.
+
+A separate Lusion-inspired motion experiment is available at [basovichsharon.vercel.app/immersive/](https://basovichsharon.vercel.app/immersive/), with source in `dist/startup/immersive/`. See [its motion and implementation notes](docs/lusion-inspired-version.md) for references, local preview, and fallback behavior.

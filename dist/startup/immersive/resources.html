@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Behind the motion — Sharon Basovich</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #eef1fa;
+        color: #090b11;
+        font:
+          18px/1.6 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 900px;
+        margin: auto;
+        padding: 64px 24px;
+      }
+      h1 {
+        font-size: clamp(40px, 7vw, 72px);
+        line-height: 1.05;
+        letter-spacing: -0.06em;
+      }
+      h2 {
+        font-size: 26px;
+        margin-top: 48px;
+      }
+      a {
+        color: #2439dd;
+        text-underline-offset: 4px;
+      }
+      li {
+        margin: 18px 0;
+      }
+      small {
+        color: #576075;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a href="./">← Back to the site</a>
+      <h1>Behind the motion.</h1>
+      <p>
+        A mechanical sculpture inspired by watch movements and robotics, with
+        scenes that connect to my projects. The models and choreography were
+        built for this site.
+      </p>
+      <h2>References</h2>
+      <ul>
+        <li>
+          <a href="https://lusion.co/">Lusion</a> — the visual reference for a
+          generous editorial layout, glossy sculptural objects, and motion that
+          drives the page.
+        </li>
+        <li>
+          <a href="https://github.com/lusionltd/WebGL-Scroll-Sync"
+            >Lusion’s WebGL Scroll Sync</a
+          >
+          — its MIT-licensed example informed the single-canvas approach:
+          measure DOM frames, map the camera to each frame, and clip the scene
+          to its visible area.
+        </li>
+        <li>
+          <a href="https://threejs.org/docs/pages/MeshPhysicalMaterial.html"
+            >Three.js physical materials</a
+          >
+          and
+          <a
+            href="https://threejs.org/examples/webgl_materials_physical_clearcoat.html"
+            >clearcoat example</a
+          >
+          — reflective cobalt, brushed metal, and enamel materials.
+        </li>
+        <li>
+          <a
+            href="https://tympanus.net/codrops/2021/10/27/creating-the-effect-of-transparent-glass-and-plastic-in-three-js/"
+            >Codrops: glass and plastic in Three.js</a
+          >
+          — material and lighting research for the scene.
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <p>
+        <a href="https://threejs.org/">Three.js</a>, including its MIT-licensed
+        RoomEnvironment and RoundedBoxGeometry, provides the renderer, lighting
+        environment, and geometry. <a href="https://gsap.com/">GSAP</a>,
+        ScrollTrigger, and SplitText handle entrances, heading reveals, and the
+        project sequence.
+      </p>
+      <p>
+        <small
+          >No Lusion images, models, or site assets are reused. Motion can be
+          paused, and small screens use a natural vertical layout.</small
+        >
+      </p>
+    </main>
+  </body>
+</html>
