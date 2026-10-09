@@ -496,6 +496,36 @@ if (rail && thumb) {
     lastInput = performance.now();
   });
 }
+// Keyboard navigation must cancel a wheel coast rather than fighting its target.
+document.addEventListener("keydown", (event) => {
+  if (
+    event.defaultPrevented ||
+    !lenis ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.altKey
+  )
+    return;
+  if (
+    event.target.closest(
+      'input,textarea,select,[contenteditable="true"],[data-lenis-prevent]',
+    )
+  )
+    return;
+  const destinations = {
+    ArrowDown: scrollY + 64,
+    ArrowUp: scrollY - 64,
+    PageDown: scrollY + innerHeight * 0.85,
+    PageUp: scrollY - innerHeight * 0.85,
+    Home: 0,
+    End: root.scrollHeight - innerHeight,
+  };
+  if (!(event.key in destinations)) return;
+  event.preventDefault();
+  scrollToPosition(destinations[event.key], true);
+  lastInput = performance.now();
+});
+
 document.addEventListener("click", (event) => {
   const link = event.target.closest('a[href^="#"]');
   if (
