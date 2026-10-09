@@ -64,12 +64,68 @@
         ><span class="brand-mark" aria-hidden="true"></span>Sharon Basovich</a
       >
       <nav aria-label="Main navigation">
-        <a href="#work">Work</a>
-        <a href="#projects">Projects</a>
-        <a href="../resume.pdf">Resume <span aria-hidden="true">↗</span></a>
-        <a class="nav-contact" href="mailto:sharon@basovich.com"
-          >Let's talk <span aria-hidden="true">↗</span></a
+        <a href="#work" class="roll-link"
+          ><span class="roll-label button-label"
+            ><span class="roll-original">Work</span
+            ><span class="roll-duplicate" aria-hidden="true">Work</span></span
+          ></a
         >
+        <a href="#projects" class="roll-link"
+          ><span class="roll-label button-label"
+            ><span class="roll-original">Projects</span
+            ><span class="roll-duplicate" aria-hidden="true"
+              >Projects</span
+            ></span
+          ></a
+        >
+        <a href="../resume.pdf" class="roll-link"
+          ><span class="roll-label button-label"
+            ><span class="roll-original">Resume</span
+            ><span class="roll-duplicate" aria-hidden="true">Resume</span></span
+          ><span class="link-arrow button-arrow" aria-hidden="true"
+            ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M5 15 15 5M5 5h10v10"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              /></svg
+            ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M5 15 15 5M5 5h10v10"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              /></svg></span
+        ></a>
+        <a
+          class="nav-contact roll-link magnetic"
+          href="mailto:sharon@basovich.com"
+          ><span class="roll-label button-label"
+            ><span class="roll-original">Let's talk</span
+            ><span class="roll-duplicate" aria-hidden="true"
+              >Let's talk</span
+            ></span
+          ><span class="link-arrow button-arrow" aria-hidden="true"
+            ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M5 15 15 5M5 5h10v10"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              /></svg
+            ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M5 15 15 5M5 5h10v10"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              /></svg></span
+        ></a>
       </nav>
     </header>
     <aside class="scene-status" aria-hidden="true">
@@ -79,6 +135,19 @@
     <button class="motion" type="button" aria-pressed="false" hidden>
       Pause motion
     </button>
+    <div class="scroll-rail" hidden>
+      <div
+        class="scroll-thumb"
+        role="scrollbar"
+        tabindex="0"
+        aria-label="Page scroll"
+        aria-controls="main"
+        aria-orientation="vertical"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      ></div>
+    </div>
 
     <main id="main" tabindex="-1">
       <section
@@ -100,12 +169,34 @@
         <div class="hero-window art-window" data-world-window>
           <div class="hero-interaction">
             <button
-              class="scene-burst"
+              class="scene-burst roll-link magnetic"
               type="button"
               aria-label="Take the 3D object apart"
               hidden
             >
-              Take it apart <span aria-hidden="true">↗</span>
+              <span class="roll-label button-label"
+                ><span class="roll-original">Take it apart</span
+                ><span class="roll-duplicate" aria-hidden="true"
+                  >Take it apart</span
+                ></span
+              ><span class="link-arrow button-arrow" aria-hidden="true"
+                ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M5 15 15 5M5 5h10v10"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+                ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M5 15 15 5M5 5h10v10"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+              ></span>
             </button>
             <p class="hero-hint">
               <span class="cursor-hint">Move your cursor. Take it apart.</span
@@ -240,10 +331,39 @@
                   <li>Serial control</li>
                 </ul>
                 <a
-                  class="project-link"
+                  class="project-link roll-link"
                   href="https://github.com/sharonbasovich/undercity"
-                  >Source & architecture <span aria-hidden="true">↗</span></a
-                >
+                  ><span class="roll-label button-label"
+                    ><span class="roll-original">Source &amp; architecture</span
+                    ><span class="roll-duplicate" aria-hidden="true"
+                      >Source &amp; architecture</span
+                    ></span
+                  ><span class="link-arrow button-arrow" aria-hidden="true"
+                    ><svg
+                      class="arrow-original"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 15 15 5M5 5h10v10"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      /></svg
+                    ><svg
+                      class="arrow-duplicate"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 15 15 5M5 5h10v10"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      /></svg></span
+                ></a>
               </div>
             </article>
             <article
@@ -273,10 +393,39 @@
                   <li>NMEA GPS</li>
                 </ul>
                 <a
-                  class="project-link"
+                  class="project-link roll-link"
                   href="https://github.com/sharonbasovich/skycell"
-                  >Dashboard source <span aria-hidden="true">↗</span></a
-                >
+                  ><span class="roll-label button-label"
+                    ><span class="roll-original">Dashboard source</span
+                    ><span class="roll-duplicate" aria-hidden="true"
+                      >Dashboard source</span
+                    ></span
+                  ><span class="link-arrow button-arrow" aria-hidden="true"
+                    ><svg
+                      class="arrow-original"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 15 15 5M5 5h10v10"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      /></svg
+                    ><svg
+                      class="arrow-duplicate"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 15 15 5M5 5h10v10"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      /></svg></span
+                ></a>
               </div>
             </article>
             <article
@@ -305,9 +454,38 @@
                   <li>Python</li>
                   <li>LLM extraction</li>
                 </ul>
-                <a class="project-link" href="../resume.pdf"
-                  >Details in my resume <span aria-hidden="true">↗</span></a
-                >
+                <a class="project-link roll-link" href="../resume.pdf"
+                  ><span class="roll-label button-label"
+                    ><span class="roll-original">Details in my resume</span
+                    ><span class="roll-duplicate" aria-hidden="true"
+                      >Details in my resume</span
+                    ></span
+                  ><span class="link-arrow button-arrow" aria-hidden="true"
+                    ><svg
+                      class="arrow-original"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 15 15 5M5 5h10v10"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      /></svg
+                    ><svg
+                      class="arrow-duplicate"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 15 15 5M5 5h10v10"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      /></svg></span
+                ></a>
               </div>
             </article>
           </div>
@@ -328,19 +506,105 @@
               I'm always curious to meet people doing interesting things. If
               that's you, reach out for a chat.
             </p>
-            <a class="email" href="mailto:sharon@basovich.com"
-              >sharon@basovich.com <span aria-hidden="true">↗</span></a
-            >
+            <a class="email roll-link" href="mailto:sharon@basovich.com"
+              ><span class="roll-label button-label"
+                ><span class="roll-original">sharon@basovich.com</span
+                ><span class="roll-duplicate" aria-hidden="true"
+                  >sharon@basovich.com</span
+                ></span
+              ><span class="link-arrow button-arrow" aria-hidden="true"
+                ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M5 15 15 5M5 5h10v10"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+                ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M5 15 15 5M5 5h10v10"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg></span
+            ></a>
             <nav class="contact-links" aria-label="More ways to connect">
-              <a href="https://github.com/sharonbasovich"
-                >GitHub <span aria-hidden="true">↗</span></a
-              >
-              <a href="https://www.linkedin.com/in/sharon-basovich"
-                >LinkedIn <span aria-hidden="true">↗</span></a
-              >
-              <a href="../resume.pdf"
-                >Resume <span aria-hidden="true">↗</span></a
-              >
+              <a href="https://github.com/sharonbasovich" class="roll-link"
+                ><span class="roll-label button-label"
+                  ><span class="roll-original">GitHub</span
+                  ><span class="roll-duplicate" aria-hidden="true"
+                    >GitHub</span
+                  ></span
+                ><span class="link-arrow button-arrow" aria-hidden="true"
+                  ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M5 15 15 5M5 5h10v10"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    /></svg
+                  ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M5 15 15 5M5 5h10v10"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    /></svg></span
+              ></a>
+              <a
+                href="https://www.linkedin.com/in/sharon-basovich"
+                class="roll-link"
+                ><span class="roll-label button-label"
+                  ><span class="roll-original">LinkedIn</span
+                  ><span class="roll-duplicate" aria-hidden="true"
+                    >LinkedIn</span
+                  ></span
+                ><span class="link-arrow button-arrow" aria-hidden="true"
+                  ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M5 15 15 5M5 5h10v10"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    /></svg
+                  ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M5 15 15 5M5 5h10v10"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    /></svg></span
+              ></a>
+              <a href="../resume.pdf" class="roll-link"
+                ><span class="roll-label button-label"
+                  ><span class="roll-original">Resume</span
+                  ><span class="roll-duplicate" aria-hidden="true"
+                    >Resume</span
+                  ></span
+                ><span class="link-arrow button-arrow" aria-hidden="true"
+                  ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M5 15 15 5M5 5h10v10"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    /></svg
+                  ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M5 15 15 5M5 5h10v10"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    /></svg></span
+              ></a>
             </nav>
             <div class="contact-about">
               <p>
@@ -362,9 +626,30 @@
         </div>
         <footer>
           <span>Sharon Basovich</span
-          ><a href="resources.html"
-            >Resources & credits <span aria-hidden="true">↗</span></a
-          >
+          ><a href="resources.html" class="roll-link"
+            ><span class="roll-label button-label"
+              ><span class="roll-original">Resources &amp; credits</span
+              ><span class="roll-duplicate" aria-hidden="true"
+                >Resources &amp; credits</span
+              ></span
+            ><span class="link-arrow button-arrow" aria-hidden="true"
+              ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M5 15 15 5M5 5h10v10"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg
+              ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M5 15 15 5M5 5h10v10"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+          ></a>
         </footer>
       </section>
     </main>

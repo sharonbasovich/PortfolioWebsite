@@ -10,7 +10,7 @@ The implementation follows the alignment pattern in Lusion's MIT-licensed [WebGL
 
 Material research used Three.js's [MeshPhysicalMaterial documentation](https://threejs.org/docs/pages/MeshPhysicalMaterial.html), its [clearcoat example](https://threejs.org/examples/webgl_materials_physical_clearcoat.html), and the [Codrops glass/plastic article](https://tympanus.net/codrops/2021/10/27/creating-the-effect-of-transparent-glass-and-plastic-in-three-js/). The scene uses the official Three.js 0.180.0 `RoomEnvironment` and `RoundedBoxGeometry` addons. Their source and license headers are retained under `vendor/three/addons/`.
 
-No Lusion models, images, shaders, or other site assets were copied. `resources.html` provides public attribution and source links.
+No Lusion models, images, or production site assets are reused. The October 8 refinement adapts the five-sample velocity shader in Lusion's MIT-licensed WebGL Scroll Sync example and retains its notice. `resources.html` provides public attribution and source links; [the interaction audit](lusion-motion-audit.md) describes the revised scroll engine, multiple visible views, controls, and verification.
 
 ## Motion brief
 

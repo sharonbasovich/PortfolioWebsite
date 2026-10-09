@@ -27,12 +27,10 @@ export function createWorld(canvas, { compact = false } = {}) {
 
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.38;
+  renderer.toneMappingExposure = 1.05;
   renderer.autoClear = false;
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio || 1, compact ? 1.25 : 1.65),
-  );
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, compact ? 1 : 1.5));
   renderer.autoClear = false;
 
   const scene = new THREE.Scene();
@@ -51,7 +49,7 @@ export function createWorld(canvas, { compact = false } = {}) {
         roughness,
         clearcoat: 0.7,
         clearcoatRoughness: 0.13,
-        transparent: true,
+        transparent: false,
         ...options,
       }),
     );
@@ -91,14 +89,14 @@ export function createWorld(canvas, { compact = false } = {}) {
     console.warn("Using direct lighting for the interactive scene.", error);
   }
 
-  scene.add(new THREE.HemisphereLight(0xeaf4ff, 0x15223e, 2.1));
-  const key = new THREE.DirectionalLight(0xffffff, 3.3);
+  scene.add(new THREE.HemisphereLight(0xeaf4ff, 0x0c1426, 1.3));
+  const key = new THREE.DirectionalLight(0xffffff, 2.8);
   key.position.set(-4, 6, 8);
   scene.add(key);
-  const blueRim = new THREE.PointLight(0x4081ff, 54, 30);
+  const blueRim = new THREE.PointLight(0x4081ff, 32, 30);
   blueRim.position.set(4, 0, 3);
   scene.add(blueRim);
-  const paleRim = new THREE.PointLight(0xdbedff, 39, 30);
+  const paleRim = new THREE.PointLight(0xdbedff, 28, 30);
   paleRim.position.set(-5, -4, -1);
   scene.add(paleRim);
 
@@ -716,272 +714,520 @@ export function createWorld(canvas, { compact = false } = {}) {
     reveal: 1,
     rotation: 0,
     zoom: 0,
+    velocity: 0,
+    motion: true,
   };
-  const pointerTarget = new THREE.Vector2();
-  const pointer = new THREE.Vector2();
-  let burstStrength = 0;
-  let internalTime = 0;
   let disposed = false;
-  let frame = null;
   let screenWidth = 1;
   let screenHeight = 1;
+  let legacyFrame = null;
+  let pointerPresent = false;
+  const pointerPosition = new THREE.Vector2(-10000, -10000);
+  const poses = new Map();
+  let burstAge = 10;
+  let scrollDrift = 0;
+
+  // Semi-implicit springs keep cursor response quick, with a slight physical
+  // settle. Substeps make the damping consistent on 30 Hz and 60 Hz screens.
+  function spring(value, velocity, target, dt, stiffness = 210, damping = 25) {
+    if (dt === 0) {
+      value.copy(target);
+      velocity.setScalar(0);
+      return;
+    }
+    const steps = Math.max(1, Math.ceil(dt / (1 / 120)));
+    const h = dt / steps;
+    for (let index = 0; index < steps; index++) {
+      velocity.x +=
+        ((target.x - value.x) * stiffness - velocity.x * damping) * h;
+      velocity.y +=
+        ((target.y - value.y) * stiffness - velocity.y * damping) * h;
+      value.x += velocity.x * h;
+      value.y += velocity.y * h;
+      if (value.isVector3) {
+        velocity.z +=
+          ((target.z - value.z) * stiffness - velocity.z * damping) * h;
+        value.z += velocity.z * h;
+      }
+    }
+  }
 
   const onPointerMove = (event) => {
-    pointerTarget.x = clamp((event.clientX / innerWidth - 0.5) * 2, -1, 1);
-    pointerTarget.y = clamp((0.5 - event.clientY / innerHeight) * 2, -1, 1);
+    pointerPresent = event.pointerType !== "touch";
+    pointerPosition.set(event.clientX, event.clientY);
+  };
+  const onPointerLeave = () => {
+    pointerPresent = false;
   };
   window.addEventListener("pointermove", onPointerMove, { passive: true });
+  document.documentElement.addEventListener("pointerleave", onPointerLeave);
+  window.addEventListener("blur", onPointerLeave);
+
+  // Five-tap texture accumulation follows the mechanism in Lusion's MIT
+  // WebGL-Scroll-Sync/src/shaders/img.frag. The offsets here are continuous and
+  // velocity-driven, rather than the original example's randomized glitch.
+  // Source: https://github.com/lusionltd/WebGL-Scroll-Sync
+  // Copyright (c) 2025 Lusion Ltd
+  // Permission is hereby granted, free of charge, to any person obtaining a copy
+  // of this software and associated documentation files (the "Software"), to deal
+  // in the Software without restriction, including without limitation the rights
+  // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  // copies of the Software, and to permit persons to whom the Software is
+  // furnished to do so, subject to the following conditions:
+  // The above copyright notice and this permission notice shall be included in all
+  // copies or substantial portions of the Software.
+  // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  // SOFTWARE.
+  const outputScene = new THREE.Scene();
+  const outputCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const renderTarget = new THREE.WebGLRenderTarget(1, 1, {
+    type: THREE.HalfFloatType,
+    format: THREE.RGBAFormat,
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    depthBuffer: true,
+    stencilBuffer: false,
+    samples: compact ? 0 : 2,
+  });
+  const outputMaterial = material(
+    new THREE.ShaderMaterial({
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      toneMapped: true,
+      uniforms: {
+        uTexture: { value: renderTarget.texture },
+        uFrame: { value: new THREE.Vector4() },
+        uSize: { value: new THREE.Vector2() },
+        uRadius: { value: 28 },
+        uVelocity: { value: 0 },
+        uPointer: { value: new THREE.Vector2(0.5, 0.5) },
+        uHover: { value: 0 },
+        uEffect: { value: compact ? 0 : 1 },
+      },
+      vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position.xy, 0.0, 1.0);
+      }
+    `,
+      fragmentShader: `
+      uniform sampler2D uTexture;
+      uniform vec4 uFrame;
+      uniform vec2 uSize;
+      uniform float uRadius;
+      uniform float uVelocity;
+      uniform vec2 uPointer;
+      uniform float uHover;
+      uniform float uEffect;
+      varying vec2 vUv;
+
+      float roundedMask(vec2 uv) {
+        vec2 halfSize = uSize * 0.5;
+        float radius = min(uRadius, min(halfSize.x, halfSize.y));
+        vec2 p = abs((uv - 0.5) * uSize) - halfSize + radius;
+        float distance = length(max(p, 0.0)) + min(max(p.x, p.y), 0.0) - radius;
+        return 1.0 - smoothstep(-0.75, 0.75, distance);
+      }
+
+      vec3 background(vec2 uv) {
+        // A studio backdrop is part of WebGL rather than a flat DOM gradient.
+        vec3 color = mix(vec3(0.008, 0.011, 0.020), vec3(0.021, 0.032, 0.059), uv.x);
+        float glow = exp(-length((uv - vec2(0.72, 0.68)) * vec2(1.5, 1.0)) * 3.0);
+        color += vec3(0.008, 0.014, 0.031) * glow;
+        return color;
+      }
+
+      void main() {
+        float mask = roundedMask(vUv);
+        if (mask < 0.001) discard;
+        float velocity = clamp(uVelocity, -1.0, 1.0) * uEffect;
+        float envelope = sin(vUv.y * 3.14159265) * sin(vUv.x * 3.14159265);
+        vec2 bend = vec2(sin(vUv.y * 3.14159265) * velocity * 0.006,
+                         (vUv.x - 0.5) * velocity * 0.028 * envelope);
+        vec2 uv = vUv + bend;
+        vec2 cursorDelta = uv - uPointer;
+        float lens = exp(-dot(cursorDelta, cursorDelta) * 40.0) * uHover * uEffect;
+        uv += cursorDelta * lens * 0.014;
+        vec2 offset = vec2(velocity * 0.0005, velocity * 0.0045);
+        vec3 color = vec3(0.0);
+        if (uEffect > 0.5 && abs(velocity) > 0.012) {
+          for (int sampleIndex = 0; sampleIndex < 5; sampleIndex++) {
+            float distance = float(sampleIndex) - 2.0;
+            vec2 sampleUv = clamp(uv + offset * distance, vec2(0.001), vec2(0.999));
+            vec4 texel = texture2D(uTexture, uFrame.xy + sampleUv * uFrame.zw);
+            color += texel.rgb + background(sampleUv) * (1.0 - texel.a);
+          }
+          color *= 0.2;
+        } else {
+          vec2 sampleUv = clamp(uv, vec2(0.001), vec2(0.999));
+          vec4 texel = texture2D(uTexture, uFrame.xy + sampleUv * uFrame.zw);
+          color = texel.rgb + background(sampleUv) * (1.0 - texel.a);
+        }
+        gl_FragColor = vec4(color, mask);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `,
+    }),
+  );
+  outputScene.add(
+    new THREE.Mesh(geometry(new THREE.PlaneGeometry(2, 2)), outputMaterial),
+  );
 
   function resize() {
     if (disposed) return;
     screenWidth = Math.max(1, innerWidth);
     screenHeight = Math.max(1, innerHeight);
-    camera.aspect = frame
-      ? frame.width / frame.height
-      : screenWidth / screenHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(screenWidth, screenHeight, false);
-  }
-
-  // Coordinates are CSS pixels from getBoundingClientRect(), not device pixels.
-  // A null frame restores the original full-viewport composition.
-  function setFrame(rect) {
-    if (disposed) return;
-    const previousFov = camera.fov;
-    const previousAspect = camera.aspect;
-    if (
-      !rect ||
-      ![rect.left, rect.top, rect.width, rect.height].every(Number.isFinite) ||
-      rect.width <= 0 ||
-      rect.height <= 0
-    ) {
-      frame = null;
-      camera.fov = compact ? 43 : 36;
-      camera.aspect = screenWidth / screenHeight;
-    } else {
-      frame = {
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-      };
-      camera.fov = compact ? 27 : 29;
-      camera.aspect = frame.width / frame.height;
-    }
-    if (
-      Math.abs(camera.fov - previousFov) > 0.001 ||
-      Math.abs(camera.aspect - previousAspect) > 0.001
-    ) {
-      camera.updateProjectionMatrix();
-    }
-  }
-
-  const opacity = (surfaces, weight) => {
-    for (const surface of surfaces) {
-      surface.opacity = weight;
-      if (surface.isMeshPhysicalMaterial) surface.depthWrite = weight > 0.99;
-    }
-  };
-
-  function render(time, delta = 1 / 60) {
-    if (disposed) return;
-    const dt = clamp(Number.isFinite(delta) ? delta : 1 / 60, 0, 0.05);
-    internalTime = Number.isFinite(time)
-      ? time > 10000
-        ? time / 1000
-        : time
-      : internalTime + dt;
-    pointer.lerp(pointerTarget, 1 - Math.exp(-dt * 4.2));
-    burstStrength *= Math.exp(-dt * 3.9);
-
-    const chapter = clamp(state.chapter, 0, 3);
-    const inspection = smooth(0.33, 1.16, chapter);
-    const projectsIn = smooth(1.46, 2, chapter);
-    const finaleIn = smooth(2.58, 2.98, chapter);
-    const appearance = clamp(state.reveal);
-    const heroWeight = (1 - projectsIn) * appearance;
-    const projectWeight = projectsIn * (1 - finaleIn) * appearance;
-    const finaleWeight = finaleIn * appearance;
-    const separation = clamp(
-      state.explode + inspection * 0.78 + burstStrength * 1.2,
-      0,
-      1.55,
+    const ratio = Math.min(
+      devicePixelRatio || 1,
+      compact ? 1 : 1.5,
+      (compact ? 1440 : 2560) / Math.max(screenWidth, screenHeight),
     );
-    const settle = 1 - Math.exp(-dt * 8.5);
+    renderer.setPixelRatio(ratio);
+    renderer.setSize(screenWidth, screenHeight, false);
+    const drawingSize = renderer.getDrawingBufferSize(new THREE.Vector2());
+    renderTarget.setSize(drawingSize.x, drawingSize.y);
+  }
 
-    assembly.visible = heroWeight > 0.008;
+  function setFrame(rect) {
+    legacyFrame = rect;
+  }
+
+  function getPose(item) {
+    const id = item.id || `${item.chapter}:${item.project || 0}`;
+    if (!poses.has(id)) {
+      poses.set(id, {
+        pointer: new THREE.Vector2(),
+        pointerVelocity: new THREE.Vector2(),
+        pointerTarget: new THREE.Vector2(),
+        camera: new THREE.Vector3(),
+        cameraVelocity: new THREE.Vector3(),
+        cameraTarget: new THREE.Vector3(),
+        hover: 0,
+        initialized: false,
+        parts: pieces.map((part) => ({
+          current: part.base.clone(),
+          velocity: new THREE.Vector3(),
+          target: new THREE.Vector3(),
+        })),
+      });
+    }
+    return poses.get(id);
+  }
+
+  function applyPose(item, pose, time, dt) {
+    const rect = item.rect;
+    const chapter = Math.round(clamp(item.chapter, 0, 3));
+    const project = Math.round(clamp(item.project || 0, 0, 2));
+    const progress = clamp(item.progress || 0);
+    const motion = state.motion !== false;
+    const appearance = clamp(state.reveal);
+    const rotation = (item.rotation || 0) + state.rotation;
+    const zoom = clamp(item.zoom || 0, -1, 1);
+    const inside =
+      motion &&
+      pointerPresent &&
+      pointerPosition.x >= rect.left &&
+      pointerPosition.x <= rect.left + rect.width &&
+      pointerPosition.y >= rect.top &&
+      pointerPosition.y <= rect.top + rect.height;
+    // The same pixel under the cursor now controls the object in that frame.
+    pose.pointerTarget.set(
+      inside ? ((pointerPosition.x - rect.left) / rect.width) * 2 - 1 : 0,
+      inside ? 1 - ((pointerPosition.y - rect.top) / rect.height) * 2 : 0,
+    );
+    spring(
+      pose.pointer,
+      pose.pointerVelocity,
+      pose.pointerTarget,
+      motion ? dt : 0,
+    );
+    pose.hover +=
+      ((inside ? 1 : 0) - pose.hover) * (dt ? 1 - Math.exp(-dt * 14) : 1);
+    const px = pose.pointer.x;
+    const py = pose.pointer.y;
+    const torqueX = motion ? clamp(pose.pointerVelocity.x, -2, 2) * 0.028 : 0;
+    const torqueY = motion ? clamp(pose.pointerVelocity.y, -2, 2) * 0.022 : 0;
+    const drift = motion ? scrollDrift : 0;
+    const ambientTime = motion ? time : 0;
+
+    assembly.visible = chapter < 2 && appearance > 0.001;
+    satellites.visible =
+      chapter === 0 && rect.width / rect.height > 1.65 && appearance > 0.001;
+    finale.visible = chapter === 3 && appearance > 0.001;
+    projects.forEach(({ group }, index) => {
+      group.visible = chapter === 2 && index === project;
+    });
+    // PBR surfaces stay opaque. Scenes are changed by their registered frame,
+    // so two visible windows never share a half-transparent in-between pose.
+    world.position.set(px * 0.08, py * 0.07, 0);
+    world.scale.setScalar(0.82 + appearance * 0.18);
+
     if (assembly.visible) {
-      const px = pointer.x * 1.95;
-      const py = pointer.y * 1.15;
-      for (const part of pieces) {
-        part.target.copy(part.base).addScaledVector(part.apart, separation);
-        // Only nearby pieces yield to the cursor; the rest maintain their mass.
-        const dx = part.base.x - px;
-        const dy = part.base.y - py;
-        const distance = Math.hypot(dx, dy);
-        if (distance < 1.55 && distance > 0.01) {
-          const strength = (1 - distance / 1.55) * 0.32;
-          part.target.x += (dx / distance) * strength;
-          part.target.y += (dy / distance) * strength;
-          part.target.z += strength * 0.22;
-        }
-        if (dt === 0) part.current.copy(part.target);
-        else part.current.lerp(part.target, settle);
-        part.object.position.copy(part.current);
-      }
-      assembly.position.set(
-        frame ? 0 : (compact ? 0 : 1.64 * inspection) * (1 - projectsIn),
-        (frame ? 0 : compact ? -0.33 : -0.58 + inspection * 0.52) +
-          Math.sin(internalTime * 0.48) * 0.055,
+      const burstEnvelope =
+        chapter === 0 && motion
+          ? (burstAge / 0.18) * Math.exp(1 - burstAge / 0.18)
+          : 0;
+      const separation = clamp(
+        (item.explode ?? (chapter === 1 ? 0.78 : progress * 0.5)) +
+          burstEnvelope * 1.05,
         0,
+        1.55,
       );
+      pieces.forEach((part, index) => {
+        const local = pose.parts[index];
+        local.target.copy(part.base).addScaledVector(part.apart, separation);
+        const dx = part.base.x - px * 2.1;
+        const dy = part.base.y - py * 1.65;
+        const distance = Math.hypot(dx, dy);
+        if (pose.hover > 0.001 && distance < 1.8 && distance > 0.01) {
+          const strength = (1 - distance / 1.8) * 0.42 * pose.hover;
+          local.target.x += (dx / distance) * strength;
+          local.target.y += (dy / distance) * strength;
+          local.target.z += strength * 0.62;
+        }
+        spring(
+          local.current,
+          local.velocity,
+          local.target,
+          pose.initialized && motion ? dt : 0,
+          155,
+          24,
+        );
+        part.object.position.copy(local.current);
+      });
+      assembly.position.set(0, Math.sin(ambientTime * 0.42) * 0.04, 0);
       assembly.rotation.set(
-        -0.14 + pointer.y * 0.12,
-        -0.2 + pointer.x * 0.18 + state.rotation * 0.22,
-        -0.13 + Math.sin(internalTime * 0.24) * 0.035,
+        -0.17 + progress * 0.12 + py * 0.16 + torqueY,
+        -0.23 + rotation * 0.42 + progress * 0.2 + px * 0.26 + torqueX,
+        -0.12 + rotation * 0.065 - drift * 0.065,
       );
-      assembly.scale.setScalar(
-        (frame ? 1.06 : compact ? 0.73 : 1) * (0.68 + 0.32 * heroWeight),
-      );
-      opacity(assemblySurfaces, heroWeight);
-      outerRing.rotation.z = internalTime * 0.045;
-      innerRing.rotation.z = -internalTime * 0.033;
+      assembly.scale.setScalar(1);
+      outerRing.rotation.z = ambientTime * 0.038 + progress * 0.7;
+      innerRing.rotation.z = -ambientTime * 0.03 - progress * 0.38;
     }
 
-    // Side pieces belong only to the wide opening. They retreat as the watch
-    // separates, leaving the smaller inspection window free of edge clutter.
-    const panoramic = frame ? smooth(1.43, 1.92, camera.aspect) : 0;
-    const satelliteWeight =
-      heroWeight * (1 - smooth(0.14, 0.88, chapter)) * panoramic;
-    satellites.visible = satelliteWeight > 0.008;
     if (satellites.visible) {
-      const spread = 2.85 + 0.9 * smooth(1.5, 2.4, camera.aspect);
+      const spread = 2.85 + 0.7 * smooth(1.65, 2.5, rect.width / rect.height);
       leftSatellite.position.set(
-        -spread - burstStrength * 0.45 + pointer.x * -0.08,
-        0.13 + Math.sin(internalTime * 0.39) * 0.05,
+        -spread - progress * 0.8,
+        0.13 + Math.sin(ambientTime * 0.36) * 0.04,
         -0.32,
       );
       rightSatellite.position.set(
-        spread + burstStrength * 0.45 + pointer.x * 0.08,
-        -0.1 + Math.sin(internalTime * 0.34 + 1.7) * 0.06,
+        spread + progress * 0.8,
+        -0.1 + Math.sin(ambientTime * 0.34 + 1.7) * 0.04,
         -0.45,
       );
-      leftSatellite.rotation.y = -0.18 + pointer.x * 0.055;
-      rightSatellite.rotation.y = 0.15 + pointer.x * 0.05;
-      satellites.scale.setScalar(0.78 + 0.22 * satelliteWeight);
-      opacity(satelliteSurfaces, satelliteWeight);
+      leftSatellite.rotation.y = -0.18 - progress * 0.22 + px * 0.07;
+      rightSatellite.rotation.y = 0.15 + progress * 0.22 + px * 0.07;
+      satellites.scale.setScalar(1);
     }
 
-    const selectedProject = clamp(state.project, 0, 2);
-    projects.forEach(({ group, surfaces }, index) => {
-      const selectionWeight = clamp(1 - Math.abs(selectedProject - index));
-      const weight = selectionWeight * projectWeight;
-      group.visible = weight > 0.008;
-      if (!group.visible) return;
-      group.position.set(
-        frame ? 0 : compact ? 0 : -2.33,
-        frame ? 0 : compact ? -0.43 : -0.12,
-        0,
+    if (chapter === 2) {
+      const group = projects[project].group;
+      group.position.set(0, pose.hover * 0.05, 0);
+      group.scale.setScalar(1);
+      group.rotation.set(
+        -py * 0.085 + torqueY,
+        px * 0.16 + rotation * 0.35 + torqueX,
+        -drift * 0.028,
       );
-      group.scale.setScalar(
-        (frame ? (compact ? 0.88 : 1.04) : compact ? 0.71 : 0.91) *
-          (0.69 + 0.31 * weight),
-      );
-      group.rotation.y =
-        pointer.x * 0.095 + Math.sin(internalTime * 0.35) * 0.035;
-      group.rotation.x = -pointer.y * 0.055;
-      opacity(surfaces, weight);
-    });
-    if (projects[0].group.visible) {
-      armBase.rotation.z = 0.06 + Math.sin(internalTime * 0.72) * 0.095;
-      elbow.rotation.z = -0.62 + Math.sin(internalTime * 0.72 + 0.8) * 0.11;
+      if (project === 0) {
+        armBase.rotation.z =
+          0.04 + Math.sin(ambientTime * 0.72) * 0.085 + py * 0.09;
+        elbow.rotation.z = -0.62 + Math.sin(ambientTime * 0.72 + 0.8) * 0.1;
+      } else if (project === 1) {
+        radioRings.rotation.z =
+          Math.sin(ambientTime * 0.4) * 0.07 + drift * 0.08;
+        basket.rotation.z = Math.sin(ambientTime * 0.65) * 0.025;
+      } else {
+        graphCore.rotation.y =
+          0.4 + Math.sin(ambientTime * 0.4) * 0.2 + px * 0.15;
+      }
     }
-    if (projects[1].group.visible)
-      radioRings.rotation.z = Math.sin(internalTime * 0.4) * 0.075;
-    if (projects[2].group.visible)
-      graphCore.rotation.y = 0.4 + Math.sin(internalTime * 0.4) * 0.22;
 
-    finale.visible = finaleWeight > 0.008;
     if (finale.visible) {
-      finale.position.set(
-        frame ? 0 : compact ? 0 : 2.23,
-        frame ? 0 : compact ? -0.34 : 0.06,
-        0,
-      );
+      finale.position.set(0, pose.hover * 0.055, 0);
       finale.rotation.set(
-        pointer.y * 0.08,
-        pointer.x * 0.14,
-        state.rotation * 0.18,
+        py * 0.12 + torqueY,
+        px * 0.19 + rotation * 0.3 + torqueX,
+        -drift * 0.05,
       );
-      finale.scale.setScalar(
-        (frame ? (compact ? 0.96 : 1.07) : compact ? 0.75 : 1) *
-          (0.65 + 0.35 * finaleWeight),
-      );
-      finaleInner.rotation.z = -internalTime * 0.055;
-      opacity(finaleSurfaces, finaleWeight);
+      finale.scale.setScalar(1);
+      finaleInner.rotation.z = -ambientTime * 0.048 + progress * 0.7;
     }
 
-    const baseDistance = frame ? (compact ? 9.5 : 8.6) : compact ? 13.7 : 12.5;
-    const minimumFitDistance = frame
-      ? (compact ? 4.6 : 5.1) /
-        (Math.max(0.15, camera.aspect) *
-          2 *
-          Math.tan((camera.fov * Math.PI) / 360))
-      : 0;
-    camera.position.z = Math.max(
-      baseDistance - clamp(state.zoom, -1, 1) * 1.5,
-      minimumFitDistance,
+    camera.fov = compact ? 31 : 29;
+    camera.aspect = rect.width / rect.height;
+    camera.updateProjectionMatrix();
+    const panoramic = satellites.visible;
+    const heightToFit = chapter === 1 ? 5.7 : chapter === 2 ? 4.75 : 4.25;
+    const widthToFit = panoramic
+      ? 8.7
+      : chapter === 1
+        ? 6.1
+        : chapter === 2
+          ? 4.25
+          : 4.45;
+    const tangent = Math.tan((camera.fov * Math.PI) / 360) * 2;
+    const distance =
+      Math.max(heightToFit / tangent, widthToFit / (camera.aspect * tangent)) *
+      (1 - zoom * 0.11);
+    pose.cameraTarget.set(
+      Math.sin(rotation * 0.28) * distance * 0.085 + drift * 0.07,
+      progress * distance * 0.015,
+      distance,
     );
-    world.position.x = pointer.x * (compact ? 0.08 : 0.16);
-    world.position.y = pointer.y * 0.1;
+    spring(
+      pose.camera,
+      pose.cameraVelocity,
+      pose.cameraTarget,
+      pose.initialized && motion ? dt : 0,
+      120,
+      23,
+    );
+    camera.position.copy(pose.camera);
+    camera.lookAt(0, 0, 0);
+    pose.initialized = true;
+  }
 
-    // Clear the *whole* canvas before changing the viewport. Otherwise a moving
-    // scroll window leaves the previous frame painted behind it.
+  function frameViewport(rect) {
+    const left = Math.max(0, rect.left);
+    const top = Math.max(0, rect.top);
+    const right = Math.min(screenWidth, rect.left + rect.width);
+    const bottom = Math.min(screenHeight, rect.top + rect.height);
+    renderer.setViewport(
+      rect.left,
+      screenHeight - rect.top - rect.height,
+      rect.width,
+      rect.height,
+    );
+    renderer.setScissor(
+      left,
+      screenHeight - bottom,
+      right - left,
+      bottom - top,
+    );
+    renderer.setScissorTest(true);
+  }
+
+  function renderFrames(time = 0, delta = 1 / 60, frames = []) {
+    if (disposed) return;
+    const dt =
+      state.motion === false
+        ? 0
+        : clamp(Number.isFinite(delta) ? delta : 1 / 60, 0, 0.05);
+    const seconds = Number.isFinite(time) ? time : 0;
+    burstAge = Math.min(10, burstAge + dt);
+    scrollDrift = dt
+      ? scrollDrift +
+        (clamp(state.velocity || 0, -1, 1) - scrollDrift) *
+          (1 - Math.exp(-dt * 9))
+      : 0;
+    const visibleFrames = frames.filter(
+      ({ rect }) =>
+        rect &&
+        [rect.left, rect.top, rect.width, rect.height].every(Number.isFinite) &&
+        rect.width > 1 &&
+        rect.height > 1 &&
+        rect.left < screenWidth &&
+        rect.top < screenHeight &&
+        rect.left + rect.width > 0 &&
+        rect.top + rect.height > 0,
+    );
+
+    renderer.setRenderTarget(renderTarget);
+    renderer.setScissorTest(false);
+    renderer.setViewport(0, 0, screenWidth, screenHeight);
+    renderer.setClearColor(0x000000, 0);
+    renderer.clear(true, true, true);
+    // Both scenes can coexist while a section crosses the viewport. Render the
+    // actual geometry where its DOM window is, with independent pose histories.
+    for (const item of visibleFrames) {
+      const pose = getPose(item);
+      applyPose(item, pose, seconds, dt);
+      frameViewport(item.rect);
+      renderer.clear(false, true, false);
+      renderer.render(scene, camera);
+    }
+
+    renderer.setRenderTarget(null);
     renderer.setScissorTest(false);
     renderer.setViewport(0, 0, screenWidth, screenHeight);
     renderer.clear(true, true, true);
-    if (frame) {
-      const left = Math.max(0, frame.left);
-      const top = Math.max(0, frame.top);
-      const right = Math.min(screenWidth, frame.left + frame.width);
-      const bottom = Math.min(screenHeight, frame.top + frame.height);
-      if (right > left && bottom > top) {
-        renderer.setViewport(
-          frame.left,
-          screenHeight - frame.top - frame.height,
-          frame.width,
-          frame.height,
-        );
-        renderer.setScissor(
-          left,
-          screenHeight - bottom,
-          right - left,
-          bottom - top,
-        );
-        renderer.setScissorTest(true);
-        renderer.render(scene, camera);
-        renderer.setScissorTest(false);
-      }
-    } else {
-      renderer.render(scene, camera);
+    for (const item of visibleFrames) {
+      const rect = item.rect;
+      const pose = getPose(item);
+      const uniforms = outputMaterial.uniforms;
+      uniforms.uFrame.value.set(
+        rect.left / screenWidth,
+        (screenHeight - rect.top - rect.height) / screenHeight,
+        rect.width / screenWidth,
+        rect.height / screenHeight,
+      );
+      uniforms.uSize.value.set(rect.width, rect.height);
+      uniforms.uRadius.value = Math.max(0, item.radius ?? 28);
+      uniforms.uVelocity.value = scrollDrift;
+      uniforms.uPointer.value.set(
+        pose.pointer.x * 0.5 + 0.5,
+        pose.pointer.y * 0.5 + 0.5,
+      );
+      uniforms.uHover.value = pose.hover;
+      uniforms.uEffect.value = compact || state.motion === false ? 0 : 1;
+      frameViewport(rect);
+      renderer.render(outputScene, outputCamera);
     }
+    renderer.setScissorTest(false);
+  }
+
+  function render(time = 0, delta = 1 / 60) {
+    renderFrames(time, delta, [
+      {
+        rect: legacyFrame || {
+          left: 0,
+          top: 0,
+          width: screenWidth,
+          height: screenHeight,
+        },
+        chapter: Math.round(state.chapter),
+        project: Math.round(state.project),
+        explode: state.explode,
+        rotation: 0,
+        zoom: state.zoom,
+        radius: legacyFrame ? 28 : 0,
+      },
+    ]);
   }
 
   function burst() {
-    burstStrength = Math.max(burstStrength, 1.25);
+    if (state.motion !== false) burstAge = 0;
   }
 
   function dispose() {
     if (disposed) return;
     disposed = true;
     window.removeEventListener("pointermove", onPointerMove);
+    document.documentElement.removeEventListener(
+      "pointerleave",
+      onPointerLeave,
+    );
+    window.removeEventListener("blur", onPointerLeave);
     for (const shape of resources.geometries) shape.dispose();
     for (const surface of resources.materials) surface.dispose();
+    poses.clear();
+    renderTarget.dispose();
     environment?.dispose();
     renderer.dispose();
   }
 
   resize();
-  render(0);
-  return { state, render, resize, setFrame, dispose, burst };
+  return { state, render, renderFrames, resize, setFrame, dispose, burst };
 }
