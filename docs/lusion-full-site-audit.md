@@ -1,109 +1,141 @@
-# Lusion follow-up audit — 22 October 2026
+# Lusion reference audit — 22 October 2026
 
-## Coverage and limits
+## Result and scope
 
-This audit is **not a completed visual walkthrough of every page**.
+The most useful lesson is continuity: an object, frame, material or drawn route
+carries the visitor between scenes. The strongest next improvement is to connect
+this motion to real evidence of Sharon's projects.
 
-- The public source inventory covers [Home](https://lusion.co/),
-  [About](https://lusion.co/about), [Projects](https://lusion.co/projects), and all
-  19 case-study routes linked from Projects. Each returned its own correct title.
-- Live Home inspection covered the interactive hero, first kinetic title and
-  drawn route, reel expansion and full-screen player, project-grid framing,
-  early camera transition, a later tunnel stage, contact scene, menu, footer and
-  next-page continuation. The complete tunnel progression was not inspected.
-- About's particle field and large opening typography were viewed live. Its
-  team/client/awards/expertise sequences were inspected in source, not exercised.
-- Atlas Motion was viewed live at its introduction and early/middle horizontal
-  media states. Its next-project endpoint was not reached. The other 18 case
-  studies remain source-only; their complete motion was not verified.
-- Labs is a separate outbound site; its landing URL was checked but no complete
-  Labs experiment walkthrough was performed. External client sites, award
-  destinations, social accounts and newsletter submissions are outside coverage.
+The review covers the live Home, About and Projects catalogue, the 19 linked
+case-study routes, and the separate Labs landing. The case traversal recorded
+all 209 ordered panels: 181 images, 26 video panels and two technical text panels.
+Codex compared those browser records with an independently extracted source
+inventory: all counts and ordered media types match. Every panel was substantially
+in view; each recorded state showed at least 97.4% of the panel width that could
+fit in the viewport. Final captures were within 6 CSS pixels of the computed track end.
 
-The in-app browser repeatedly stalled/reset. Isolated Playwright was then used
-as the fallback allowed by the Frontend App Builder skill. A call with a
-45-second requested limit returned after approximately 1,001 seconds; local
-free RAM was subsequently measured around 0.8 GB of 16 GB. Browsing was stopped
-instead of claiming unobserved coverage. The installed Devin helper initially
-reported unauthenticated; its separate setup later completed and a second check
-confirmed authentication. The org usage screen showed Max with 0% weekly usage,
-reset in two days, and no on-demand balance; it states sessions pause at the
-included limit. No billing settings were changed. A separate cloud audit was
-requested to complete the missing visual coverage. No local LLM was used.
+This is a page/sequence audit, not a claim that every video was watched in full
+or that every possible interaction was verified. Client Launch Project sites,
+Labs experiments, forms, newsletter submissions and social destinations were
+not followed. Mobile coverage uses Chrome emulation, not physical devices.
 
-Raw inventory, HTML/JSON and actual screenshots are retained outside Git in
-workspace `tmp/lusion-oct22-audit/`. `case-study-walkthrough.md` records the
-partial browser evidence separately from `inventory.md`'s source inspection.
+## Coverage
 
-## Useful mechanisms and their fit
-
-| Mechanism | Evidence | Fit for this portfolio |
+| Area | Observed coverage | Qualification |
 | --- | --- | --- |
-| Hero objects respond directly to a cursor gesture | Home live | Already implemented with transformed mesh hits and springs; preserve it. |
-| Large type and one drawn line carry the eye into the next section | Home live | Existing flow bridge supplies this motif. Extra unrelated decorations would dilute it. |
-| Reel grows from a small editorial block into a large media surface, with geometric distortion during the transfer | Home live | A useful future treatment for authentic project footage; no reel should be invented just to imitate the layout. |
-| Media and introductory copy move as one transition, then leave a clear viewing/reading state | Atlas live | Add restrained internal project-copy choreography to the existing shared horizontal deck clock. |
-| Small index/progress/continuation marks repeat through the journey | Home live; case-study endpoint source | Make project progress continuous, indicate the active navigation section, and provide an explicit return path. |
-| Contact is a composed final scene, followed by practical ways to connect | Home live | Let the existing mechanical iris open with contact progress, retaining the site's own visual language. |
-| Project-specific palettes distinguish case studies within one system | All 19 source; Atlas live | Consider a small accent evolution later, while preserving the accepted cobalt/chrome identity. Changing every project to a new art direction is unnecessary. |
-| Project pages pair strong visuals with concise implementation detail and a clear launch action | All 19 source; Atlas live | Keep technical descriptions; add the actual SkyCell demo alongside source. Authentic project screenshots/footage would be a valuable next content pass. |
-| Evidence is grouped into compact award/article lists | About source | A future compact hackathon record could help, using only confirmed prizes and links; avoid inventing a studio-style client/award wall. |
-| Team/brand carousels and large expertise panels | About source only | These solve studio-specific content needs and do not currently justify new portfolio sections. |
+| [Home](https://lusion.co/) | Physics hero and pointer exit; kinetic type; tube/reel transfer; expanding media; featured work; astronaut/tunnel/warp progression; contact/footer; continuation to About; menu | Large sweeps sampled the long camera sequence. Overlay-close verification is recorded separately below. |
+| [About](https://lusion.co/about) | Particle/letter opening; studio copy; point-cloud team and click/scroll changes; logo rows; awards/articles; expertise-card flips; contact/footer; continuation to Projects | Talks, card hover and representative mobile follow-up have separate evidence qualifications below. |
+| [Projects](https://lusion.co/projects) | All 19 cards; title entrance; hover changes; scroll-reactive framing; end/contact; case entry | Browser Back restoration is a separate interaction check, not established by simply returning to the URL. |
+| Case archive | All 19 intros, ordered panels, final media and next-preview states | A next preview/progress fill does not itself prove completed next-project navigation. Representative transition checks are separate. |
+| [Labs](https://labs.lusion.co/) | Landing, experimental-card layout, cursor and reverse scroll | Experiments were outside scope; the grid/list control has a separate follow-up result. |
 
-The important observation is temporal coordination: each section has an entry,
-a readable hold and an exit. More simultaneous effects are not automatically an
-improvement. The existing shared Lenis/GSAP/WebGL clock remains the foundation.
+A bounded follow-up confirmed About reachability through its footer. Talks
+content, expertise-card hover, reel close/Escape and genuine Back restoration
+remain unverified. Labs toggle failed at the locator, and mobile menu-close used
+an invalid touch harness; neither establishes a Lusion site defect.
 
-## Refinements prepared from verified observations
+The archive records one completed Devin AI → Of The Oak navigation in its path/
+transform log, without retained probe screenshots. Other ending captures show
+partial next-preview progress. Dedicated archive reverse/Back/mobile checks did
+not complete; representative mobile case views exist in the separate main audit.
+Oak and Worldcoin technical paragraphs were captured, but their fully revealed
+contrast states remain unverified. Video panels were sampled rather than watched
+in full; for example Spatial Fusion panel 2 shows an initial loading state.
+All 19 contact-sheet overviews were inspected across the independent reviews.
 
-1. Project metadata, titles and body/actions now enter and leave inside the
-   existing deck's transfers. Its 6.3-unit duration and reading holds are retained.
-   Reverse scroll and direct project selection use the same timeline.
-2. The project indicator follows the fractional deck index; the selected button
-   remains discrete. Removed its separate CSS transition to avoid double easing.
-3. Work and Projects expose `aria-current="location"` and a small cobalt cue.
-4. SkyCell has distinct Live demo and Source actions, both ordinary links.
-5. The contact sculpture's six blades open with its cached scroll progress. The
-   central cobalt part is revealed slightly; there is no extra animation clock.
-6. The footer has Back to top through the existing anchor/focus behavior.
+## Findings that fit this portfolio
 
-No Lusion production assets or proprietary bundle code were copied. No new
-framework, paid resource, model or font was introduced. The existing resume and
-both root homepages remain outside the change scope.
+| Reference mechanism | Evidence | Useful adaptation |
+| --- | --- | --- |
+| One item travels into the next composition | Home reel tile/tube; framed tablet becoming the astronaut scene | Carry one existing mechanical part through a short transition, rather than resetting every scene independently. |
+| Selected media expands into a larger stage | Home tablet transfer; catalogue-to-Oryzo entry | One reversible change in artwork framing could add more scale to the current experience. Camera, crop and mask radius must remain synchronized. |
+| Finished work alternates with process | [Of The Oak](https://lusion.co/projects/of_the_oak) technical/process panels; [Atlas Motion](https://lusion.co/projects/atlas_motion) sketches and production views | Show authentic SkyCell dashboard/prototype and robot-control/drawing material alongside the procedural art. This makes technical work concrete. |
+| A broad, lit route connects editorial scenes | Home reel/path and later creative-ideas section | Upgrade the existing bridge path's material and depth while keeping its geometry and scroll clock. Implemented in this pass. |
+| Reflective cursor material extends over the light page | Projects pointer/exit captures; About team interaction | A short tapered chrome/cobalt treatment could refine the existing trace. Limit it to appropriate surfaces and preserve control/pause/reduced-motion exclusions. |
+| Content and controls enter, hold and leave together | Atlas case sequence and shared case template | Internal project-copy choreography, a continuous indicator and an explicit return path. Implemented in this pass. |
 
-## Verification status
+These are visual observations and design adaptations. Screenshot sequences
+establish changing states/composition; they do not establish exact acceleration,
+easing constants, video decoding or GPU performance. The live production site's
+proprietary art and bundles are not reusable source.
 
-Source checks passed for the agent-owned HTML/main/CSS changes; world.js syntax
-also passed. Independent source review found no material aperture-envelope,
-pause/state or deck-hold issue. The iris stays inside the existing outer ring.
+## Changes shipped
 
-After browser cleanup restored normal execution, all 17 focused browser checks
-passed: forward/reverse reading holds for every project, active header state,
-fractional progress, SkyCell keyboard actions/demo URL, contact aperture/pause,
-native paused copy, return to top, mobile and reduced-motion copy, 300px overflow
-and runtime errors. The initial navigation attempt had timed out; it did not
-produce a site assertion. A full-viewport pause screenshot initially differed
-because the surrounding document/scroll rail settled; a corrected art-window
-comparison and a separate focused check both preserved exact 3D pixels.
+Implementation commits:
+- aeb0d670daf572019f38c17f02a87dc4adfaef33
+- 5d7b5c7e59956fd40dd8719dd6e10561df04480e
 
-The bottom contact state reached aperture0.962 and remained inside its existing
-frame. Desktop1440x900, mobile390x844 and narrow300x740 screenshots were inspected.
-Chromium used SwiftShader; this is not a hardware performance benchmark. Resume
-SHA256 remains797d80301edbf6be264cc5d02b093fb6fab8567c71c5f0b5cef6ed95d0c13288.
-Raw follow-up checks and screenshots live in workspace `tmp/immersive-oct22-qa/`.
-The prior production baseline is
-`ea031ec3ba45e2a9e3141cbf60901aac0c81f852`; the new implementation is on branch
-`codex/lusion-full-site-refinement`.
+1. Project metadata, masked titles, body copy and actions enter/leave within the
+   existing deck transfers. Its 6.3-unit duration and reading holds remain intact.
+   Reverse scroll and direct selection share that timeline.
+2. The project indicator follows the fractional deck index, without a second
+   CSS easing clock.
+3. Work/Projects expose the active location visually and through aria-current.
+4. SkyCell has separate Live demo and Source actions.
+5. The contact sculpture's six blades open from cached scroll progress, preserving
+   its exact paused pose and existing mechanical identity.
+6. Footer Back to top uses the established anchor/focus behavior.
+7. The bridge route now has a cobalt core, depth, bevel and icy highlight. Four
+   matching paths inherit one draw offset. Narrow screens use a lighter weight;
+   paper-colored glyph outlines protect text intersections. A paper mask makes
+   the tube feed into the proof divider without a dangling tail below it.
 
-## Case-study source inventory
+No new animation framework, asset pack, paid resource or font was introduced.
+The existing Three.js/GSAP/Lenis system, sculpture and cobalt/chrome/paper palette
+remain the foundation. No Lusion production asset or bundle code was copied.
 
-All paths below are under `https://lusion.co/projects/`:
+## Ranked next work
 
-`oryzo_ai`, `atlas_motion`, `devin_ai`, `of_the_oak`, `everswap`,
-`porsche_dream_machine`, `synthetic_human`, `ddd_2024`, `spaace`,
-`choo_choo_world`, `zero_tech`, `spatial_fusion`, `worldcoin`, `lusion_labs`,
-`my_little_story_book`, `soda_experience`, `infinite_passerella`,
-`the_turn_of_the_screw`, `maxmara_bearings_gifts`.
+1. **Authentic project/process visuals.** Put real output and implementation
+   evidence into the project sequence. The Lusion archive's biggest advantage is
+   the quality and variety of its own work, not another shader over empty content.
+2. **One larger spatial handoff.** Let a framed artwork become a wider scene,
+   or carry one existing part between chapters. Treat camera, frame, mask,
+   typography and reading hold as one change; preserve native/mobile fallback.
+3. **A more material pointer trace.** Refine the existing sampled tail with a
+   short taper and controlled chrome/cobalt lighting. Avoid covering links or
+   text; verify enter/leave, pause, reduced motion and fine-pointer boundaries.
 
-Reusable technical reference, distinct from the live proprietary site:
-[Lusion's MIT WebGL Scroll Sync](https://github.com/lusionltd/WebGL-Scroll-Sync).
+A cloud capture did not resolve the contact iris frame by frame, so its suggestion
+to add extra scroll runway is not an established defect. Codex's focused local
+check reached aperture 0.962 at the bottom and preserved exact paused art pixels.
+Do not add empty scroll distance solely on that inconclusive observation.
+
+## Verification and preservation
+
+- The initial pass passed 17 focused browser checks, covering project holds in
+  both directions, navigation, actions, contact aperture/pause, native/paused
+  copy, return to top, mobile/reduced motion, narrow overflow and runtime errors.
+- Six route checks passed: shared inherited draw state, reversal, complete static
+  pause, mobile/reduced-motion bounds, no-JS static drawing and runtime errors.
+- All 15 project/layout cases passed at the tested short viewports and 125% text.
+  A first resize fixture sampled an old 700px gallery in a new 900px viewport;
+  after waiting for the actual layout/drawing-buffer agreement, no steady-state
+  clipping was found.
+- Desktop and mobile screenshots were visually inspected. The final mobile
+  reduced-motion view confirms the route no longer resumes below the metrics.
+- Both Vercel projects reported success. Live immersive HTML, main.js, style.css,
+  world.js and resume match the tested bytes.
+- Both existing root homepages remain identical to their original canonical Git
+  blobs. Resume SHA256 remains
+  797d80301edbf6be264cc5d02b093fb6fab8567c71c5f0b5cef6ed95d0c13288.
+
+Local Chromium used SwiftShader. Neither this validation nor the cloud images
+establish real-device GPU performance or a 60fps claim.
+
+## Evidence and reusable source
+
+Research artifacts remain outside Git in workspace
+tmp/lusion-oct22-audit/: main-page report/ledger/contact sheets, the independent
+source inventory, case JSON ledgers, screenshot contact sheets and
+coverage-validation.json. Website QA remains in tmp/immersive-oct22-qa/.
+Operational account/client details are kept outside this public repository.
+
+The 19 source routes under https://lusion.co/projects/ are:
+oryzo_ai, atlas_motion, devin_ai, of_the_oak, everswap, porsche_dream_machine,
+synthetic_human, ddd_2024, spaace, choo_choo_world, zero_tech, spatial_fusion,
+worldcoin, lusion_labs, my_little_story_book, soda_experience,
+infinite_passerella, the_turn_of_the_screw, maxmara_bearings_gifts.
+
+[Lusion's MIT WebGL Scroll Sync](https://github.com/lusionltd/WebGL-Scroll-Sync)
+is a reusable technical reference, distinct from the proprietary live site.

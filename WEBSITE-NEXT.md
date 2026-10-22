@@ -1,4 +1,50 @@
-# Website checkpoint — October 22, 2026
+# Lusion reference review — 22 October 2026
+
+User asked to inspect Lusion's pages for further compatible refinements.
+Published code: 5d7b5c7e59956fd40dd8719dd6e10561df04480e
+(previous pass aeb0d670daf572019f38c17f02a87dc4adfaef33).
+Branch: codex/lusion-full-site-refinement. Pushed to branch and main.
+Both Vercel projects success; actual live immersive assets match tested bytes.
+Live: https://basovichsharon.vercel.app/immersive/
+
+Shipped this pass: reversible internal project-copy choreography, fractional
+indicator, active navigation, SkyCell demo/source links, cached-progress contact
+iris, footer return path, and layered cobalt/chrome bridge path. The route uses
+one inherited draw offset, narrower mobile weight and a paper mask at the metrics.
+No extra clock, framework, asset pack or new WebGL pass.
+
+Verification: 17 initial focused checks, 6 path checks, and 15 corrected layout/
+text-size cases pass. Final desktop/mobile images inspected. Both existing root
+homepages and resume bytes preserved. Resume SHA256:
+797d80301edbf6be264cc5d02b093fb6fab8567c71c5f0b5cef6ed95d0c13288.
+Evidence: workspace tmp/immersive-oct22-qa/, especially tube-check.json,
+gallery-fit-probe.json, tube-production.json and tube-desktop/mobile-reduced.png.
+A stale-resize fixture was corrected; no steady-state clipping defect found.
+
+Reference coverage: Home, About, Projects catalogue and all 19 case sequences,
+plus Labs landing. All 209 ordered panels (181 image / 26 video / 2 text) match the
+independent source inventory. All 19 contact-sheet overviews were reviewed.
+Per-state panel geometry shows at least 97.4% of the width that fits in the viewport;
+track-end captures within 6 CSS pixels. Detailed results and qualifications:
+docs/lusion-full-site-audit.md; raw reports/source/evidence remain outside Git in
+workspace tmp/lusion-oct22-audit/, including coverage-validation.json.
+
+Do not claim every control/video was verified. Talks, card hover, reel close,
+Back restoration, valid mobile menu close and Labs toggle remain unverified after
+bounded attempts. Some video panels show initial states; technical-text full
+contrast not confirmed. External client demos/Labs experiments/forms excluded.
+Source/live/inference are distinct in the audit. No hardware GPU/FPS claim.
+
+Next design priorities: authentic project/process media; one wider framing or
+object handoff using current scene/clock; short material pointer trace.
+Preserve sculpture, cobalt/chrome/paper, friendly positioning and current stack.
+No game world, new template, job-seeking copy, Eigenvale or clean-version link.
+
+The public cloud audits have returned their final reports and stopped task work.
+Their account/client lifecycle details are kept outside this repository.
+Do not restart research merely because an individual control remained unverified.
+
+# Earlier verified baseline — October 22, 2026
 
 Sharon authorized continuing with the existing Lusion-inspired design and lifted
 the earlier usage stopping constraint. AUREUS was rejected as a replacement.
@@ -54,7 +100,7 @@ Final screenshots and raw JSON: workspace tmp/immersive-oct22-qa/.
   final-small-300.png and desktop-project-0/1/2.png retain visual evidence.
 
 Limits: Chromium used SwiftShader software rendering; observed slow software
-cadence is not a hardwareGPU/FPS benchmark. Actual phoneGPU/touch hardware and
+cadence is not a hardware GPU/FPS benchmark. Actual phoneGPU/touch hardware and
 screen-reader behavior were not tested. No real-device60fps claim.
 
 ## Run/check commands
