@@ -6,6 +6,7 @@ the earlier usage stopping constraint. AUREUS was rejected as a replacement.
 - Repository: sharonbasovich/PortfolioWebsite, tmp/vercel-portfolio-deploy.
 - Branch: codex/immersive-refined.
 - Implementation commit: 407cf5a6b98ea64c3c0e7a0d0f806431f4b5a452.
+- Published code including narrow controls: fb06dc9161e050cd1a5dc226ccf880de33673175.
 - Rollback: codex/immersive-oct22-baseline at a5d6398407c0cba2b3fe7bd50f96aca1958882f0.
 - Result URL: https://basovichsharon.vercel.app/immersive/
 - Current source and rationale: docs/immersive-refinement.md.
@@ -71,6 +72,13 @@ unattended subprocess output pipe. Local review modules live in tools/ and are
 not included in Vercel's public output.
 
 ## Publication and preservation
+
+Both Vercel projects reported successful publication. Public immersive HTML,
+JS/CSS/font/resume matched the implementation; desktop/mobile runtime rendered
+without page/network errors. Both root homepages matched unchanged baseline Git
+blobs exactly. Initial Windows checkout-hash comparisons failed because of CRLF;
+production-homepages.json uses canonical Git bytes and passes. Narrow300px
+controls have no overlap/overflow; production-narrow.json passes. Review endpoint404.
 
 Existing Git integration publishes main to both Vercel projects; CLI login is
 unnecessary. basovichsharon uses dist/startup and portfolio-website uses dist.
