@@ -14,6 +14,21 @@ const gallery = document.querySelector(".project-gallery"),
 const panels = [...document.querySelectorAll(".project-panel")];
 const rail = document.querySelector(".scroll-rail"),
   thumb = document.querySelector(".scroll-thumb");
+const projectSwitcher = document.querySelector(".project-switcher");
+const projectButtons = [...document.querySelectorAll("[data-select-project]")];
+const projectStops = [1 / 9, 0.5, 8 / 9];
+const chapters = [...document.querySelectorAll(".chapter")];
+const bridge = document.querySelector(".flow-bridge");
+const route = document.querySelector(".route-line"),
+  routeDot = document.querySelector(".route-dot");
+const routeLength = route?.getTotalLength() || 1;
+const routeClock = { progress: 0 };
+const heroWindow = document.querySelector(".hero-window");
+const trace = document.querySelector(".pointer-trace"),
+  tracePath = trace?.querySelector("path");
+const pointer = { x: 0, y: 0, active: false, movedAt: 0 };
+const tail = Array.from({ length: 14 }, () => ({ x: 0, y: 0 }));
+let traceBounds;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 const compactQuery = matchMedia("(max-width: 800px)");
 const desktopQuery = matchMedia("(min-width: 1100px) and (min-height: 650px)");
@@ -62,6 +77,11 @@ let activeChapter = -1,
   lastScroll = scrollY,
   velocity = 0,
   lastInput = 0;
+let sceneTime = 0,
+  separated = false,
+  selectedProject = -1,
+  initialized = false,
+  lostContext = false;
 let resizeTimer,
   disposed = false,
   drag;
@@ -117,7 +137,96 @@ function refreshMeasurements() {
     thumb.style.height = `${thumbHeight}px`;
   }
   lenis?.resize();
+  traceBounds = heroWindow.getBoundingClientRect();
+  trace?.setAttribute(
+    "viewBox",
+    `0 0 ${traceBounds.width} ${traceBounds.height}`,
+  );
+  if (route) {
+    route.style.strokeDasharray = String(routeLength);
+    route.style.strokeDashoffset = String(
+      paused ? 0 : routeLength * (1 - routeClock.progress),
+    );
+  }
 }
+
+heroWindow.addEventListener("pointermove", (event) => {
+  if (paused || !finePointer.matches || event.target.closest("button,a"))
+    return;
+  const rect = heroWindow.getBoundingClientRect();
+  pointer.x = event.clientX - rect.left;
+  pointer.y = event.clientY - rect.top;
+  if (!pointer.active)
+    for (const point of tail) {
+      point.x = pointer.x;
+      point.y = pointer.y;
+    }
+  pointer.active = true;
+  pointer.movedAt = performance.now();
+});
+heroWindow.addEventListener("pointerleave", () => {
+  pointer.active = false;
+});
+function updateTrace(delta) {
+  if (!trace || !tracePath) return;
+  const show =
+    !paused &&
+    finePointer.matches &&
+    pointer.active &&
+    performance.now() - pointer.movedAt < 650;
+  trace.style.opacity = show ? "1" : "0";
+  if (!show) return;
+  let ahead = pointer;
+  const follow = 1 - Math.exp(-delta * 34);
+  for (const point of tail) {
+    point.x += (ahead.x - point.x) * follow;
+    point.y += (ahead.y - point.y) * follow;
+    ahead = point;
+  }
+  const points = tail.slice().reverse();
+  let d = `M${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+  for (let index = 1; index < points.length - 1; index++) {
+    const point = points[index],
+      next = points[index + 1];
+    d += ` Q${point.x.toFixed(1)},${point.y.toFixed(1)} ${((point.x + next.x) / 2).toFixed(1)},${((point.y + next.y) / 2).toFixed(1)}`;
+  }
+  d += ` L${pointer.x.toFixed(1)},${pointer.y.toFixed(1)}`;
+  tracePath.setAttribute("d", d);
+}
+function updateProjectNavigation() {
+  const index = clamp(Math.round(deckClock.index), 0, panels.length - 1);
+  if (index === selectedProject) return;
+  selectedProject = index;
+  for (const button of projectButtons) {
+    if (Number(button.dataset.selectProject) === index)
+      button.setAttribute("aria-current", "true");
+    else button.removeAttribute("aria-current");
+  }
+  projectSwitcher?.style.setProperty("--project-index", String(index));
+}
+function goToProject(index, immediate = false) {
+  if (!panels[index]) return;
+  if (deckTrigger) {
+    const progress = projectStops[index];
+    scrollToPosition(
+      deckTrigger.start + progress * (deckTrigger.end - deckTrigger.start),
+      immediate || paused,
+    );
+    if (immediate) {
+      deckTimeline.progress(progress);
+      ScrollTrigger.update();
+    }
+  } else {
+    scrollToPosition(
+      scrollY + panels[index].getBoundingClientRect().top - 100,
+      paused || immediate,
+    );
+  }
+}
+for (const button of projectButtons)
+  button.addEventListener("click", () =>
+    goToProject(Number(button.dataset.selectProject)),
+  );
 
 const magnets = [...document.querySelectorAll(".magnetic")].map((element) => ({
   element,
@@ -251,12 +360,21 @@ function paint(time = 0, delta = 1 / 60) {
     world.state.velocity = paused ? 0 : velocity;
     world.state.reveal = entry.reveal;
     world.state.rotation = entry.rotation;
-    world.renderFrames(paused ? 0 : time, paused ? 0 : delta, visible);
+    if (visible.length)
+      world.renderFrames(sceneTime, paused ? 0 : delta, visible);
     frame.style.visibility = visible.length ? "visible" : "hidden";
   }
   activeWindow = dominant || activeWindow;
-  if (dominant && dominant.chapter !== activeChapter) {
-    activeChapter = dominant.chapter;
+  // Chapter state follows semantic content, including in the non-WebGL fallback.
+  const currentChapter = chapters.reduce(
+    (current, section) =>
+      section.getBoundingClientRect().top <= innerHeight * 0.5
+        ? Number(section.dataset.scene)
+        : current,
+    0,
+  );
+  if (currentChapter !== activeChapter) {
+    activeChapter = currentChapter;
     root.dataset.chapter = String(activeChapter);
     document.querySelector(".status-index").textContent =
       `0${activeChapter + 1} / 04`;
@@ -269,6 +387,15 @@ function paint(time = 0, delta = 1 / 60) {
   }
   updateScrollRail();
   updateMagnetic(delta);
+  updateTrace(delta);
+  updateProjectNavigation();
+  if (route) {
+    const progress = paused ? 1 : routeClock.progress;
+    route.style.strokeDashoffset = String(routeLength * (1 - progress));
+    const position = route.getPointAtLength(routeLength * progress);
+    routeDot.setAttribute("cx", position.x);
+    routeDot.setAttribute("cy", position.y);
+  }
 }
 function tick(time, deltaMs) {
   if (disposed || document.hidden) return;
@@ -287,6 +414,7 @@ function tick(time, deltaMs) {
     updateScrollRail();
     return;
   }
+  sceneTime += delta;
   const interval = compactQuery.matches ? 1 / 30 : 1 / 60;
   if (time - lastRender < interval * 0.9 && !paused) return;
   const renderDelta = Math.min(0.05, time - lastRender || delta);
@@ -314,19 +442,21 @@ function buildChoreography(entrance = false) {
     entry.rotation = 0;
   }
   gallery.classList.remove("is-horizontal");
+  projectSwitcher.hidden = true;
   root.classList.toggle("motion-paused", paused);
   motionButton.textContent = paused ? "Enable motion" : "Pause motion";
   motionButton.setAttribute("aria-pressed", String(paused));
   burstButton.disabled = paused;
   if (!paused && gsap && ScrollTrigger) {
     context = gsap.context(() => {
-      if (desktopQuery.matches && world) {
+      if (desktopQuery.matches && world && !lostContext) {
         gallery.classList.add("is-horizontal");
+        projectSwitcher.hidden = false;
         const deck = gsap.timeline({
           scrollTrigger: {
             trigger: gallery,
             start: "top top",
-            end: () => `+=${innerHeight * 3.4}`,
+            end: () => `+=${innerHeight * 3.2}`,
             pin: true,
             scrub: true,
             anticipatePin: 1,
@@ -359,6 +489,50 @@ function buildChoreography(entrance = false) {
         deck.to({}, { duration: 1.2 });
         deckTimeline = deck;
         deckTrigger = deck.scrollTrigger;
+      }
+      if (bridge) {
+        gsap.fromTo(
+          ".flow-words span:first-child",
+          { x: () => innerWidth * 0.08 },
+          {
+            x: () => -innerWidth * 0.1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: bridge,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+        gsap.fromTo(
+          ".flow-words span:last-child",
+          { x: () => -innerWidth * 0.06 },
+          {
+            x: () => innerWidth * 0.1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: bridge,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+        gsap.fromTo(
+          routeClock,
+          { progress: 0 },
+          {
+            progress: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: bridge,
+              start: "top 80%",
+              end: "bottom 25%",
+              scrub: true,
+            },
+          },
+        );
       }
       if (entrance) {
         entry.reveal = 0;
@@ -394,6 +568,7 @@ function buildChoreography(entrance = false) {
         SplitText?.create(heading, {
           type: "lines",
           mask: "lines",
+          linesClass: "chapter-line",
           autoSplit: true,
           onSplit(split) {
             return gsap.from(split.lines, {
@@ -402,9 +577,9 @@ function buildChoreography(entrance = false) {
               stagger: 0.08,
               ease: "power3.out",
               scrollTrigger: {
-                trigger: heading,
+                trigger: heading.parentElement,
                 start: "top 88%",
-                toggleActions: "play none none reverse",
+                once: true,
               },
             });
           },
@@ -417,7 +592,7 @@ function buildChoreography(entrance = false) {
   }
   ScrollTrigger?.refresh();
   if (preservePanel && deckTrigger) {
-    const progress = [0.1, 0.5, 0.9][Number(preservePanel.dataset.project)];
+    const progress = projectStops[Number(preservePanel.dataset.project)];
     scrollToPosition(
       deckTrigger.start + progress * (deckTrigger.end - deckTrigger.start),
       true,
@@ -519,7 +694,9 @@ document.addEventListener("keydown", (event) => {
     PageUp: scrollY - innerHeight * 0.85,
     Home: 0,
     End: root.scrollHeight - innerHeight,
+    " ": scrollY + innerHeight * (event.shiftKey ? -0.85 : 0.85),
   };
+  if (event.key === " " && event.target.closest("button,a")) return;
   if (!(event.key in destinations)) return;
   event.preventDefault();
   scrollToPosition(destinations[event.key], true);
@@ -557,7 +734,7 @@ document.addEventListener("click", (event) => {
 gallery.addEventListener("focusin", (event) => {
   const panel = event.target.closest(".project-panel");
   if (!panel || !deckTrigger) return;
-  const progress = [0.1, 0.5, 0.9][Number(panel.dataset.project)];
+  const progress = projectStops[Number(panel.dataset.project)];
   scrollToPosition(
     deckTrigger.start + progress * (deckTrigger.end - deckTrigger.start),
     true,
@@ -575,19 +752,63 @@ if (world) {
   root.classList.add("has-world");
   burstButton.hidden = false;
   burstButton.addEventListener("click", () => {
-    if (!paused) world.burst();
-  });
-  document.querySelector(".hero-window").addEventListener("click", (event) => {
-    if (!paused && !event.target.closest("a,button")) world.burst();
+    if (paused) return;
+    separated = !separated;
+    world.burst(separated ? 1 : 0);
+    burstButton.setAttribute("aria-pressed", String(separated));
+    burstButton.setAttribute(
+      "aria-label",
+      separated ? "Put the 3D object together" : "Take the 3D object apart",
+    );
+    for (const label of burstButton.querySelectorAll(
+      ".roll-original,.roll-duplicate",
+    ))
+      label.textContent = separated ? "Put it together" : "Take it apart";
   });
 } else {
   frame.remove();
   root.classList.add("world-unavailable");
 }
-document.fonts.ready.then(async () => {
+async function initialize() {
+  if (initialized) return;
+  initialized = true;
   if (disposed) return;
   buildChoreography(true);
   if (gsap) gsap.ticker.add(tick);
+  root.dataset.ready = "true";
+  if (
+    ["127.0.0.1", "localhost"].includes(location.hostname) &&
+    new URLSearchParams(location.search).get("review") === "1"
+  ) {
+    const { installReview } = await import("/__motion_lab__/review-api.js");
+    installReview({
+      getState: () => ({
+        paused,
+        sceneTime,
+        entry: { reveal: entry.reveal, rotation: entry.rotation },
+        activeChapter,
+        selectedProject,
+        deckProgress: deckTrigger?.progress,
+        scrollY,
+        world: world?.getStats?.() || null,
+      }),
+      jumpProject: (index) => {
+        goToProject(index, true);
+        paint(sceneTime, 0);
+      },
+      freezeEntrance: () => {
+        entranceTimeline?.progress(1);
+        paint(sceneTime, 0);
+      },
+      repaint: () => paint(sceneTime, 0),
+      finishReveals: () => {
+        for (const trigger of ScrollTrigger?.getAll() || [])
+          if (trigger.vars.once && trigger.animation)
+            trigger.animation.progress(1);
+        paint(sceneTime, 0);
+      },
+    });
+  }
   // This harness is served only by tools/motion-lab.py, outside public assets.
   if (
     ["127.0.0.1", "localhost"].includes(location.hostname) &&
@@ -596,6 +817,12 @@ document.fonts.ready.then(async () => {
     const { installMotionLab } = await import("/__motion_lab__/motion-lab.js");
     installMotionLab(() => entranceTimeline).catch(console.warn);
   }
+}
+initialize();
+document.fonts.ready.then(() => {
+  if (disposed) return;
+  ScrollTrigger?.refresh();
+  refreshMeasurements();
 });
 window.addEventListener(
   "scroll",
@@ -614,7 +841,11 @@ window.addEventListener(
         world.dispose();
         compact = compactQuery.matches;
         try {
-          world = createWorld(canvas, { compact });
+          world = createWorld(canvas, {
+            compact,
+            initialBurst: separated ? 1 : 0,
+          });
+          if (world) world.state.burst = separated ? 1 : 0;
         } catch (error) {
           console.warn("The 3D scene could not resize.", error);
           world = null;
@@ -631,6 +862,21 @@ window.addEventListener(
   },
   { passive: true },
 );
+canvas.addEventListener("webglcontextlost", (event) => {
+  event.preventDefault();
+  lostContext = true;
+  root.classList.add("world-unavailable");
+  burstButton.hidden = true;
+  frame.style.display = "none";
+  buildChoreography();
+});
+canvas.addEventListener("webglcontextrestored", () => {
+  lostContext = false;
+  root.classList.remove("world-unavailable");
+  burstButton.hidden = !world;
+  frame.style.display = "";
+  buildChoreography();
+});
 reduced.addEventListener("change", (event) => {
   paused = event.matches;
   buildChoreography();

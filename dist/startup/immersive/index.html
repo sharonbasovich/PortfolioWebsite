@@ -167,11 +167,13 @@
           </div>
         </div>
         <div class="hero-window art-window" data-world-window>
+          <svg class="pointer-trace" aria-hidden="true"><path></path></svg>
           <div class="hero-interaction">
             <button
               class="scene-burst roll-link magnetic"
               type="button"
               aria-label="Take the 3D object apart"
+              aria-pressed="false"
               hidden
             >
               <span class="roll-label button-label"
@@ -198,11 +200,52 @@
                   /></svg
               ></span>
             </button>
-            <p class="hero-hint">
-              <span class="cursor-hint">Move your cursor. Take it apart.</span
-              ><span class="touch-hint">An idea, in motion.</span>
-            </p>
           </div>
+        </div>
+        <div class="hero-foot">
+          <p>Always curious. Always building.</p>
+          <a class="hero-hello" href="mailto:sharon@basovich.com"
+            >Let's talk <span aria-hidden="true">↗</span></a
+          >
+        </div>
+      </section>
+
+      <section class="flow-bridge" aria-label="Curiosity in motion">
+        <svg
+          class="flow-route"
+          viewBox="0 0 1440 650"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path
+            class="route-base"
+            d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
+          />
+          <path
+            class="route-line"
+            d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
+          />
+          <circle class="route-dot" r="5" cx="1070" cy="0" />
+        </svg>
+        <div class="flow-words" aria-hidden="true">
+          <span>Curiosity,</span><span>in motion.</span>
+        </div>
+        <div class="flow-proof">
+          <p>
+            <strong>10×</strong
+            ><span
+              >Hackathon winner<br />Hack the North, General Catalyst,
+              Ramp</span
+            >
+          </p>
+          <p>
+            <strong>12,000+</strong
+            ><span>Hours saved annually<br />at RBC</span>
+          </p>
+          <p>
+            <strong>1st</strong
+            ><span>APEX<br />International research hackathon</span>
+          </p>
         </div>
       </section>
 
@@ -301,6 +344,18 @@
           <h2 id="projects-title">Bits meet<br />the real world.</h2>
         </div>
         <div class="project-gallery">
+          <nav class="project-switcher" aria-label="Choose a project" hidden>
+            <button type="button" data-select-project="0" aria-current="true">
+              <span>01</span> Drawing Robot
+            </button>
+            <button type="button" data-select-project="1">
+              <span>02</span> SkyCell
+            </button>
+            <button type="button" data-select-project="2">
+              <span>03</span> Marble
+            </button>
+            <span class="project-progress" aria-hidden="true"><i></i></span>
+          </nav>
           <div class="project-panels">
             <article
               class="project-panel"
@@ -378,7 +433,8 @@
               ></div>
               <div class="project-copy">
                 <div class="project-index">
-                  <span>02 / 03</span><span>1st place at APEX</span>
+                  <span>02 / 03</span
+                  ><span>1st at APEX · International research hackathon</span>
                 </div>
                 <h3 id="skycell-title">SkyCell</h3>
                 <p>

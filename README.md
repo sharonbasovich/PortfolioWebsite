@@ -11,4 +11,6 @@ Each project uses the `vercel.json` in its own root. The creative version includ
 
 Preview locally by serving `dist/` over HTTP. The main portfolio is at `/`, and the experimental version is at `/startup/`.
 
-A separate Lusion-inspired motion experiment is available at [basovichsharon.vercel.app/immersive/](https://basovichsharon.vercel.app/immersive/), with source in `dist/startup/immersive/`. See [its motion and implementation notes](docs/lusion-inspired-version.md) for references, local preview, and fallback behavior.
+A separate Lusion-inspired portfolio is available at [basovichsharon.vercel.app/immersive/](https://basovichsharon.vercel.app/immersive/), with source in `dist/startup/immersive/`. Its procedural mechanical sculpture responds to pointer hits, opens into a sustained exploded view, and connects to a scroll-driven project sequence. Keyboard navigation, pause, reduced motion, WebGL recovery and a readable non-3D layout are supported. See [the refinement notes](docs/immersive-refinement.md) and the site's [source credits](https://basovichsharon.vercel.app/immersive/resources.html).
+
+For the immersive page, run `python -m http.server 8790 --bind 127.0.0.1 --directory dist/startup` and open `http://127.0.0.1:8790/immersive/`. `python tools/motion-lab.py` adds local review fixtures on port8789; those development modules are outside Vercel's public output.

@@ -9,7 +9,10 @@ const smooth = (start, end, value) => {
   return t * t * (3 - 2 * t);
 };
 
-export function createWorld(canvas, { compact = false } = {}) {
+export function createWorld(
+  canvas,
+  { compact = false, initialBurst = 0 } = {},
+) {
   if (!canvas) return null;
 
   let renderer;
@@ -17,7 +20,8 @@ export function createWorld(canvas, { compact = false } = {}) {
     renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: !compact,
+      // The scene target owns antialiasing; avoid resolving the same frame twice.
+      antialias: false,
       powerPreference: "high-performance",
     });
   } catch (error) {
@@ -27,11 +31,19 @@ export function createWorld(canvas, { compact = false } = {}) {
 
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.14;
   renderer.autoClear = false;
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, compact ? 1 : 1.5));
-  renderer.autoClear = false;
+  const context = renderer.getContext();
+  const rendererExtension = context.getExtension("WEBGL_debug_renderer_info");
+  const rendererName = rendererExtension
+    ? String(context.getParameter(rendererExtension.UNMASKED_RENDERER_WEBGL))
+    : "WebGL 2";
+  const softwareRenderer = /swiftshader|llvmpipe|software/i.test(rendererName);
+  renderer.setPixelRatio(
+    Math.min(devicePixelRatio || 1, compact || softwareRenderer ? 1 : 1.25),
+  );
+  renderer.info.autoReset = false;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(compact ? 43 : 36, 1, 0.1, 100);
@@ -39,20 +51,26 @@ export function createWorld(canvas, { compact = false } = {}) {
   camera.lookAt(0, 0, 0);
 
   const resources = { geometries: new Set(), materials: new Set() };
+  const shapeCache = new Map();
   const geometry = (value) => (resources.geometries.add(value), value);
   const material = (value) => (resources.materials.add(value), value);
-  const physical = (color, metalness, roughness, options = {}) =>
-    material(
-      new THREE.MeshPhysicalMaterial({
+  const physical = (color, metalness, roughness, options = {}) => {
+    const { clearcoat = 0, clearcoatRoughness = 0.13, ...rest } = options;
+    const Surface = clearcoat
+      ? THREE.MeshPhysicalMaterial
+      : THREE.MeshStandardMaterial;
+    return material(
+      new Surface({
         color,
         metalness,
         roughness,
-        clearcoat: 0.7,
-        clearcoatRoughness: 0.13,
         transparent: false,
-        ...options,
+        envMapIntensity: 1.08,
+        ...(clearcoat ? { clearcoat, clearcoatRoughness } : {}),
+        ...rest,
       }),
     );
+  };
   const basic = (color, opacity = 1) =>
     material(
       new THREE.MeshBasicMaterial({
@@ -62,14 +80,37 @@ export function createWorld(canvas, { compact = false } = {}) {
         depthWrite: false,
       }),
     );
+  const cachedShape = (key, create) => {
+    if (!shapeCache.has(key)) shapeCache.set(key, geometry(create()));
+    return shapeCache.get(key);
+  };
   const rounded = (width, height, depth, radius = 0.09) =>
-    geometry(new RoundedBoxGeometry(width, height, depth, 4, radius));
+    cachedShape(
+      `round:${width}:${height}:${depth}:${radius}`,
+      () =>
+        new RoundedBoxGeometry(width, height, depth, compact ? 2 : 3, radius),
+    );
   const box = (width, height, depth) =>
-    geometry(new THREE.BoxGeometry(width, height, depth));
+    cachedShape(
+      `box:${width}:${height}:${depth}`,
+      () => new THREE.BoxGeometry(width, height, depth),
+    );
   const torus = (radius, tube = 0.05) =>
-    geometry(new THREE.TorusGeometry(radius, tube, 10, 80));
+    cachedShape(
+      `torus:${radius}:${tube}`,
+      () =>
+        new THREE.TorusGeometry(
+          radius,
+          tube,
+          compact ? 8 : 10,
+          compact ? 56 : 80,
+        ),
+    );
   const sphere = (radius, detail = 2) =>
-    geometry(new THREE.IcosahedronGeometry(radius, detail));
+    cachedShape(
+      `sphere:${radius}:${detail}`,
+      () => new THREE.IcosahedronGeometry(radius, detail),
+    );
   const addMesh = (parent, shape, surface, x = 0, y = 0, z = 0) => {
     const mesh = new THREE.Mesh(shape, surface);
     mesh.position.set(x, y, z);
@@ -78,19 +119,32 @@ export function createWorld(canvas, { compact = false } = {}) {
   };
 
   let environment;
-  try {
-    const generator = new THREE.PMREMGenerator(renderer);
-    const room = new RoomEnvironment();
-    environment = generator.fromScene(room, 0.04);
-    scene.environment = environment.texture;
-    room.dispose();
-    generator.dispose();
-  } catch (error) {
-    console.warn("Using direct lighting for the interactive scene.", error);
+  function rebuildEnvironment() {
+    // This texture is rendered GPU data, not an uploaded image. Its contents do
+    // not survive context loss, so Three's object restoration alone is insufficient.
+    let generator;
+    let room;
+    const previous = environment;
+    try {
+      generator = new THREE.PMREMGenerator(renderer);
+      room = new RoomEnvironment();
+      environment = generator.fromScene(room, 0.04);
+      scene.environment = environment.texture;
+      previous?.dispose();
+    } catch (error) {
+      scene.environment = null;
+      environment = undefined;
+      previous?.dispose();
+      console.warn("Using direct lighting for the interactive scene.", error);
+    } finally {
+      room?.dispose();
+      generator?.dispose();
+    }
   }
+  rebuildEnvironment();
 
-  scene.add(new THREE.HemisphereLight(0xeaf4ff, 0x0c1426, 1.3));
-  const key = new THREE.DirectionalLight(0xffffff, 2.8);
+  scene.add(new THREE.HemisphereLight(0xeaf4ff, 0x0c1426, 1.1));
+  const key = new THREE.DirectionalLight(0xffffff, 3.15);
   key.position.set(-4, 6, 8);
   scene.add(key);
   const blueRim = new THREE.PointLight(0x4081ff, 32, 30);
@@ -103,21 +157,25 @@ export function createWorld(canvas, { compact = false } = {}) {
   const world = new THREE.Group();
   scene.add(world);
 
+  let paletteCache;
   const makePalette = () => {
+    if (paletteCache) return paletteCache;
     const cobalt = physical(0x315fdf, 0.67, 0.17, {
       clearcoat: 1,
       clearcoatRoughness: 0.07,
     });
     const deepBlue = physical(0x092a76, 0.79, 0.24);
-    const chrome = physical(0xc5d5e7, 1, 0.13, { clearcoat: 0.9 });
+    // Bare metal has no second lacquer lobe. Keep that cost for the cobalt enamel.
+    const chrome = physical(0xd3deeb, 1, 0.115);
     const dark = physical(0x121a2c, 0.7, 0.26);
     const ivory = physical(0xf4f3ee, 0.23, 0.22, { clearcoat: 0.9 });
     const electric = physical(0x7bc5ff, 0.35, 0.15, {
       emissive: 0x2575ff,
       emissiveIntensity: 0.32,
-      clearcoat: 1,
+      clearcoat: 0.35,
     });
-    return { cobalt, deepBlue, chrome, dark, ivory, electric };
+    paletteCache = { cobalt, deepBlue, chrome, dark, ivory, electric };
+    return paletteCache;
   };
 
   // A watch movement crossed with a robot joint: a dense, asymmetric object that
@@ -127,15 +185,21 @@ export function createWorld(canvas, { compact = false } = {}) {
   const a = makePalette();
   const assemblySurfaces = Object.values(a);
   const pieces = [];
+  const pieceIndices = new WeakMap();
   const piece = (object, x, y, z, dx, dy, dz) => {
     object.position.set(x, y, z);
     assembly.add(object);
+    const index = pieces.length;
+    object.traverse((child) => {
+      if (child.isMesh) pieceIndices.set(child, index);
+    });
     pieces.push({
       object,
       base: new THREE.Vector3(x, y, z),
       apart: new THREE.Vector3(dx, dy, dz),
       current: new THREE.Vector3(x, y, z),
       target: new THREE.Vector3(),
+      restRotation: object.rotation.clone(),
     });
     return object;
   };
@@ -402,6 +466,100 @@ export function createWorld(canvas, { compact = false } = {}) {
     0.84,
   );
   rightInset.rotation.z = 0.35;
+
+  // A rigid bone per mechanical part lets six material batches carry the whole
+  // movement. Every vertex belongs to exactly one part: no shape deformation or
+  // blended joints. Keep the original meshes as precise, invisible pick proxies.
+  // This removes the draw call per screw/housing without losing independent kicks.
+  scene.updateMatrixWorld(true);
+  const rotatingBoneIndices = new Map([
+    [outerRing, pieces.length],
+    [innerRing, pieces.length + 1],
+  ]);
+  const skeleton = new THREE.Skeleton([
+    ...pieces.map((part) => part.object),
+    outerRing,
+    innerRing,
+  ]);
+  const batches = new Map();
+  const toAssembly = new THREE.Matrix4().copy(assembly.matrixWorld).invert();
+  const transform = new THREE.Matrix4();
+  const instanceTransform = new THREE.Matrix4();
+  const appendRigidGeometry = (mesh, partIndex, instanceIndex = null) => {
+    const boneIndex = rotatingBoneIndices.get(mesh) ?? partIndex;
+    transform.multiplyMatrices(toAssembly, mesh.matrixWorld);
+    if (instanceIndex !== null) {
+      mesh.getMatrixAt(instanceIndex, instanceTransform);
+      transform.multiply(instanceTransform);
+    }
+    const source = mesh.geometry.index
+      ? mesh.geometry.toNonIndexed()
+      : mesh.geometry.clone();
+    source.applyMatrix4(transform);
+    const position = source.getAttribute("position");
+    const normal = source.getAttribute("normal");
+    const uv = source.getAttribute("uv");
+    if (!batches.has(mesh.material)) {
+      batches.set(mesh.material, {
+        position: [],
+        normal: [],
+        uv: [],
+        skinIndex: [],
+        skinWeight: [],
+      });
+    }
+    const batch = batches.get(mesh.material);
+    for (let vertex = 0; vertex < position.count; vertex++) {
+      batch.position.push(
+        position.getX(vertex),
+        position.getY(vertex),
+        position.getZ(vertex),
+      );
+      batch.normal.push(
+        normal.getX(vertex),
+        normal.getY(vertex),
+        normal.getZ(vertex),
+      );
+      batch.uv.push(uv ? uv.getX(vertex) : 0, uv ? uv.getY(vertex) : 0);
+      batch.skinIndex.push(boneIndex, 0, 0, 0);
+      batch.skinWeight.push(1, 0, 0, 0);
+    }
+    source.dispose();
+  };
+  pieces.forEach((part, partIndex) => {
+    part.object.traverse((mesh) => {
+      if (!mesh.isMesh) return;
+      if (mesh.isInstancedMesh) {
+        for (let index = 0; index < mesh.count; index++)
+          appendRigidGeometry(mesh, partIndex, index);
+      } else appendRigidGeometry(mesh, partIndex);
+      mesh.visible = false;
+    });
+  });
+  for (const [surface, batch] of batches) {
+    const shape = geometry(new THREE.BufferGeometry());
+    shape.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(batch.position, 3),
+    );
+    shape.setAttribute(
+      "normal",
+      new THREE.Float32BufferAttribute(batch.normal, 3),
+    );
+    shape.setAttribute("uv", new THREE.Float32BufferAttribute(batch.uv, 2));
+    shape.setAttribute(
+      "skinIndex",
+      new THREE.Uint16BufferAttribute(batch.skinIndex, 4),
+    );
+    shape.setAttribute(
+      "skinWeight",
+      new THREE.Float32BufferAttribute(batch.skinWeight, 4),
+    );
+    const mesh = new THREE.SkinnedMesh(shape, surface);
+    mesh.frustumCulled = false;
+    assembly.add(mesh);
+    mesh.bind(skeleton, new THREE.Matrix4());
+  }
 
   // Three concrete engineering scenes replace abstract particles in the work chapter.
   const projects = [];
@@ -716,6 +874,8 @@ export function createWorld(canvas, { compact = false } = {}) {
     zoom: 0,
     velocity: 0,
     motion: true,
+    // A desired, sustained disassembly state. The engine owns its physical settle.
+    burst: clamp(initialBurst),
   };
   let disposed = false;
   let screenWidth = 1;
@@ -724,8 +884,34 @@ export function createWorld(canvas, { compact = false } = {}) {
   let pointerPresent = false;
   const pointerPosition = new THREE.Vector2(-10000, -10000);
   const poses = new Map();
-  let burstAge = 10;
+  let burstValue = clamp(initialBurst);
+  let burstVelocity = 0;
   let scrollDrift = 0;
+  let contextLost = false;
+  let renderedFrames = 0;
+  let submissionMs = 0;
+  let frameIntervalMs = 0;
+  let lastTime = null;
+  let pixelRatio = 1;
+  let qualityScale = 1;
+  let nextQualityProbe = 75;
+  let lastWallTime = null;
+  let lastFrames = [];
+  let hitCount = 0;
+  let kickCount = 0;
+  let peakSpringOffset = 0;
+  let lastHitPart = null;
+  const raycaster = new THREE.Raycaster();
+  const hits = [];
+  const hitParts = new Set();
+  const pickTargets = pieces.map((part) => part.object);
+  const sweepPoint = new THREE.Vector2();
+  const sweepDelta = new THREE.Vector2();
+  const cameraRight = new THREE.Vector3();
+  const cameraUp = new THREE.Vector3();
+  const kick = new THREE.Vector3();
+  const inverseAssembly = new THREE.Matrix4();
+  const zero = new THREE.Vector3();
 
   // Semi-implicit springs keep cursor response quick, with a slight physical
   // settle. Substeps make the damping consistent on 30 Hz and 60 Hz screens.
@@ -762,6 +948,27 @@ export function createWorld(canvas, { compact = false } = {}) {
   window.addEventListener("pointermove", onPointerMove, { passive: true });
   document.documentElement.addEventListener("pointerleave", onPointerLeave);
   window.addEventListener("blur", onPointerLeave);
+  const onContextLost = (event) => {
+    event.preventDefault();
+    contextLost = true;
+    onPointerLeave();
+  };
+  const onContextRestored = () => {
+    contextLost = false;
+    const restoreTime = lastTime ?? 0;
+    rebuildEnvironment();
+    resize();
+    // Also restore a paused scene immediately, without restarting its clock.
+    if (lastFrames.length) {
+      const wasMoving = state.motion;
+      state.motion = false;
+      renderFrames(restoreTime, 0, lastFrames);
+      state.motion = wasMoving;
+    }
+    lastWallTime = null;
+  };
+  canvas.addEventListener("webglcontextlost", onContextLost);
+  canvas.addEventListener("webglcontextrestored", onContextRestored);
 
   // Five-tap texture accumulation follows the mechanism in Lusion's MIT
   // WebGL-Scroll-Sync/src/shaders/img.frag. The offsets here are continuous and
@@ -792,7 +999,7 @@ export function createWorld(canvas, { compact = false } = {}) {
     magFilter: THREE.LinearFilter,
     depthBuffer: true,
     stencilBuffer: false,
-    samples: compact ? 0 : 2,
+    samples: softwareRenderer ? 0 : 2,
   });
   const outputMaterial = material(
     new THREE.ShaderMaterial({
@@ -887,9 +1094,11 @@ export function createWorld(canvas, { compact = false } = {}) {
     screenHeight = Math.max(1, innerHeight);
     const ratio = Math.min(
       devicePixelRatio || 1,
-      compact ? 1 : 1.5,
-      (compact ? 1440 : 2560) / Math.max(screenWidth, screenHeight),
+      (softwareRenderer ? (compact ? 0.9 : 1) : compact ? 1.25 : 1.5) *
+        qualityScale,
+      (compact ? 1440 : 2200) / Math.max(screenWidth, screenHeight),
     );
+    pixelRatio = ratio;
     renderer.setPixelRatio(ratio);
     renderer.setSize(screenWidth, screenHeight, false);
     const drawingSize = renderer.getDrawingBufferSize(new THREE.Vector2());
@@ -912,10 +1121,22 @@ export function createWorld(canvas, { compact = false } = {}) {
         cameraTarget: new THREE.Vector3(),
         hover: 0,
         initialized: false,
+        pointerWasInside: false,
+        previousPointer: new THREE.Vector2(),
+        layoutPose: null,
+        torqueX: 0,
+        torqueY: 0,
+        drift: 0,
+        aspect: 0,
         parts: pieces.map((part) => ({
           current: part.base.clone(),
           velocity: new THREE.Vector3(),
           target: new THREE.Vector3(),
+          offset: new THREE.Vector3(),
+          offsetVelocity: new THREE.Vector3(),
+          rotation: new THREE.Vector3(),
+          rotationVelocity: new THREE.Vector3(),
+          lastHit: -10,
         })),
       });
     }
@@ -926,11 +1147,15 @@ export function createWorld(canvas, { compact = false } = {}) {
     const rect = item.rect;
     const chapter = Math.round(clamp(item.chapter, 0, 3));
     const project = Math.round(clamp(item.project || 0, 0, 2));
-    const progress = clamp(item.progress || 0);
     const motion = state.motion !== false;
-    const appearance = clamp(state.reveal);
-    const rotation = (item.rotation || 0) + state.rotation;
-    const zoom = clamp(item.zoom || 0, -1, 1);
+    const inputPose = {
+      progress: clamp(item.progress || 0),
+      appearance: clamp(state.reveal),
+      rotation: (item.rotation || 0) + state.rotation,
+      zoom: clamp(item.zoom || 0, -1, 1),
+    };
+    if (motion || !pose.layoutPose) pose.layoutPose = inputPose;
+    const { progress, appearance, rotation, zoom } = pose.layoutPose;
     const inside =
       motion &&
       pointerPresent &&
@@ -939,24 +1164,25 @@ export function createWorld(canvas, { compact = false } = {}) {
       pointerPosition.y >= rect.top &&
       pointerPosition.y <= rect.top + rect.height;
     // The same pixel under the cursor now controls the object in that frame.
-    pose.pointerTarget.set(
-      inside ? ((pointerPosition.x - rect.left) / rect.width) * 2 - 1 : 0,
-      inside ? 1 - ((pointerPosition.y - rect.top) / rect.height) * 2 : 0,
-    );
-    spring(
-      pose.pointer,
-      pose.pointerVelocity,
-      pose.pointerTarget,
-      motion ? dt : 0,
-    );
-    pose.hover +=
-      ((inside ? 1 : 0) - pose.hover) * (dt ? 1 - Math.exp(-dt * 14) : 1);
+    if (motion) {
+      pose.pointerTarget.set(
+        inside ? ((pointerPosition.x - rect.left) / rect.width) * 2 - 1 : 0,
+        inside ? 1 - ((pointerPosition.y - rect.top) / rect.height) * 2 : 0,
+      );
+      spring(pose.pointer, pose.pointerVelocity, pose.pointerTarget, dt);
+      pose.hover +=
+        ((inside ? 1 : 0) - pose.hover) * (dt ? 1 - Math.exp(-dt * 14) : 1);
+    }
     const px = pose.pointer.x;
     const py = pose.pointer.y;
-    const torqueX = motion ? clamp(pose.pointerVelocity.x, -2, 2) * 0.028 : 0;
-    const torqueY = motion ? clamp(pose.pointerVelocity.y, -2, 2) * 0.022 : 0;
-    const drift = motion ? scrollDrift : 0;
-    const ambientTime = motion ? time : 0;
+    if (motion) {
+      pose.torqueX = clamp(pose.pointerVelocity.x, -2, 2) * 0.028;
+      pose.torqueY = clamp(pose.pointerVelocity.y, -2, 2) * 0.022;
+      pose.drift = scrollDrift;
+    }
+    const { torqueX, torqueY, drift } = pose;
+    // Caller freezes the supplied time on pause, preserving the exact displayed pose.
+    const ambientTime = time;
 
     assembly.visible = chapter < 2 && appearance > 0.001;
     satellites.visible =
@@ -971,37 +1197,32 @@ export function createWorld(canvas, { compact = false } = {}) {
     world.scale.setScalar(0.82 + appearance * 0.18);
 
     if (assembly.visible) {
-      const burstEnvelope =
-        chapter === 0 && motion
-          ? (burstAge / 0.18) * Math.exp(1 - burstAge / 0.18)
-          : 0;
       const separation = clamp(
         (item.explode ?? (chapter === 1 ? 0.78 : progress * 0.5)) +
-          burstEnvelope * 1.05,
+          (chapter === 0 ? burstValue * 1.05 : 0),
         0,
         1.55,
       );
       pieces.forEach((part, index) => {
         const local = pose.parts[index];
         local.target.copy(part.base).addScaledVector(part.apart, separation);
-        const dx = part.base.x - px * 2.1;
-        const dy = part.base.y - py * 1.65;
-        const distance = Math.hypot(dx, dy);
-        if (pose.hover > 0.001 && distance < 1.8 && distance > 0.01) {
-          const strength = (1 - distance / 1.8) * 0.42 * pose.hover;
-          local.target.x += (dx / distance) * strength;
-          local.target.y += (dy / distance) * strength;
-          local.target.z += strength * 0.62;
+        if (!pose.initialized) local.current.copy(local.target);
+        else if (motion && dt) {
+          spring(local.current, local.velocity, local.target, dt, 110, 21);
+          spring(local.offset, local.offsetVelocity, zero, dt, 36, 7.6);
+          spring(local.rotation, local.rotationVelocity, zero, dt, 30, 7.2);
+          local.offset.clampLength(0, 0.95);
+          peakSpringOffset = Math.max(peakSpringOffset, local.offset.length());
+          local.offsetVelocity.clampLength(0, 7);
+          local.rotation.clampLength(0, 0.58);
+          local.rotationVelocity.clampLength(0, 4);
         }
-        spring(
-          local.current,
-          local.velocity,
-          local.target,
-          pose.initialized && motion ? dt : 0,
-          155,
-          24,
+        part.object.position.copy(local.current).add(local.offset);
+        part.object.rotation.set(
+          part.restRotation.x + local.rotation.x,
+          part.restRotation.y + local.rotation.y,
+          part.restRotation.z + local.rotation.z,
         );
-        part.object.position.copy(local.current);
       });
       assembly.position.set(0, Math.sin(ambientTime * 0.42) * 0.04, 0);
       assembly.rotation.set(
@@ -1069,14 +1290,14 @@ export function createWorld(canvas, { compact = false } = {}) {
     camera.aspect = rect.width / rect.height;
     camera.updateProjectionMatrix();
     const panoramic = satellites.visible;
-    const heightToFit = chapter === 1 ? 5.7 : chapter === 2 ? 4.75 : 4.25;
-    const widthToFit = panoramic
-      ? 8.7
-      : chapter === 1
-        ? 6.1
-        : chapter === 2
-          ? 4.25
-          : 4.45;
+    // Opening the mechanism increases its true envelope, including nearer parts.
+    // Fit that envelope continuously; the assembled camera retains its original framing.
+    const burstFit = chapter === 0 ? 1 + smooth(0, 1, burstValue) * 0.56 : 1;
+    const heightToFit =
+      (chapter === 1 ? 5.7 : chapter === 2 ? 4.75 : 4.25) * burstFit;
+    const widthToFit =
+      (panoramic ? 8.7 : chapter === 1 ? 6.1 : chapter === 2 ? 4.25 : 4.45) *
+      burstFit;
     const tangent = Math.tan((camera.fov * Math.PI) / 360) * 2;
     const distance =
       Math.max(heightToFit / tangent, widthToFit / (camera.aspect * tangent)) *
@@ -1086,16 +1307,69 @@ export function createWorld(canvas, { compact = false } = {}) {
       progress * distance * 0.015,
       distance,
     );
-    spring(
-      pose.camera,
-      pose.cameraVelocity,
-      pose.cameraTarget,
-      pose.initialized && motion ? dt : 0,
-      120,
-      23,
-    );
+    if (!pose.initialized || pose.aspect !== camera.aspect) {
+      pose.camera.copy(pose.cameraTarget);
+      pose.cameraVelocity.setScalar(0);
+    } else if (motion)
+      spring(pose.camera, pose.cameraVelocity, pose.cameraTarget, dt, 120, 23);
+    pose.aspect = camera.aspect;
     camera.position.copy(pose.camera);
     camera.lookAt(0, 0, 0);
+    // Raycasts see the real camera, assembly rotation, disassembly and spring offsets.
+    // A short sweep catches fast cursor passes whose endpoints miss thin metal parts.
+    if (assembly.visible && motion && dt > 0) {
+      world.updateMatrixWorld(true);
+      camera.updateMatrixWorld(true);
+      if (inside && pose.pointerWasInside) {
+        sweepDelta.subVectors(pose.pointerTarget, pose.previousPointer);
+        const movement = sweepDelta.length();
+        if (movement > 0.0015) {
+          hitParts.clear();
+          const steps = Math.min(6, Math.max(1, Math.ceil(movement / 0.08)));
+          for (let step = 1; step <= steps; step++) {
+            sweepPoint.lerpVectors(
+              pose.previousPointer,
+              pose.pointerTarget,
+              step / steps,
+            );
+            raycaster.setFromCamera(sweepPoint, camera);
+            hits.length = 0;
+            raycaster.intersectObjects(pickTargets, true, hits);
+            if (hits.length) {
+              const index = pieceIndices.get(hits[0].object);
+              if (index !== undefined) hitParts.add(index);
+            }
+          }
+          if (hitParts.size) {
+            hitCount += hitParts.size;
+            cameraRight.setFromMatrixColumn(camera.matrixWorld, 0);
+            cameraUp.setFromMatrixColumn(camera.matrixWorld, 1);
+            inverseAssembly.copy(assembly.matrixWorld).invert();
+            const impulse =
+              clamp(movement / Math.max(dt, 1 / 120), 0, 5) * 0.88;
+            kick
+              .copy(cameraRight)
+              .multiplyScalar(sweepDelta.x)
+              .addScaledVector(cameraUp, sweepDelta.y);
+            kick.z -= movement * 0.35;
+            kick.transformDirection(inverseAssembly).multiplyScalar(impulse);
+            for (const index of hitParts) {
+              const local = pose.parts[index];
+              if (time - local.lastHit < 0.045) continue;
+              local.lastHit = time;
+              kickCount++;
+              lastHitPart = index;
+              local.offsetVelocity.add(kick).clampLength(0, 7);
+              local.rotationVelocity.x += kick.y * 0.3;
+              local.rotationVelocity.y -= kick.x * 0.3;
+              local.rotationVelocity.z += (kick.x - kick.y) * 0.23;
+            }
+          }
+        }
+      }
+      pose.previousPointer.copy(pose.pointerTarget);
+      pose.pointerWasInside = inside;
+    } else if (!motion) pose.pointerWasInside = false;
     pose.initialized = true;
   }
 
@@ -1120,13 +1394,25 @@ export function createWorld(canvas, { compact = false } = {}) {
   }
 
   function renderFrames(time = 0, delta = 1 / 60, frames = []) {
-    if (disposed) return;
+    if (disposed || contextLost) return;
+    const started = performance.now();
     const dt =
       state.motion === false
         ? 0
         : clamp(Number.isFinite(delta) ? delta : 1 / 60, 0, 0.05);
     const seconds = Number.isFinite(time) ? time : 0;
-    burstAge = Math.min(10, burstAge + dt);
+    // Critically damp the desired disassembly. It stays open until requested closed.
+    // Substeps keep this stable when a low-power device supplies a 50ms frame.
+    if (dt) {
+      const target = clamp(Number.isFinite(state.burst) ? state.burst : 0);
+      const steps = Math.max(1, Math.ceil(dt * 120));
+      const h = dt / steps;
+      for (let step = 0; step < steps; step++) {
+        burstVelocity +=
+          ((target - burstValue) * 56.25 - burstVelocity * 15) * h;
+        burstValue = clamp(burstValue + burstVelocity * h);
+      }
+    }
     scrollDrift = dt
       ? scrollDrift +
         (clamp(state.velocity || 0, -1, 1) - scrollDrift) *
@@ -1143,9 +1429,31 @@ export function createWorld(canvas, { compact = false } = {}) {
         rect.left + rect.width > 0 &&
         rect.top + rect.height > 0,
     );
+    lastFrames = visibleFrames;
 
+    renderer.info.reset();
     renderer.setRenderTarget(renderTarget);
     renderer.setScissorTest(false);
+    renderedFrames++;
+    if (state.motion !== false) {
+      const wallInterval = lastWallTime === null ? 0 : started - lastWallTime;
+      if (wallInterval > 4 && wallInterval < 1000) {
+        frameIntervalMs = frameIntervalMs
+          ? frameIntervalMs * 0.94 + wallInterval * 0.06
+          : wallInterval;
+      }
+      lastWallTime = started;
+      lastTime = seconds;
+      // A bounded downshift is based on observed rendering cadence, not a guessed
+      // GPU class. The long probe and no automatic upshift prevent quality oscillation.
+      if (renderedFrames >= nextQualityProbe && qualityScale > 0.61) {
+        nextQualityProbe = renderedFrames + 150;
+        if (frameIntervalMs > (compact ? 46 : 38)) {
+          qualityScale = Math.max(0.6, qualityScale - 0.2);
+          resize();
+        }
+      }
+    } else lastWallTime = null;
     renderer.setViewport(0, 0, screenWidth, screenHeight);
     renderer.setClearColor(0x000000, 0);
     renderer.clear(true, true, true);
@@ -1186,6 +1494,7 @@ export function createWorld(canvas, { compact = false } = {}) {
       renderer.render(outputScene, outputCamera);
     }
     renderer.setScissorTest(false);
+    submissionMs = performance.now() - started;
   }
 
   function render(time = 0, delta = 1 / 60) {
@@ -1207,8 +1516,52 @@ export function createWorld(canvas, { compact = false } = {}) {
     ]);
   }
 
-  function burst() {
-    if (state.motion !== false) burstAge = 0;
+  function burst(value) {
+    if (state.motion !== false) {
+      state.burst = Number.isFinite(value)
+        ? clamp(value)
+        : state.burst >= 0.5
+          ? 0
+          : 1;
+    }
+    return state.burst;
+  }
+
+  function getStats() {
+    let maxSpringOffset = 0;
+    for (const pose of poses.values()) {
+      for (const part of pose.parts)
+        maxSpringOffset = Math.max(maxSpringOffset, part.offset.length());
+    }
+    return {
+      renderer: rendererName,
+      softwareRenderer,
+      compact,
+      pixelRatio,
+      qualityScale,
+      width: canvas.width,
+      height: canvas.height,
+      frames: renderedFrames,
+      calls: renderer.info.render.calls,
+      triangles: renderer.info.render.triangles,
+      geometries: renderer.info.memory.geometries,
+      textures: renderer.info.memory.textures,
+      programs: renderer.info.programs?.length || 0,
+      mechanicalBatches: batches.size,
+      hitCount,
+      kickCount,
+      lastHitPart,
+      maxSpringOffset: Math.round(maxSpringOffset * 10000) / 10000,
+      peakSpringOffset: Math.round(peakSpringOffset * 10000) / 10000,
+      // Submission is CPU wall time; observed cadence includes the caller/browser.
+      cpuSubmissionMs: Math.round(submissionMs * 100) / 100,
+      observedIntervalMs: Math.round(frameIntervalMs * 100) / 100,
+      burstTarget: state.burst,
+      burstValue: Math.round(burstValue * 1000) / 1000,
+      lastTime,
+      contextLost,
+      disposed,
+    };
   }
 
   function dispose() {
@@ -1220,14 +1573,29 @@ export function createWorld(canvas, { compact = false } = {}) {
       onPointerLeave,
     );
     window.removeEventListener("blur", onPointerLeave);
+    canvas.removeEventListener("webglcontextlost", onContextLost);
+    canvas.removeEventListener("webglcontextrestored", onContextRestored);
     for (const shape of resources.geometries) shape.dispose();
     for (const surface of resources.materials) surface.dispose();
     poses.clear();
+    shapeCache.clear();
     renderTarget.dispose();
+    skeleton.dispose();
     environment?.dispose();
+    skeleton.dispose();
     renderer.dispose();
   }
 
   resize();
-  return { state, render, renderFrames, resize, setFrame, dispose, burst };
+  return {
+    state,
+    render,
+    renderFrames,
+    resize,
+    setFrame,
+    dispose,
+    destroy: dispose,
+    burst,
+    getStats,
+  };
 }

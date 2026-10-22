@@ -8,6 +8,7 @@ from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DEV_ASSETS = {
+    '/__motion_lab__/review-api.js': ROOT / 'tools/review-api.js',
     '/__motion_lab__/motion-lab.js': ROOT / 'tools/motion-lab.js',
     '/__motion_lab__/GSDevTools.min.js': ROOT / 'tools/vendor/GSDevTools.min.js',
 }
@@ -41,6 +42,11 @@ REDUCED_MOTION = """
 
 
 class MotionHandler(SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        # Browser QA records network failures. Avoid filling an unattended
+        # subprocess stderr pipe with successful static-asset requests.
+        pass
+
     def translate_path(self, path):
         requested = path.split('?', 1)[0]
         if requested in DEV_ASSETS:
