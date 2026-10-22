@@ -18,6 +18,14 @@ const projectSwitcher = document.querySelector(".project-switcher");
 const projectButtons = [...document.querySelectorAll("[data-select-project]")];
 const projectStops = [1 / 9, 0.5, 8 / 9];
 const chapters = [...document.querySelectorAll(".chapter")];
+const sectionLinks = [
+  ...document.querySelectorAll(
+    '.site-header a[href="#work"], .site-header a[href="#projects"]',
+  ),
+].map((element) => ({
+  element,
+  chapter: element.getAttribute("href") === "#work" ? 1 : 2,
+}));
 const bridge = document.querySelector(".flow-bridge");
 const route = document.querySelector(".route-line"),
   routeDot = document.querySelector(".route-dot");
@@ -194,6 +202,10 @@ function updateTrace(delta) {
   tracePath.setAttribute("d", d);
 }
 function updateProjectNavigation() {
+  projectSwitcher?.style.setProperty(
+    "--project-index",
+    String(clamp(deckClock.index, 0, panels.length - 1)),
+  );
   const index = clamp(Math.round(deckClock.index), 0, panels.length - 1);
   if (index === selectedProject) return;
   selectedProject = index;
@@ -202,7 +214,6 @@ function updateProjectNavigation() {
       button.setAttribute("aria-current", "true");
     else button.removeAttribute("aria-current");
   }
-  projectSwitcher?.style.setProperty("--project-index", String(index));
 }
 function goToProject(index, immediate = false) {
   if (!panels[index]) return;
@@ -376,6 +387,11 @@ function paint(time = 0, delta = 1 / 60) {
   if (currentChapter !== activeChapter) {
     activeChapter = currentChapter;
     root.dataset.chapter = String(activeChapter);
+    for (const link of sectionLinks) {
+      if (link.chapter === activeChapter)
+        link.element.setAttribute("aria-current", "location");
+      else link.element.removeAttribute("aria-current");
+    }
     document.querySelector(".status-index").textContent =
       `0${activeChapter + 1} / 04`;
     document.querySelector(".status-label").textContent = [
@@ -464,6 +480,9 @@ function buildChoreography(entrance = false) {
             refreshPriority: 2,
           },
         });
+        gsap.set(panels.map((panel) => panel.querySelector("h3")), {
+          clipPath: "inset(0 0 0% 0)",
+        });
         deck.to(deckClock, { index: 0, duration: 1.2 });
         deck.to(track, {
           x: () => -innerWidth,
@@ -487,6 +506,86 @@ function buildChoreography(entrance = false) {
           "<",
         );
         deck.to({}, { duration: 1.2 });
+        // Copy shares the deck clock: each transfer finishes before its reading
+        // hold, and reversing or keyboard-seeking restores the same clear state.
+        // The context reverts every inline style for native/reduced-motion views.
+        const copyTransition = (panel, entering) => {
+          const copy = panel.querySelector(".project-copy");
+          const metadata = copy.querySelector(".project-index");
+          const title = copy.querySelector("h3");
+          const details = [
+            ...copy.querySelectorAll(
+              ":scope > p, :scope > .technology-list, :scope > .project-actions, :scope > .project-link",
+            ),
+          ];
+          const sequence = gsap.timeline();
+          if (entering) {
+            sequence
+              .fromTo(
+                metadata,
+                { y: 8, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+                0.18,
+              )
+              .fromTo(
+                title,
+                { y: 18, clipPath: "inset(0 0 100% 0)" },
+                {
+                  y: 0,
+                  clipPath: "inset(0 0 0% 0)",
+                  duration: 0.58,
+                  ease: "power3.out",
+                },
+                0.16,
+              )
+              .fromTo(
+                details,
+                { x: 18, opacity: 0 },
+                {
+                  x: 0,
+                  opacity: 1,
+                  duration: 0.44,
+                  stagger: 0.04,
+                  ease: "power2.out",
+                },
+                0.3,
+              );
+          } else {
+            sequence
+              .to(
+                metadata,
+                { y: -6, opacity: 0, duration: 0.24, ease: "power2.in" },
+                0,
+              )
+              .to(
+                title,
+                {
+                  y: -12,
+                  clipPath: "inset(100% 0 0% 0)",
+                  duration: 0.42,
+                  ease: "power2.inOut",
+                },
+                0,
+              )
+              .to(
+                details,
+                {
+                  x: -16,
+                  opacity: 0,
+                  duration: 0.28,
+                  stagger: 0.03,
+                  ease: "power2.in",
+                },
+                0,
+              );
+          }
+          return sequence;
+        };
+        for (let index = 0; index < panels.length - 1; index++) {
+          const transfer = 1.2 + index * 2.1;
+          deck.add(copyTransition(panels[index], false), transfer);
+          deck.add(copyTransition(panels[index + 1], true), transfer);
+        }
         deckTimeline = deck;
         deckTrigger = deck.scrollTrigger;
       }

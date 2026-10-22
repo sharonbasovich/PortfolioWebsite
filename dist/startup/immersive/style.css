@@ -1574,7 +1574,6 @@ footer a {
   height: 100%;
   background: var(--cobalt);
   transform: translateX(calc(var(--project-index) * 100%));
-  transition: transform 650ms var(--ease-out);
 }
 .project-panel {
   padding-top: 167px;
@@ -1883,5 +1882,62 @@ footer a {
   .motion {
     padding: 9px 10px;
     font-size: 9px;
+  }
+}
+
+/* Continuation cues use the same deck clock and control language. */
+.site-header nav a:is([href="#work"], [href="#projects"]) {
+  position: relative;
+}
+.site-header nav a[aria-current="location"] {
+  color: var(--cobalt);
+}
+.site-header nav a[aria-current="location"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 30px;
+}
+footer {
+  flex-wrap: wrap;
+}
+.footer-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  column-gap: clamp(18px, 3vw, 36px);
+  row-gap: 4px;
+  min-width: min(100%, 240px);
+}
+.footer-top .return-arrow {
+  color: var(--cobalt);
+  font-size: 18px;
+  line-height: 1;
+  transition: transform var(--motion-standard) var(--ease-settle);
+}
+.footer-top:is(:hover, :focus-visible) .return-arrow {
+  transform: translateY(-3px);
+}
+.motion-paused .footer-top .return-arrow {
+  transform: none;
+}
+@media (max-width: 600px) {
+  .project-actions {
+    column-gap: 24px;
+  }
+  .footer-navigation {
+    justify-content: flex-start;
   }
 }

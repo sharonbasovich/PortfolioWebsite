@@ -854,6 +854,7 @@ export function createWorld(
     0.52,
   );
   center.rotation.z = Math.PI / 4;
+  const irisBlades = [];
   for (let index = 0; index < 6; index++) {
     const angle = (index / 6) * Math.PI * 2;
     const blade = addMesh(
@@ -863,6 +864,7 @@ export function createWorld(
     );
     blade.position.set(Math.sin(angle) * 0.88, Math.cos(angle) * 0.88, 0.34);
     blade.rotation.z = -angle - 0.35;
+    irisBlades.push({ blade, angle });
   }
 
   const state = {
@@ -897,6 +899,7 @@ export function createWorld(
   let nextQualityProbe = 75;
   let lastWallTime = null;
   let lastFrames = [];
+  let apertureValue = 0;
   let hitCount = 0;
   let kickCount = 0;
   let peakSpringOffset = 0;
@@ -1284,6 +1287,22 @@ export function createWorld(
       );
       finale.scale.setScalar(1);
       finaleInner.rotation.z = -ambientTime * 0.048 + progress * 0.7;
+      // The same mechanical language resolves into an opening at contact.
+      // Use the cached layout progress so pause, reverse scroll and context
+      // restoration retain the exact same aperture without another clock.
+      apertureValue = smooth(0.12, 0.62, progress);
+      for (const { blade, angle } of irisBlades) {
+        const radius = 0.88 + apertureValue * 0.28;
+        blade.position.set(
+          Math.sin(angle) * radius,
+          Math.cos(angle) * radius,
+          0.34 - apertureValue * 0.08,
+        );
+        blade.rotation.z = -angle - 0.35 - apertureValue * 0.72;
+      }
+      center.position.z = 0.52 + apertureValue * 0.15;
+      center.scale.setScalar(1 - apertureValue * 0.14);
+      center.rotation.z = Math.PI / 4 + apertureValue * 0.12;
     }
 
     camera.fov = compact ? 31 : 29;
@@ -1558,6 +1577,7 @@ export function createWorld(
       observedIntervalMs: Math.round(frameIntervalMs * 100) / 100,
       burstTarget: state.burst,
       burstValue: Math.round(burstValue * 1000) / 1000,
+      apertureValue: Math.round(apertureValue * 1000) / 1000,
       lastTime,
       contextLost,
       disposed,
@@ -1582,7 +1602,6 @@ export function createWorld(
     renderTarget.dispose();
     skeleton.dispose();
     environment?.dispose();
-    skeleton.dispose();
     renderer.dispose();
   }
 
