@@ -482,6 +482,18 @@ export function createWorld(
     innerRing,
   ]);
   const batches = new Map();
+  const carrierPartIndex = pieces.findIndex((part) => part.object === floatingModule);
+  // One visible module shares the source geometry/materials. The original remains
+  // the rigid bone and exact pick proxy, including while the visible module flies.
+  const carrier = new THREE.Group();
+  carrier.matrixAutoUpdate = false;
+  carrier.visible = false;
+  for (const source of floatingModule.children) {
+    const mesh = source.clone();
+    mesh.visible = true;
+    carrier.add(mesh);
+  }
+  scene.add(carrier);
   const toAssembly = new THREE.Matrix4().copy(assembly.matrixWorld).invert();
   const transform = new THREE.Matrix4();
   const instanceTransform = new THREE.Matrix4();
@@ -529,6 +541,10 @@ export function createWorld(
   pieces.forEach((part, partIndex) => {
     part.object.traverse((mesh) => {
       if (!mesh.isMesh) return;
+      if (partIndex === carrierPartIndex) {
+        mesh.visible = false;
+        return;
+      }
       if (mesh.isInstancedMesh) {
         for (let index = 0; index < mesh.count; index++)
           appendRigidGeometry(mesh, partIndex, index);
@@ -899,6 +915,7 @@ export function createWorld(
   let nextQualityProbe = 75;
   let lastWallTime = null;
   let lastFrames = [];
+  let lastCarrierInput = null;
   let apertureValue = 0;
   let hitCount = 0;
   let kickCount = 0;
@@ -962,10 +979,10 @@ export function createWorld(
     rebuildEnvironment();
     resize();
     // Also restore a paused scene immediately, without restarting its clock.
-    if (lastFrames.length) {
+    if (lastFrames.length || (carrierPose.enabled && carrierPose.owner === "flight")) {
       const wasMoving = state.motion;
       state.motion = false;
-      renderFrames(restoreTime, 0, lastFrames);
+      renderFrames(restoreTime, 0, lastFrames, lastCarrierInput);
       state.motion = wasMoving;
     }
     lastWallTime = null;
@@ -1112,8 +1129,10 @@ export function createWorld(
     legacyFrame = rect;
   }
 
+  const frameKey = (item) => item.id || `${item.chapter}:${item.project || 0}`;
+
   function getPose(item) {
-    const id = item.id || `${item.chapter}:${item.project || 0}`;
+    const id = frameKey(item);
     if (!poses.has(id)) {
       poses.set(id, {
         pointer: new THREE.Vector2(),
@@ -1146,7 +1165,7 @@ export function createWorld(
     return poses.get(id);
   }
 
-  function applyPose(item, pose, time, dt) {
+  function applyPose(item, pose, time, dt, advance = true) {
     const rect = item.rect;
     const chapter = Math.round(clamp(item.chapter, 0, 3));
     const project = Math.round(clamp(item.project || 0, 0, 2));
@@ -1167,7 +1186,7 @@ export function createWorld(
       pointerPosition.y >= rect.top &&
       pointerPosition.y <= rect.top + rect.height;
     // The same pixel under the cursor now controls the object in that frame.
-    if (motion) {
+    if (motion && advance) {
       pose.pointerTarget.set(
         inside ? ((pointerPosition.x - rect.left) / rect.width) * 2 - 1 : 0,
         inside ? 1 - ((pointerPosition.y - rect.top) / rect.height) * 2 : 0,
@@ -1210,7 +1229,7 @@ export function createWorld(
         const local = pose.parts[index];
         local.target.copy(part.base).addScaledVector(part.apart, separation);
         if (!pose.initialized) local.current.copy(local.target);
-        else if (motion && dt) {
+        else if (motion && dt && advance) {
           spring(local.current, local.velocity, local.target, dt, 110, 21);
           spring(local.offset, local.offsetVelocity, zero, dt, 36, 7.6);
           spring(local.rotation, local.rotationVelocity, zero, dt, 30, 7.2);
@@ -1329,14 +1348,14 @@ export function createWorld(
     if (!pose.initialized || pose.aspect !== camera.aspect) {
       pose.camera.copy(pose.cameraTarget);
       pose.cameraVelocity.setScalar(0);
-    } else if (motion)
+    } else if (motion && advance)
       spring(pose.camera, pose.cameraVelocity, pose.cameraTarget, dt, 120, 23);
     pose.aspect = camera.aspect;
     camera.position.copy(pose.camera);
     camera.lookAt(0, 0, 0);
     // Raycasts see the real camera, assembly rotation, disassembly and spring offsets.
     // A short sweep catches fast cursor passes whose endpoints miss thin metal parts.
-    if (assembly.visible && motion && dt > 0) {
+    if (assembly.visible && motion && dt > 0 && advance) {
       world.updateMatrixWorld(true);
       camera.updateMatrixWorld(true);
       if (inside && pose.pointerWasInside) {
@@ -1392,6 +1411,252 @@ export function createWorld(
     pose.initialized = true;
   }
 
+
+  // The carrier is rendered once: in its source/target window at the boundaries,
+  // or as a transparent flight after all window composites. No second RAF/target.
+  const advancedPoses = new Set();
+  const carrierCamera = new THREE.PerspectiveCamera(29, 1, 0.1, 100);
+  const makeCarrierEndpoint = () => ({
+    center: new THREE.Vector2(),
+    position: new THREE.Vector3(),
+    quaternion: new THREE.Quaternion(),
+    scale: new THREE.Vector3(),
+    cameraPosition: new THREE.Vector3(),
+    cameraQuaternion: new THREE.Quaternion(),
+    projection: new THREE.Matrix4(),
+    unitPixels: 1,
+    key: "",
+  });
+  const carrierStart = makeCarrierEndpoint();
+  const carrierEnd = makeCarrierEndpoint();
+  const carrierPose = {
+    initialized: false,
+    enabled: false,
+    progress: 0,
+    owner: "local",
+    ownerKey: "",
+    point: new THREE.Vector2(),
+    basePoint: new THREE.Vector2(),
+    anchor: new THREE.Vector2(),
+    lastAnchor: new THREE.Vector2(),
+    baseProjection: new THREE.Matrix4(),
+    growth: 1,
+    draws: 0,
+    width: 1,
+    height: 1,
+    matrix: new THREE.Matrix4(),
+  };
+  const carrierViewport = new THREE.Matrix4();
+  const carrierView = new THREE.Matrix4();
+  const carrierLocal = new THREE.Matrix4();
+  const carrierProjection = new THREE.Matrix4();
+  const carrierPosition = new THREE.Vector3();
+  const carrierQuaternion = new THREE.Quaternion();
+  const carrierScale = new THREE.Vector3();
+  const carrierNdc = new THREE.Vector3();
+  const carrierTurn = new THREE.Quaternion();
+  const carrierAxis = new THREE.Vector3(0, 0, 1);
+  const carrierBounds = new THREE.Box3();
+  const carrierBox = new THREE.Box3();
+  const carrierCorner = new THREE.Vector3();
+  const carrierScreenBounds = { left: 0, top: 0, right: 0, bottom: 0 };
+  for (const mesh of carrier.children) {
+    mesh.updateMatrix();
+    mesh.geometry.computeBoundingBox();
+    carrierBox.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrix);
+    carrierBounds.union(carrierBox);
+  }
+
+  function applyFramePose(item, time, dt) {
+    const key = frameKey(item);
+    const pose = getPose(item);
+    const advance = !advancedPoses.has(key);
+    applyPose(item, pose, time, dt, advance);
+    advancedPoses.add(key);
+    return pose;
+  }
+
+  function validCarrierFrame(item) {
+    const rect = item?.rect;
+    return rect &&
+      [rect.left, rect.top, rect.width, rect.height].every(Number.isFinite) &&
+      rect.width > 1 && rect.height > 1;
+  }
+
+  function captureCarrierEndpoint(item, endpoint, time, dt) {
+    applyFramePose(item, time, dt);
+    world.updateMatrixWorld(true);
+    camera.updateMatrixWorld(true);
+    carrierView.multiplyMatrices(camera.matrixWorldInverse, floatingModule.matrixWorld);
+    carrierView.decompose(endpoint.position, endpoint.quaternion, endpoint.scale);
+    endpoint.cameraPosition.copy(camera.position);
+    endpoint.cameraQuaternion.copy(camera.quaternion);
+    const rect = item.rect;
+    // Map the local window's clip coordinates into the full viewport. This keeps
+    // every vertex in exactly the same CSS pixel at the rendering-owner boundary.
+    carrierViewport.set(
+      rect.width / screenWidth, 0, 0, (rect.left * 2 + rect.width) / screenWidth - 1,
+      0, rect.height / screenHeight, 0, 1 - (rect.top * 2 + rect.height) / screenHeight,
+      0, 0, 1, 0,
+      0, 0, 0, 1,
+    );
+    endpoint.projection.multiplyMatrices(carrierViewport, camera.projectionMatrix);
+    carrierNdc.copy(endpoint.position).applyMatrix4(endpoint.projection);
+    endpoint.center.set(
+      (carrierNdc.x + 1) * screenWidth * 0.5,
+      (1 - carrierNdc.y) * screenHeight * 0.5,
+    );
+    endpoint.unitPixels = screenHeight * 0.5 * endpoint.projection.elements[5] /
+      Math.max(0.01, -endpoint.position.z);
+    endpoint.key = frameKey(item);
+  }
+
+  function setCarrierBounds(matrix, viewCamera, rect = null) {
+    carrierScreenBounds.left = carrierScreenBounds.top = Infinity;
+    carrierScreenBounds.right = carrierScreenBounds.bottom = -Infinity;
+    for (let index = 0; index < 8; index++) {
+      carrierCorner.set(
+        index & 1 ? carrierBounds.max.x : carrierBounds.min.x,
+        index & 2 ? carrierBounds.max.y : carrierBounds.min.y,
+        index & 4 ? carrierBounds.max.z : carrierBounds.min.z,
+      ).applyMatrix4(matrix).project(viewCamera);
+      const x = (rect?.left || 0) + (carrierCorner.x + 1) * (rect?.width || screenWidth) * 0.5;
+      const y = (rect?.top || 0) + (1 - carrierCorner.y) * (rect?.height || screenHeight) * 0.5;
+      carrierScreenBounds.left = Math.min(carrierScreenBounds.left, x);
+      carrierScreenBounds.top = Math.min(carrierScreenBounds.top, y);
+      carrierScreenBounds.right = Math.max(carrierScreenBounds.right, x);
+      carrierScreenBounds.bottom = Math.max(carrierScreenBounds.bottom, y);
+    }
+  }
+
+  function updateCarrier(input, time, dt) {
+    // A user pause freezes the already displayed owner, camera and model matrix.
+    // An initially reduced-motion/disabled page never enters the transfer.
+    if (state.motion === false && carrierPose.initialized) {
+      if (carrierPose.enabled && carrierPose.owner === "flight") {
+        const anchor = input?.path?.[0];
+        if (Number.isFinite(anchor?.x) && Number.isFinite(anchor?.y))
+          carrierPose.lastAnchor.set(anchor.x, anchor.y);
+        const dx = carrierPose.lastAnchor.x - carrierPose.anchor.x;
+        const dy = carrierPose.lastAnchor.y - carrierPose.anchor.y;
+        const sx = carrierPose.width / Math.max(1, screenWidth);
+        const sy = carrierPose.height / Math.max(1, screenHeight);
+        // Freeze physical motion, while its paper/document attachment still
+        // follows native scrolling. Mapping frozen clip space preserves CSS
+        // size through viewport changes without advancing any spring or clock.
+        carrierViewport.set(
+          sx, 0, 0, sx - 1 + 2 * dx / Math.max(1, screenWidth),
+          0, sy, 0, 1 - sy - 2 * dy / Math.max(1, screenHeight),
+          0, 0, 1, 0,
+          0, 0, 0, 1,
+        );
+        carrierCamera.projectionMatrix.multiplyMatrices(
+          carrierViewport, carrierPose.baseProjection,
+        );
+        carrierCamera.projectionMatrixInverse.copy(carrierCamera.projectionMatrix).invert();
+        carrierPose.point.copy(carrierPose.basePoint);
+        carrierPose.point.x += dx;
+        carrierPose.point.y += dy;
+        setCarrierBounds(carrierPose.matrix, carrierCamera);
+      }
+      return;
+    }
+    carrierPose.initialized = true;
+    const path = input?.path;
+    carrierPose.enabled = Boolean(
+      state.motion !== false && input?.enabled && validCarrierFrame(input.startFrame) &&
+      validCarrierFrame(input.endFrame) && Array.isArray(path) && path.length &&
+      path.every((point) => Number.isFinite(point?.x) && Number.isFinite(point?.y)),
+    );
+    if (!carrierPose.enabled) {
+      carrierPose.owner = "local";
+      return;
+    }
+    const p = clamp(Number.isFinite(input.progress) ? input.progress : 0);
+    carrierPose.progress = p;
+    captureCarrierEndpoint(input.startFrame, carrierStart, time, dt);
+    captureCarrierEndpoint(input.endFrame, carrierEnd, time, dt);
+    carrierPose.owner = p <= 0 ? "hero" : p >= 1 ? "work" : "flight";
+    carrierPose.ownerKey = p <= 0 ? carrierStart.key : p >= 1 ? carrierEnd.key : "";
+    if (carrierPose.owner !== "flight") {
+      carrierPose.point.copy(p <= 0 ? carrierStart.center : carrierEnd.center);
+      carrierPose.growth = 1;
+      return;
+    }
+
+    const interpolation = smooth(0, 1, p);
+    carrierCamera.position.lerpVectors(
+      carrierStart.cameraPosition, carrierEnd.cameraPosition, interpolation,
+    );
+    carrierCamera.quaternion.slerpQuaternions(
+      carrierStart.cameraQuaternion, carrierEnd.cameraQuaternion, interpolation,
+    );
+    carrierCamera.updateMatrixWorld(true);
+    // Unfold the source window into the viewport, then resolve into the target.
+    // These projection matrices share near/far planes, so their interpolation
+    // remains a finite perspective projection with a continuous off-axis center.
+    carrierCamera.fov = compact ? 31 : 29;
+    carrierCamera.aspect = screenWidth / Math.max(1, screenHeight);
+    carrierCamera.updateProjectionMatrix();
+    carrierProjection.copy(carrierCamera.projectionMatrix);
+    const sourceWeight = 1 - smooth(0, 0.2, p);
+    const targetWeight = smooth(0.8, 1, p);
+    for (let index = 0; index < 16; index++) {
+      carrierCamera.projectionMatrix.elements[index] =
+        carrierProjection.elements[index] * (1 - sourceWeight - targetWeight) +
+        carrierStart.projection.elements[index] * sourceWeight +
+        carrierEnd.projection.elements[index] * targetWeight;
+    }
+    carrierCamera.projectionMatrixInverse.copy(carrierCamera.projectionMatrix).invert();
+
+    const pathIndex = p * (path.length - 1);
+    const lower = Math.floor(pathIndex);
+    const upper = Math.min(path.length - 1, lower + 1);
+    carrierPose.point.set(
+      path[lower].x + (path[upper].x - path[lower].x) * (pathIndex - lower),
+      path[lower].y + (path[upper].y - path[lower].y) * (pathIndex - lower),
+    );
+    if (p < 0.15)
+      carrierPose.point.lerp(carrierStart.center, 1 - smooth(0, 0.15, p));
+    else if (p > 0.8)
+      carrierPose.point.lerp(carrierEnd.center, smooth(0.8, 1, p));
+
+    const depth = Math.max(0.2,
+      -carrierStart.position.z +
+      (-carrierEnd.position.z + carrierStart.position.z) * interpolation,
+    );
+    const projection = carrierCamera.projectionMatrix.elements;
+    const clipZ = projection[10] * -depth + projection[14];
+    const clipW = projection[11] * -depth + projection[15];
+    carrierPosition.set(
+      carrierPose.point.x / Math.max(1, screenWidth) * 2 - 1,
+      1 - carrierPose.point.y / Math.max(1, screenHeight) * 2,
+      clipZ / Math.max(0.0001, clipW),
+    ).applyMatrix4(carrierCamera.projectionMatrixInverse);
+    carrierQuaternion.slerpQuaternions(
+      carrierStart.quaternion, carrierEnd.quaternion, interpolation,
+    );
+    carrierTurn.setFromAxisAngle(carrierAxis, Math.sin(p * Math.PI) * 0.24);
+    carrierQuaternion.multiply(carrierTurn);
+    carrierScale.lerpVectors(carrierStart.scale, carrierEnd.scale, interpolation);
+    const unitPixels = carrierStart.unitPixels +
+      (carrierEnd.unitPixels - carrierStart.unitPixels) * interpolation;
+    const currentUnitPixels = screenHeight * 0.5 * projection[5] / depth;
+    carrierPose.growth = 1 + Math.sin(p * Math.PI) ** 2 * 0.5;
+    carrierScale.multiplyScalar(
+      Math.max(0.001, unitPixels) / Math.max(0.001, currentUnitPixels) * carrierPose.growth,
+    );
+    carrierLocal.compose(carrierPosition, carrierQuaternion, carrierScale);
+    carrierPose.matrix.multiplyMatrices(carrierCamera.matrixWorld, carrierLocal);
+    carrierPose.width = screenWidth;
+    carrierPose.height = screenHeight;
+    carrierPose.basePoint.copy(carrierPose.point);
+    carrierPose.anchor.set(path[0].x, path[0].y);
+    carrierPose.lastAnchor.copy(carrierPose.anchor);
+    carrierPose.baseProjection.copy(carrierCamera.projectionMatrix);
+    setCarrierBounds(carrierPose.matrix, carrierCamera);
+  }
+
   function frameViewport(rect) {
     const left = Math.max(0, rect.left);
     const top = Math.max(0, rect.top);
@@ -1412,7 +1677,7 @@ export function createWorld(
     renderer.setScissorTest(true);
   }
 
-  function renderFrames(time = 0, delta = 1 / 60, frames = []) {
+  function renderFrames(time = 0, delta = 1 / 60, frames = [], handoff = null) {
     if (disposed || contextLost) return;
     const started = performance.now();
     const dt =
@@ -1449,6 +1714,12 @@ export function createWorld(
         rect.top + rect.height > 0,
     );
     lastFrames = visibleFrames;
+    lastCarrierInput = handoff;
+    advancedPoses.clear();
+    carrierPose.draws = 0;
+    updateCarrier(handoff, seconds, dt);
+    world.visible = true;
+    carrier.visible = false;
 
     renderer.info.reset();
     renderer.setRenderTarget(renderTarget);
@@ -1479,8 +1750,18 @@ export function createWorld(
     // Both scenes can coexist while a section crosses the viewport. Render the
     // actual geometry where its DOM window is, with independent pose histories.
     for (const item of visibleFrames) {
-      const pose = getPose(item);
-      applyPose(item, pose, seconds, dt);
+      applyFramePose(item, seconds, dt);
+      carrier.visible = assembly.visible && (!carrierPose.enabled ||
+        (carrierPose.owner !== "flight" && frameKey(item) === carrierPose.ownerKey));
+      if (carrier.visible) {
+        world.updateMatrixWorld(true);
+        camera.updateMatrixWorld(true);
+        carrier.matrix.copy(floatingModule.matrixWorld);
+        carrier.matrixWorldNeedsUpdate = true;
+        carrier.updateMatrixWorld(true);
+        carrierPose.draws += carrier.children.length;
+        setCarrierBounds(carrier.matrix, camera, item.rect);
+      }
       frameViewport(item.rect);
       renderer.clear(false, true, false);
       renderer.render(scene, camera);
@@ -1512,6 +1793,22 @@ export function createWorld(
       frameViewport(rect);
       renderer.render(outputScene, outputCamera);
     }
+    if (carrierPose.enabled && carrierPose.owner === "flight") {
+      // Direct PBR output keeps true transparency. The ordinary window compositor
+      // intentionally paints a studio backdrop and must not be used for flight.
+      world.visible = false;
+      carrier.visible = true;
+      carrier.matrix.copy(carrierPose.matrix);
+      carrier.matrixWorldNeedsUpdate = true;
+      carrier.updateMatrixWorld(true);
+      renderer.setScissorTest(false);
+      renderer.setViewport(0, 0, screenWidth, screenHeight);
+      renderer.clearDepth();
+      renderer.render(scene, carrierCamera);
+      carrierPose.draws += carrier.children.length;
+      world.visible = true;
+    }
+    carrier.visible = false;
     renderer.setScissorTest(false);
     submissionMs = performance.now() - started;
   }
@@ -1578,6 +1875,17 @@ export function createWorld(
       burstTarget: state.burst,
       burstValue: Math.round(burstValue * 1000) / 1000,
       apertureValue: Math.round(apertureValue * 1000) / 1000,
+      carrier: {
+        enabled: carrierPose.enabled,
+        owner: carrierPose.owner,
+        progress: Math.round(carrierPose.progress * 10000) / 10000,
+        screen: { x: carrierPose.point.x, y: carrierPose.point.y },
+        growth: carrierPose.growth,
+        draws: carrierPose.draws,
+        bounds: carrierPose.draws ? { ...carrierScreenBounds } : null,
+        source: { x: carrierStart.center.x, y: carrierStart.center.y },
+        destination: { x: carrierEnd.center.x, y: carrierEnd.center.y },
+      },
       lastTime,
       contextLost,
       disposed,

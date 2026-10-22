@@ -1,0 +1,20 @@
+/* The existing site ticker owns all ribbon movement and fading. */
+.pointer-trace[data-pointer-ribbon] {
+  overflow: hidden;
+  pointer-events: none;
+  transition: none;
+}
+.pointer-trace[data-pointer-ribbon] .pointer-ribbon__layer {
+  stroke: none;
+  stroke-width: 0;
+  filter: none;
+  pointer-events: none;
+}
+.motion-paused .pointer-trace[data-pointer-ribbon] {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .pointer-trace[data-pointer-ribbon] {
+    display: none;
+  }
+}

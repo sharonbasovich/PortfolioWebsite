@@ -84,7 +84,9 @@ No new animation framework, asset pack, paid resource or font was introduced.
 The existing Three.js/GSAP/Lenis system, sculpture and cobalt/chrome/paper palette
 remain the foundation. No Lusion production asset or bundle code was copied.
 
-## Ranked next work
+## Follow-up priorities
+
+These priorities informed the continuity pass described below.
 
 1. **Authentic project/process visuals.** Put real output and implementation
    evidence into the project sequence. The Lusion archive's biggest advantage is
@@ -100,6 +102,41 @@ A cloud capture did not resolve the contact iris frame by frame, so its suggesti
 to add extra scroll runway is not an established defect. Codex's focused local
 check reached aperture 0.962 at the bottom and preserved exact paused art pixels.
 Do not add empty scroll distance solely on that inconclusive observation.
+
+## Continuity pass — 22 October 2026
+
+The existing sculpture now contributes one real part to the bridge: its small
+chrome/cobalt module leaves the hero, follows the drawn route, and docks in the
+work scene. Only one visible module exists. The original part remains the hidden
+raycast/skeleton proxy; its vertices are omitted from the material batches.
+An off-axis camera projection matches both endpoint windows before unfolding
+into a transparent viewport pass. This uses the existing renderer, lighting,
+materials and clock, without another render target or animation framework.
+
+Pause freezes the physical pose while retaining its attachment to the document.
+Scrolling moves it out of view normally; resizing preserves its CSS size, and
+context restoration reuses the latest document position. Initially reduced
+motion and narrow/native layouts retain the local sculpture instead of flight.
+
+The pointer trace is now a short tapered silver/cobalt ribbon with a narrow glint.
+Its sampled tail has bounded geometry and frame-rate-independent segment lag.
+It clears on exit, control hover, idle, pause and reduced motion.
+
+Project stages now show the actual Undercity prototype and SkyCell replay UI.
+The full photograph is delivered as a 110KB WebP; the dashboard is 138KB.
+SkyCell's caption identifies archived APEX/SondeHub tracker data. Marble has an
+explicitly labelled explanatory workflow diagram with separate research-graph
+and news-extraction lanes. No private dashboard or invented production image is
+presented. Image provenance and source credits accompany the assets.
+Arrival masks share the existing deck clock; reading holds stay still.
+Covered 3D project stages no longer consume GPU submissions.
+
+The continuity browser checks cover normal wheel input and reversal, both
+ownership boundaries, finite projection, exact paused carrier pixels, paused
+scroll/resize, context loss/restoration, short-screen fit, accessible image
+captions, mobile/reduced motion, missing WebGL, and runtime errors. The short
+1100×650 diagram layout was corrected after testing found clipped fields.
+Validation used local Chromium with SwiftShader; it is not a hardware-FPS claim.
 
 ## Verification and preservation
 

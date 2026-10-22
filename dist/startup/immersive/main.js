@@ -1,5 +1,7 @@
 import Lenis from "../vendor/lenis/lenis.js";
 import { createWorld } from "./world.js";
+import { createPointerRibbon } from "./pointer-ribbon.js";
+import { installProjectEvidence } from "./project-evidence.js";
 
 const gsap = window.gsap,
   ScrollTrigger = window.ScrollTrigger,
@@ -12,6 +14,7 @@ const motionButton = document.querySelector(".motion"),
 const gallery = document.querySelector(".project-gallery"),
   track = document.querySelector(".project-panels");
 const panels = [...document.querySelectorAll(".project-panel")];
+const projectEvidence = installProjectEvidence(panels);
 const rail = document.querySelector(".scroll-rail"),
   thumb = document.querySelector(".scroll-thumb");
 const projectSwitcher = document.querySelector(".project-switcher");
@@ -31,12 +34,15 @@ const route = document.querySelector(".route-line"),
   routeTube = document.querySelector(".route-tube"),
   routeDot = document.querySelector(".route-dot");
 const routeLength = route?.getTotalLength() || 1;
+const routePoints = Array.from({ length: 49 }, (_, index) => {
+  const point = route.getPointAtLength((routeLength * index) / 48);
+  return { x: point.x / 1440, y: point.y / 650 };
+});
 const routeClock = { progress: 0 };
 const heroWindow = document.querySelector(".hero-window");
-const trace = document.querySelector(".pointer-trace"),
-  tracePath = trace?.querySelector("path");
+const trace = document.querySelector(".pointer-trace");
+const ribbon = createPointerRibbon(trace);
 const pointer = { x: 0, y: 0, active: false, movedAt: 0 };
-const tail = Array.from({ length: 14 }, () => ({ x: 0, y: 0 }));
 let traceBounds;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 const compactQuery = matchMedia("(max-width: 800px)");
@@ -151,6 +157,7 @@ function refreshMeasurements() {
     "viewBox",
     `0 0 ${traceBounds.width} ${traceBounds.height}`,
   );
+  ribbon.resize(traceBounds.width, traceBounds.height);
   if (routeTube) {
     routeTube.style.strokeDasharray = String(routeLength);
     routeTube.style.strokeDashoffset = String(
@@ -160,47 +167,23 @@ function refreshMeasurements() {
 }
 
 heroWindow.addEventListener("pointermove", (event) => {
-  if (paused || !finePointer.matches || event.target.closest("button,a"))
+  if (paused || !finePointer.matches || event.target.closest("button,a")) {
+    pointer.active = false;
+    ribbon.reset();
     return;
+  }
   const rect = heroWindow.getBoundingClientRect();
   pointer.x = event.clientX - rect.left;
   pointer.y = event.clientY - rect.top;
-  if (!pointer.active)
-    for (const point of tail) {
-      point.x = pointer.x;
-      point.y = pointer.y;
-    }
   pointer.active = true;
   pointer.movedAt = performance.now();
 });
 heroWindow.addEventListener("pointerleave", () => {
   pointer.active = false;
+  ribbon.reset();
 });
 function updateTrace(delta) {
-  if (!trace || !tracePath) return;
-  const show =
-    !paused &&
-    finePointer.matches &&
-    pointer.active &&
-    performance.now() - pointer.movedAt < 650;
-  trace.style.opacity = show ? "1" : "0";
-  if (!show) return;
-  let ahead = pointer;
-  const follow = 1 - Math.exp(-delta * 34);
-  for (const point of tail) {
-    point.x += (ahead.x - point.x) * follow;
-    point.y += (ahead.y - point.y) * follow;
-    ahead = point;
-  }
-  const points = tail.slice().reverse();
-  let d = `M${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
-  for (let index = 1; index < points.length - 1; index++) {
-    const point = points[index],
-      next = points[index + 1];
-    d += ` Q${point.x.toFixed(1)},${point.y.toFixed(1)} ${((point.x + next.x) / 2).toFixed(1)},${((point.y + next.y) / 2).toFixed(1)}`;
-  }
-  d += ` L${pointer.x.toFixed(1)},${pointer.y.toFixed(1)}`;
-  tracePath.setAttribute("d", d);
+  ribbon.update(pointer, delta, !paused && finePointer.matches);
 }
 function updateProjectNavigation() {
   projectSwitcher?.style.setProperty(
@@ -293,7 +276,9 @@ function paint(time = 0, delta = 1 / 60) {
   // Read all DOM geometry first; render every visible window in its own view.
   const heroBounds = document.querySelector(".hero").getBoundingClientRect();
   const workBounds = document.querySelector(".work").getBoundingClientRect();
+  const bridgeBounds = bridge.getBoundingClientRect();
   const visible = [];
+  const allFrames = [];
   let dominant,
     best = 0;
   for (const item of windows) {
@@ -301,7 +286,7 @@ function paint(time = 0, delta = 1 / 60) {
     const area =
       Math.max(0, Math.min(innerWidth, rect.right) - Math.max(0, rect.left)) *
       Math.max(0, Math.min(innerHeight, rect.bottom) - Math.max(0, rect.top));
-    if (!area || !rect.width || !rect.height) continue;
+    if (!rect.width || !rect.height) continue;
     if (area > best) {
       best = area;
       dominant = { ...item, rect };
@@ -315,7 +300,7 @@ function paint(time = 0, delta = 1 / 60) {
         Math.max(innerHeight, workBounds.height),
     );
     const galleryOffset = deckTrigger ? deckClock.index - item.project : 0;
-    visible.push({
+    const view = {
       rect,
       chapter: item.chapter,
       project: item.project,
@@ -348,7 +333,10 @@ function paint(time = 0, delta = 1 / 60) {
             : item.chapter === 2
               ? 0.12 - Math.abs(galleryOffset) * 0.3
               : 0.05,
-    });
+    };
+    allFrames.push(view);
+    if (area && !item.element.classList.contains("has-project-evidence"))
+      visible.push(view);
   }
   if (!world) {
     for (const section of document.querySelectorAll(".chapter")) {
@@ -372,9 +360,24 @@ function paint(time = 0, delta = 1 / 60) {
     world.state.velocity = paused ? 0 : velocity;
     world.state.reveal = entry.reveal;
     world.state.rotation = entry.rotation;
-    if (visible.length)
-      world.renderFrames(sceneTime, paused ? 0 : delta, visible);
-    frame.style.visibility = visible.length ? "visible" : "hidden";
+    const handoff = {
+      enabled: Boolean(
+        desktopQuery.matches && !paused && gsap && ScrollTrigger && !lostContext,
+      ),
+      progress: routeClock.progress,
+      startFrame: allFrames.find((item) => item.chapter === 0),
+      endFrame: allFrames.find((item) => item.chapter === 1),
+      path: routePoints.map((point) => ({
+        x: bridgeBounds.left + point.x * bridgeBounds.width,
+        y: bridgeBounds.top + point.y * bridgeBounds.height,
+      })),
+    };
+    const flight =
+      handoff.enabled && handoff.progress > 0 && handoff.progress < 1;
+    if (visible.length || flight || paused)
+      world.renderFrames(sceneTime, paused ? 0 : delta, visible, handoff);
+    frame.style.visibility =
+      visible.length || flight || paused ? "visible" : "hidden";
   }
   activeWindow = dominant || activeWindow;
   // Chapter state follows semantic content, including in the non-WebGL fallback.
@@ -406,6 +409,7 @@ function paint(time = 0, delta = 1 / 60) {
   updateMagnetic(delta);
   updateTrace(delta);
   updateProjectNavigation();
+  projectEvidence.update(deckClock.index, { native: !deckTrigger, paused });
   if (route) {
     const progress = paused ? 1 : routeClock.progress;
     routeTube.style.strokeDashoffset = String(routeLength * (1 - progress));
@@ -461,6 +465,10 @@ function buildChoreography(entrance = false) {
   gallery.classList.remove("is-horizontal");
   projectSwitcher.hidden = true;
   root.classList.toggle("motion-paused", paused);
+  if (paused) {
+    pointer.active = false;
+    ribbon.reset();
+  }
   motionButton.textContent = paused ? "Enable motion" : "Pause motion";
   motionButton.setAttribute("aria-pressed", String(paused));
   burstButton.disabled = paused;
@@ -972,6 +980,13 @@ canvas.addEventListener("webglcontextlost", (event) => {
 });
 canvas.addEventListener("webglcontextrestored", () => {
   lostContext = false;
+  if (!world) {
+    root.classList.add("world-unavailable");
+    burstButton.hidden = true;
+    frame.style.display = "none";
+    buildChoreography();
+    return;
+  }
   root.classList.remove("world-unavailable");
   burstButton.hidden = !world;
   frame.style.display = "";
@@ -994,5 +1009,7 @@ window.addEventListener("pagehide", (event) => {
   lenis?.destroy();
   context?.revert();
   gsap?.ticker.remove(tick);
+  ribbon.dispose();
+  projectEvidence.dispose();
   world?.dispose();
 });
