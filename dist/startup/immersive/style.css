@@ -1873,3 +1873,15 @@ footer a {
     transform: none !important;
   }
 }
+@media (max-width: 360px) {
+  .scene-status {
+    top: 111px;
+    bottom: auto;
+    padding: 2px 8px;
+    margin-left: -8px;
+  }
+  .motion {
+    padding: 9px 10px;
+    font-size: 9px;
+  }
+}
