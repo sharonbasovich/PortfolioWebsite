@@ -217,14 +217,37 @@
           preserveAspectRatio="none"
           aria-hidden="true"
         >
+          <defs>
+            <linearGradient id="route-cobalt" x1="0" y1="0" x2="100%" y2="100%">
+              <stop offset="0" stop-color="#5c76ff" />
+              <stop offset="0.3" stop-color="#2d43ff" />
+              <stop offset="0.58" stop-color="#2435c7" />
+              <stop offset="0.8" stop-color="#4d6aff" />
+              <stop offset="1" stop-color="#2d43ff" />
+            </linearGradient>
+          </defs>
           <path
             class="route-base"
             d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
           />
-          <path
-            class="route-line"
-            d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
-          />
+          <g class="route-tube">
+            <path
+              class="route-depth"
+              d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
+            />
+            <path
+              class="route-line"
+              d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
+            />
+            <path
+              class="route-bevel"
+              d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
+            />
+            <path
+              class="route-highlight"
+              d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
+            />
+          </g>
           <circle class="route-dot" r="5" cx="1070" cy="0" />
         </svg>
         <div class="flow-words" aria-hidden="true">

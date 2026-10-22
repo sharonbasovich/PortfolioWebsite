@@ -28,6 +28,7 @@ const sectionLinks = [
 }));
 const bridge = document.querySelector(".flow-bridge");
 const route = document.querySelector(".route-line"),
+  routeTube = document.querySelector(".route-tube"),
   routeDot = document.querySelector(".route-dot");
 const routeLength = route?.getTotalLength() || 1;
 const routeClock = { progress: 0 };
@@ -150,9 +151,9 @@ function refreshMeasurements() {
     "viewBox",
     `0 0 ${traceBounds.width} ${traceBounds.height}`,
   );
-  if (route) {
-    route.style.strokeDasharray = String(routeLength);
-    route.style.strokeDashoffset = String(
+  if (routeTube) {
+    routeTube.style.strokeDasharray = String(routeLength);
+    routeTube.style.strokeDashoffset = String(
       paused ? 0 : routeLength * (1 - routeClock.progress),
     );
   }
@@ -407,7 +408,7 @@ function paint(time = 0, delta = 1 / 60) {
   updateProjectNavigation();
   if (route) {
     const progress = paused ? 1 : routeClock.progress;
-    route.style.strokeDashoffset = String(routeLength * (1 - progress));
+    routeTube.style.strokeDashoffset = String(routeLength * (1 - progress));
     const position = route.getPointAtLength(routeLength * progress);
     routeDot.setAttribute("cx", position.x);
     routeDot.setAttribute("cy", position.y);

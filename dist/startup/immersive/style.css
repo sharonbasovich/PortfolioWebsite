@@ -1390,17 +1390,39 @@ footer a {
   pointer-events: none;
 }
 .route-base,
-.route-line {
+.route-tube path {
   fill: none;
-  stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 .route-base {
   stroke: #2d43ff1c;
+  stroke-width: 1;
+}
+.route-tube {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-depth {
+  stroke: #17258b;
+  stroke-width: 18;
+  opacity: 0.22;
+  transform: translateY(1.5px);
 }
 .route-line {
-  stroke: var(--cobalt);
-  stroke-width: 1.25;
+  stroke: url(#route-cobalt);
+  stroke-width: 16;
+}
+.route-bevel {
+  stroke: #7c96ff;
+  stroke-width: 9;
+  opacity: 0.52;
+  transform: translateY(-1.25px);
+}
+.route-highlight {
+  stroke: #e3ecff;
+  stroke-width: 2.25;
+  opacity: 0.82;
+  transform: translateY(-3px);
 }
 .route-dot {
   fill: var(--cobalt);
@@ -1418,6 +1440,12 @@ footer a {
 .flow-words span {
   display: block;
 }
+@supports (paint-order: stroke fill) {
+  .flow-words span {
+    paint-order: stroke fill;
+    -webkit-text-stroke: 6px var(--paper);
+  }
+}
 .flow-words span:first-child {
   color: var(--cobalt);
 }
@@ -1434,6 +1462,16 @@ footer a {
   padding-top: 28px;
   border-top: 1px solid var(--line);
   background: var(--paper);
+}
+.flow-proof::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 100svh;
+  background: var(--paper);
+  pointer-events: none;
 }
 .flow-proof p {
   display: flex;
@@ -1787,6 +1825,26 @@ footer a {
   }
   .flow-route {
     opacity: 0.6;
+  }
+  .route-depth {
+    stroke-width: 10;
+    transform: translateY(1px);
+  }
+  .route-line {
+    stroke-width: 8;
+  }
+  .route-bevel {
+    stroke-width: 4.5;
+    transform: translateY(-0.6px);
+  }
+  .route-highlight {
+    stroke-width: 1.25;
+    transform: translateY(-1.6px);
+  }
+  @supports (paint-order: stroke fill) {
+    .flow-words span {
+      -webkit-text-stroke-width: 3px;
+    }
   }
   .flow-proof {
     margin-top: 80px;
