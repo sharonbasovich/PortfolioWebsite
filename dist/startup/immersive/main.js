@@ -2,6 +2,39 @@ import Lenis from "../vendor/lenis/lenis.js";
 import { createWorld } from "./world.js";
 import { createPointerRibbon } from "./pointer-ribbon.js";
 import { installProjectEvidence } from "./project-evidence.js";
+import { installTheme } from "./theme.js";
+import { mountProjectMotion as mountTypeMotion } from "./projects-type.js";
+import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js";
+import { mountProjectMotion as mountDepthMotion } from "./projects-depth.js";
+
+const theme = installTheme();
+const projectMotionChoice = new URLSearchParams(location.search).get("projects-motion");
+const projectMotionMount = new Map([
+  ["1", mountTypeMotion], ["2", mountPhotoMotion], ["3", mountDepthMotion],
+]).get(projectMotionChoice);
+const projectHeading = document.querySelector(".projects-heading h2");
+const projectStage = document.querySelector(".projects-heading");
+let projectMotion;
+if (projectMotionMount) {
+  projectStage.dataset.motionPreview = projectMotionChoice;
+  const comparison = document.createElement("nav");
+  comparison.className = "motion-comparison";
+  comparison.setAttribute("aria-label", "Project title previews");
+  const label = document.createElement("span");
+  label.textContent = "Project title previews";
+  comparison.append(label);
+  ["Scroll-built type", "Photo through type", "Depth zoom"].forEach((name, index) => {
+    const link = document.createElement("a");
+    const url = new URL(location.href);
+    url.searchParams.set("projects-motion", String(index + 1));
+    url.hash = "projects";
+    link.href = url.href;
+    link.textContent = `${index + 1}. ${name}`;
+    if (projectMotionChoice === String(index + 1)) link.setAttribute("aria-current", "page");
+    comparison.append(link);
+  });
+  projectStage.before(comparison);
+}
 
 const gsap = window.gsap,
   ScrollTrigger = window.ScrollTrigger,
@@ -9,8 +42,7 @@ const gsap = window.gsap,
 const root = document.documentElement;
 const canvas = document.querySelector("#world"),
   frame = document.querySelector(".world-frame");
-const motionButton = document.querySelector(".motion"),
-  burstButton = document.querySelector(".scene-burst");
+const motionButton = document.querySelector(".motion");
 const gallery = document.querySelector(".project-gallery"),
   track = document.querySelector(".project-panels");
 const panels = [...document.querySelectorAll(".project-panel")];
@@ -49,10 +81,24 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 const compactQuery = matchMedia(
   "(max-width: 800px), (hover: none), (pointer: coarse)",
 );
-const desktopQuery = matchMedia("(min-width: 1100px) and (min-height: 650px)");
+const desktopQuery = matchMedia(
+  "(min-width: 1100px) and (min-height: 650px) and (hover: hover) and (pointer: fine)",
+);
 const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const ease = (value) => value * value * (3 - 2 * value);
+const dockingEnd = 0.18;
+const carrierRoutePoints = routePoints.map((_, index) => {
+  const fraction = clamp((index / (routePoints.length - 1) - dockingEnd) / (1 - dockingEnd));
+  const at = fraction * (routePoints.length - 1);
+  const lower = Math.floor(at), upper = Math.min(routePoints.length - 1, lower + 1);
+  return {
+    x: routePoints[lower].x + (routePoints[upper].x - routePoints[lower].x) * (at - lower),
+    y: routePoints[lower].y + (routePoints[upper].y - routePoints[lower].y) * (at - lower),
+  };
+});
+const routeDrawProgress = () =>
+  paused ? 1 : clamp((routeClock.progress - dockingEnd) / (1 - dockingEnd));
 const windows = [...document.querySelectorAll("[data-world-window]")].map(
   (element) => {
     const panel = element.closest(".project-panel");
@@ -70,8 +116,10 @@ const windows = [...document.querySelectorAll("[data-world-window]")].map(
     };
   },
 );
-if (gsap && ScrollTrigger)
+if (gsap && ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger, ...(SplitText ? [SplitText] : []));
+  ScrollTrigger.config({ ignoreMobileResize: true });
+}
 let compact = compactQuery.matches,
   world;
 try {
@@ -96,7 +144,6 @@ let activeChapter = -1,
   velocity = 0,
   lastInput = 0;
 let sceneTime = 0,
-  separated = false,
   selectedProject = -1,
   initialized = false,
   lostContext = false;
@@ -106,13 +153,21 @@ let resizeTimer,
 let railGeometry = { top: 0, height: 1, thumbHeight: 28, travel: 1 };
 const deckClock = { index: 0 },
   entry = { reveal: 1, rotation: 0 };
+let layoutHeight = innerHeight;
+let viewport = {
+  width: innerWidth,
+  height: innerHeight,
+  desktop: desktopQuery.matches,
+  compact: compactQuery.matches,
+};
+const diagnostics = { choreographyBuilds: 0, scrollCorrections: 0 };
 
 // One ticker drives Lenis, ScrollTrigger and WebGL. Smoothing the gallery a
 // second time would make the text and its 3D frame drift apart.
 function startScroller() {
   lenis?.destroy();
   lenis = undefined;
-  if (paused || !gsap) return;
+  if (paused || !gsap || !finePointer.matches) return;
   lenis = new Lenis({
     lerp: 0.085,
     smoothWheel: true,
@@ -127,13 +182,18 @@ function startScroller() {
   });
 }
 function scrollToPosition(top, immediate = false) {
+  diagnostics.scrollCorrections++;
   const destination = clamp(
     top,
     0,
     Math.max(0, root.scrollHeight - innerHeight),
   );
   if (lenis) lenis.scrollTo(destination, { immediate, force: true });
-  else window.scrollTo({ top: destination, behavior: "instant" });
+  else
+    window.scrollTo({
+      top: destination,
+      behavior: immediate || paused ? "instant" : "smooth",
+    });
 }
 function refreshMeasurements() {
   for (const item of windows)
@@ -164,7 +224,7 @@ function refreshMeasurements() {
   if (routeTube) {
     routeTube.style.strokeDasharray = String(routeLength);
     routeTube.style.strokeDashoffset = String(
-      paused ? 0 : routeLength * (1 - routeClock.progress),
+      routeLength * (1 - routeDrawProgress()),
     );
   }
 }
@@ -280,6 +340,14 @@ function paint(time = 0, delta = 1 / 60) {
   const heroBounds = document.querySelector(".hero").getBoundingClientRect();
   const workBounds = document.querySelector(".work").getBoundingClientRect();
   const bridgeBounds = bridge.getBoundingClientRect();
+  if (!finePointer.matches && !paused)
+    routeClock.progress = clamp(
+      (layoutHeight * 0.8 - bridgeBounds.top) /
+        (bridgeBounds.height + layoutHeight * 0.55),
+    );
+  const heroOpening = ease(
+    clamp((-heroBounds.top - 20) / (layoutHeight * 0.34)),
+  );
   const visible = [];
   const allFrames = [];
   let dominant,
@@ -297,7 +365,7 @@ function paint(time = 0, delta = 1 / 60) {
     const progress = clamp(
       (innerHeight - rect.top) / (innerHeight + rect.height),
     );
-    const heroProgress = clamp(-heroBounds.top / (innerHeight * 0.9));
+    const heroProgress = clamp(-heroBounds.top / (layoutHeight * 0.9));
     const workProgress = clamp(
       (-workBounds.top + innerHeight * 0.2) /
         Math.max(innerHeight, workBounds.height),
@@ -314,7 +382,7 @@ function paint(time = 0, delta = 1 / 60) {
           ? 0.68
           : 0
         : item.chapter === 0
-          ? ease(heroProgress) * 0.72
+          ? ease(heroProgress) * 0.25
           : item.chapter === 1
             ? 0.65 + workProgress * 0.2
             : 0,
@@ -363,6 +431,7 @@ function paint(time = 0, delta = 1 / 60) {
     world.state.velocity = paused ? 0 : velocity;
     world.state.reveal = entry.reveal;
     world.state.rotation = entry.rotation;
+    if (!paused) world.state.burst = heroOpening;
     const handoff = {
       enabled: Boolean(
         desktopQuery.matches && !paused && gsap && ScrollTrigger && !lostContext,
@@ -370,10 +439,10 @@ function paint(time = 0, delta = 1 / 60) {
       progress: routeClock.progress,
       startFrame: allFrames.find((item) => item.chapter === 0),
       endFrame: allFrames.find((item) => item.chapter === 1),
-      path: routePoints.map((point) => ({
+      path: (desktopQuery.matches || paused) ? carrierRoutePoints.map((point) => ({
         x: bridgeBounds.left + point.x * bridgeBounds.width,
         y: bridgeBounds.top + point.y * bridgeBounds.height,
-      })),
+      })) : [],
     };
     const flight =
       handoff.enabled && handoff.progress > 0 && handoff.progress < 1;
@@ -414,11 +483,12 @@ function paint(time = 0, delta = 1 / 60) {
   updateProjectNavigation();
   projectEvidence.update(deckClock.index, { native: !deckTrigger, paused });
   if (route) {
-    const progress = paused ? 1 : routeClock.progress;
+    const progress = routeDrawProgress();
     routeTube.style.strokeDashoffset = String(routeLength * (1 - progress));
     const position = route.getPointAtLength(routeLength * progress);
     routeDot.setAttribute("cx", position.x);
     routeDot.setAttribute("cy", position.y);
+    routeDot.style.opacity = progress > 0 ? "1" : "0";
   }
 }
 function tick(time, deltaMs) {
@@ -447,16 +517,26 @@ function tick(time, deltaMs) {
 }
 
 function buildChoreography(entrance = false) {
+  diagnostics.choreographyBuilds++;
+  const introBounds = projectStage.getBoundingClientRect();
+  const preserveProjectIntro = projectMotionMount && !entrance &&
+    finePointer.matches && introBounds.top < innerHeight * 0.85 &&
+    introBounds.bottom > innerHeight * 0.35;
   const preservePanel =
-    !entrance && activeWindow?.chapter === 2
+    finePointer.matches && !entrance && !preserveProjectIntro && activeWindow?.chapter === 2
       ? panels[activeWindow.project]
       : null;
-  const anchor = !entrance && !preservePanel ? activeWindow?.element : null;
+  const anchor =
+    finePointer.matches && !entrance && !preservePanel
+      ? preserveProjectIntro ? projectStage : activeWindow?.element
+      : null;
   const anchorTop = anchor?.getBoundingClientRect().top,
     panelTop = preservePanel?.getBoundingClientRect().top;
   lenis?.destroy();
   lenis = undefined;
   context?.revert();
+  projectMotion?.dispose();
+  projectMotion = undefined;
   context = undefined;
   deckTrigger = undefined;
   deckTimeline = undefined;
@@ -474,7 +554,6 @@ function buildChoreography(entrance = false) {
   }
   motionButton.textContent = paused ? "Enable motion" : "Pause motion";
   motionButton.setAttribute("aria-pressed", String(paused));
-  burstButton.disabled = paused;
   if (!paused && gsap && ScrollTrigger) {
     context = gsap.context(() => {
       if (desktopQuery.matches && world && !lostContext) {
@@ -601,7 +680,7 @@ function buildChoreography(entrance = false) {
         deckTimeline = deck;
         deckTrigger = deck.scrollTrigger;
       }
-      if (bridge) {
+      if (bridge && finePointer.matches) {
         gsap.fromTo(
           ".flow-words span:first-child",
           { x: () => innerWidth * 0.08 },
@@ -656,7 +735,7 @@ function buildChoreography(entrance = false) {
             0.1,
           )
           .from(
-            ".hero-intro, .hero-interaction",
+            ".hero-intro",
             {
               y: 16,
               opacity: 0,
@@ -673,9 +752,15 @@ function buildChoreography(entrance = false) {
             0.2,
           );
       }
+      if (projectMotionMount) projectMotion = projectMotionMount({
+        heading: projectHeading, stage: projectStage, firstProject: panels[0],
+        gsap, ScrollTrigger, SplitText,
+        enabled: desktopQuery.matches,
+      });
       for (const heading of document.querySelectorAll(
         ".work-heading h2, .projects-heading h2, .contact h2",
       )) {
+        if (!finePointer.matches || (heading === projectHeading && projectMotionMount && desktopQuery.matches)) continue;
         SplitText?.create(heading, {
           type: "lines",
           mask: "lines",
@@ -735,6 +820,7 @@ if (rail && thumb) {
     root.classList.toggle("custom-scrollbar", finePointer.matches);
     refreshMeasurements();
     paint(gsap?.ticker.time || 0, paused ? 0 : 1 / 60);
+    scheduleViewportRefresh(true);
   });
   const moveThumb = (event) => {
     if (!drag) return;
@@ -861,21 +947,6 @@ motionButton.addEventListener("click", () => {
 });
 if (world) {
   root.classList.add("has-world");
-  burstButton.hidden = false;
-  burstButton.addEventListener("click", () => {
-    if (paused) return;
-    separated = !separated;
-    world.burst(separated ? 1 : 0);
-    burstButton.setAttribute("aria-pressed", String(separated));
-    burstButton.setAttribute(
-      "aria-label",
-      separated ? "Put the 3D object together" : "Take the 3D object apart",
-    );
-    for (const label of burstButton.querySelectorAll(
-      ".roll-original,.roll-duplicate",
-    ))
-      label.textContent = separated ? "Put it together" : "Take it apart";
-  });
 } else {
   frame.remove();
   root.classList.add("world-unavailable");
@@ -900,6 +971,11 @@ async function initialize() {
         activeChapter,
         selectedProject,
         deckProgress: deckTrigger?.progress,
+        routeProgress: routeClock.progress,
+        routeDrawProgress: routeDrawProgress(),
+        viewport: { ...viewport, layoutHeight },
+        diagnostics: { ...diagnostics },
+        nativeScroll: !finePointer.matches,
         scrollY,
         world: world?.getStats?.() || null,
       }),
@@ -943,20 +1019,46 @@ window.addEventListener(
   },
   { passive: true },
 );
-window.addEventListener(
-  "resize",
-  () => {
+function scheduleViewportRefresh(force = false) {
+    if (disposed) return;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
+      if (disposed) return;
+      const next = {
+        width: innerWidth,
+        height: innerHeight,
+        desktop: desktopQuery.matches,
+        compact: compactQuery.matches,
+      };
+      const layoutChanged =
+        force === true ||
+        next.width !== viewport.width ||
+        (finePointer.matches && next.height !== viewport.height) ||
+        next.desktop !== viewport.desktop ||
+        next.compact !== viewport.compact;
+      viewport = next;
+      if (!layoutChanged) {
+        // Address-bar resizing must never rebuild layouts or correct scroll.
+        if (finePointer.matches) {
+          layoutHeight = innerHeight;
+          ScrollTrigger?.refresh();
+        }
+        world?.resize();
+        refreshMeasurements();
+        paint(gsap?.ticker.time || 0, 0);
+        return;
+      }
+      layoutHeight = innerHeight;
       if (world && compact !== compactQuery.matches) {
+        const opening = world.state.burst;
         world.dispose();
         compact = compactQuery.matches;
         try {
           world = createWorld(canvas, {
             compact,
-            initialBurst: separated ? 1 : 0,
+            initialBurst: opening,
           });
-          if (world) world.state.burst = separated ? 1 : 0;
+          if (world) world.state.burst = opening;
         } catch (error) {
           console.warn("The 3D scene could not resize.", error);
           world = null;
@@ -965,19 +1067,20 @@ window.addEventListener(
           frame.style.display = "none";
           root.classList.remove("has-world");
           root.classList.add("world-unavailable");
-          burstButton.hidden = true;
         }
       } else world?.resize();
       buildChoreography();
     }, 170);
-  },
+}
+window.addEventListener(
+  "resize",
+  scheduleViewportRefresh,
   { passive: true },
 );
 canvas.addEventListener("webglcontextlost", (event) => {
   event.preventDefault();
   lostContext = true;
   root.classList.add("world-unavailable");
-  burstButton.hidden = true;
   frame.style.display = "none";
   buildChoreography();
 });
@@ -985,13 +1088,11 @@ canvas.addEventListener("webglcontextrestored", () => {
   lostContext = false;
   if (!world) {
     root.classList.add("world-unavailable");
-    burstButton.hidden = true;
     frame.style.display = "none";
     buildChoreography();
     return;
   }
   root.classList.remove("world-unavailable");
-  burstButton.hidden = !world;
   frame.style.display = "";
   buildChoreography();
 });
@@ -1009,10 +1110,13 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("pagehide", (event) => {
   if (event.persisted) return;
   disposed = true;
+  clearTimeout(resizeTimer);
   lenis?.destroy();
   context?.revert();
+  projectMotion?.dispose();
   gsap?.ticker.remove(tick);
   ribbon.dispose();
   projectEvidence.dispose();
+  theme.dispose();
   world?.dispose();
 });

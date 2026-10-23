@@ -1950,6 +1950,60 @@ footer a {
 .site-header nav a[aria-current="location"] {
   color: var(--cobalt);
 }
+
+/* Personal details have the same reading weight as the rest of the page. */
+.flow-proof span {
+  font-size: clamp(14px, 1.1vw, 16px);
+  line-height: 1.5;
+}
+.flow-proof p {
+  align-items: center;
+}
+.contact {
+  min-height: 100svh;
+  padding-bottom: 56px;
+}
+.contact footer {
+  margin-top: 36px;
+}
+@media (min-width: 1001px) {
+  .contact {
+    padding-top: clamp(84px, 10svh, 120px);
+  }
+  .contact-layout {
+    align-items: center;
+  }
+  .contact-window {
+    height: min(50svh, 540px);
+    margin-top: 0;
+  }
+}
+@media (max-width: 1000px) {
+  .contact {
+    min-height: auto;
+  }
+  .contact-layout {
+    gap: 32px;
+  }
+  .contact-window {
+    grid-row: 1;
+    height: clamp(240px, 36svh, 360px);
+    min-height: 240px;
+    max-height: 360px;
+    margin-top: 0;
+  }
+  .contact-copy {
+    grid-row: 2;
+  }
+}
+@media (max-width: 650px) {
+  .flow-proof span {
+    font-size: 14px;
+  }
+  .contact-copy h2 {
+    font-size: clamp(56px, 16vw, 78px);
+  }
+}
 .site-header nav a[aria-current="location"]::after {
   content: "";
   position: absolute;

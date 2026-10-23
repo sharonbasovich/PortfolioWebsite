@@ -1,0 +1,268 @@
+/* Page theme follows the existing CSS system. Studio art and evidence retain
+   their independent navy/chrome palette in either theme. */
+:root {
+  color-scheme: light;
+  --paper: #eef1fa;
+  --ink: #090b11;
+  --muted: #555e70;
+  --cobalt: #2d43ff;
+  --line: #10172c26;
+  --white: #fbfcff;
+  --theme-copy: #343d50;
+  --theme-detail: #5c6680;
+  --theme-contact-copy: #424c61;
+  --theme-paper-fade: #eef1fa00;
+  --theme-paper-glass: #eef1faed;
+  --theme-control: #fbfcffe8;
+  --theme-control-hover: #ffffff;
+  --theme-control-border: #141b3220;
+  --theme-control-border-hover: #141b3240;
+  --theme-nav-hover: #ffffff99;
+  --theme-rail-thumb: #090b1180;
+  --theme-rail-hover: #090b110a;
+  --theme-action: #090b11;
+  --theme-action-ink: #ffffff;
+  --theme-action-hover: #2d43ff;
+  --theme-route-base: #2d43ff1c;
+  --theme-route-depth: #17258b;
+  --theme-route-stop-1: #5c76ff;
+  --theme-route-stop-2: #2d43ff;
+  --theme-route-stop-3: #2435c7;
+  --theme-route-stop-4: #4d6aff;
+  --theme-route-stop-5: #2d43ff;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0d111a;
+  --ink: #edf2ff;
+  --muted: #a6b1c7;
+  --cobalt: #8fa4ff;
+  --line: #c8d4f32b;
+  --white: #151c2a;
+  --theme-copy: #bdc7da;
+  --theme-detail: #a6b1c7;
+  --theme-contact-copy: #bdc7da;
+  --theme-paper-fade: #0d111a00;
+  --theme-paper-glass: #0d111af2;
+  --theme-control: #151c2af2;
+  --theme-control-hover: #202a3d;
+  --theme-control-border: #c8d4f32b;
+  --theme-control-border-hover: #c8d4f354;
+  --theme-nav-hover: #c8d4f314;
+  --theme-rail-thumb: #edf2ff99;
+  --theme-rail-hover: #edf2ff0d;
+  --theme-action: #2d43ff;
+  --theme-action-ink: #ffffff;
+  --theme-action-hover: #4055ff;
+  --theme-route-base: #8fa4ff38;
+  --theme-route-depth: #000000;
+  --theme-route-stop-1: #8fa4ff;
+  --theme-route-stop-2: #637fff;
+  --theme-route-stop-3: #5067e3;
+  --theme-route-stop-4: #8fa4ff;
+  --theme-route-stop-5: #647aff;
+}
+/* A readable system theme also works when JavaScript is unavailable. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --paper: #0d111a;
+    --ink: #edf2ff;
+    --muted: #a6b1c7;
+    --cobalt: #8fa4ff;
+    --line: #c8d4f32b;
+    --white: #151c2a;
+    --theme-copy: #bdc7da;
+    --theme-detail: #a6b1c7;
+    --theme-contact-copy: #bdc7da;
+    --theme-paper-fade: #0d111a00;
+    --theme-paper-glass: #0d111af2;
+    --theme-control: #151c2af2;
+    --theme-control-hover: #202a3d;
+    --theme-control-border: #c8d4f32b;
+    --theme-control-border-hover: #c8d4f354;
+    --theme-nav-hover: #c8d4f314;
+    --theme-rail-thumb: #edf2ff99;
+    --theme-rail-hover: #edf2ff0d;
+    --theme-action: #2d43ff;
+    --theme-action-ink: #ffffff;
+    --theme-action-hover: #4055ff;
+    --theme-route-base: #8fa4ff38;
+    --theme-route-depth: #000000;
+    --theme-route-stop-1: #8fa4ff;
+    --theme-route-stop-2: #637fff;
+    --theme-route-stop-3: #5067e3;
+    --theme-route-stop-4: #8fa4ff;
+    --theme-route-stop-5: #647aff;
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+html {
+  scrollbar-color: var(--theme-rail-thumb) transparent;
+}
+html::-webkit-scrollbar-thumb {
+  background: var(--theme-rail-thumb);
+}
+.scroll-rail:is(:hover, :focus-within, .is-dragging) {
+  background: var(--theme-rail-hover);
+}
+.site-header {
+  background: linear-gradient(var(--paper) 80%, var(--theme-paper-fade));
+}
+.site-header nav a:hover:not(.nav-contact) {
+  background: var(--theme-nav-hover);
+}
+.site-header nav .nav-contact,
+.site-header nav .nav-contact:is(:hover, :focus-visible) {
+  background: var(--theme-action);
+  color: var(--theme-action-ink);
+}
+.nav-contact::before {
+  background: var(--theme-action-hover);
+}
+.skip,
+.skip:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.scene-status {
+  background: var(--theme-paper-glass);
+}
+.motion {
+  border-color: var(--theme-control-border);
+  background: var(--theme-control);
+  color: var(--ink);
+}
+.motion:hover {
+  border-color: var(--theme-control-border-hover);
+  background: var(--theme-control-hover);
+}
+.hero-intro p {
+  color: var(--theme-copy);
+}
+.technology-list {
+  color: var(--theme-detail);
+}
+.contact-lead {
+  color: var(--theme-contact-copy);
+}
+/* This control belongs to the navy 3D stage, so its foreground stays inverse
+   even though the page's --ink and --white change with the theme. */
+.scene-burst,
+.scene-burst:is(:hover, :focus-visible) {
+  background: #fbfcff;
+  color: #090b11;
+}
+.scene-burst::before {
+  background: #090b11;
+}
+.scene-burst:is(:hover, :focus-visible) {
+  color: #ffffff;
+}
+.scene-burst[aria-pressed="true"] {
+  background: #b7caff;
+}
+.route-base {
+  stroke: var(--theme-route-base);
+}
+.route-depth {
+  stroke: var(--theme-route-depth);
+}
+#route-cobalt stop:nth-of-type(1) { stop-color: var(--theme-route-stop-1); }
+#route-cobalt stop:nth-of-type(2) { stop-color: var(--theme-route-stop-2); }
+#route-cobalt stop:nth-of-type(3) { stop-color: var(--theme-route-stop-3); }
+#route-cobalt stop:nth-of-type(4) { stop-color: var(--theme-route-stop-4); }
+#route-cobalt stop:nth-of-type(5) { stop-color: var(--theme-route-stop-5); }
+.flow-proof,
+.flow-proof::after {
+  background: var(--paper);
+}
+.flow-proof span {
+  color: var(--muted);
+}
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--theme-control-border);
+  border-radius: 50%;
+  background: var(--theme-control);
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--motion-quick, 160ms) ease-out,
+    border-color var(--motion-quick, 160ms) ease-out,
+    color var(--motion-quick, 160ms) ease-out;
+}
+.theme-toggle:hover {
+  border-color: var(--theme-control-border-hover);
+  background: var(--theme-control-hover);
+}
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 3px;
+}
+.theme-toggle:active {
+  scale: 0.96;
+}
+.theme-toggle svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  pointer-events: none;
+}
+.theme-toggle svg[hidden] {
+  display: none;
+}
+@media (min-width: 651px) and (max-width: 900px) {
+  .site-header { gap: 10px; }
+  .site-header nav { gap: 4px; }
+  .site-header nav a { padding-inline: 10px; gap: 8px; }
+  .site-header nav .nav-contact { margin-left: 0; }
+}
+@media (max-width: 650px) {
+  /* The contact link remains absolutely positioned on the brand row. The
+     second row holds three flexible links and one non-shrinking touch target. */
+  .site-header nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1.35fr) 44px;
+    gap: 4px;
+  }
+  .site-header nav a:not(.nav-contact) {
+    min-width: 0;
+    padding-inline: 6px;
+    gap: 6px;
+    background: transparent;
+  }
+  .theme-toggle {
+    justify-self: end;
+  }
+}
+.motion-paused .theme-toggle {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle { transition: none; }
+}
+@media (forced-colors: active) {
+  .theme-toggle {
+    border-color: ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+  .theme-toggle:focus-visible { outline-color: Highlight; }
+}

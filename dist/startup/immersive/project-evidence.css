@@ -320,24 +320,30 @@
   }
 }
 
-/* Native landscape layouts need a content-sized diagram, not a viewport crop. */
-@media (min-width: 651px) and (max-width: 1099px) and (max-height: 650px) {
-  .project-panel[data-project="2"] .project-window.has-project-evidence {
+/* Native layouts keep one content-sized diagram as browser chrome changes. */
+@media (min-width: 651px) {
+  .project-gallery:not(.is-horizontal)
+    .project-panel[data-project="2"]
+    .project-window.has-project-evidence {
     height: auto;
     min-height: 500px;
     max-height: none;
   }
 
-  .project-evidence--marble {
+  .project-gallery:not(.is-horizontal) .project-evidence--marble {
     position: relative;
     min-height: 500px;
   }
 
-  .project-evidence--marble .project-evidence-workflow {
+  .project-gallery:not(.is-horizontal)
+    .project-evidence--marble
+    .project-evidence-workflow {
     flex: 1 0 auto;
   }
 
-  .project-evidence--marble .evidence-workflow-lanes {
+  .project-gallery:not(.is-horizontal)
+    .project-evidence--marble
+    .evidence-workflow-lanes {
     height: auto;
   }
 }

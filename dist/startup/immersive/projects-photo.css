@@ -1,0 +1,102 @@
+.projects-heading.projects-photo-stage {
+  position: relative;
+  z-index: 4;
+  display: block;
+  min-height: clamp(560px, 78svh, 780px);
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
+.projects-photo-stage > .section-kicker {
+  position: absolute;
+  top: 18px;
+  left: var(--gutter, 4.5vw);
+  z-index: 2;
+}
+
+/* Opacity preserves the real heading in the document and accessibility tree. */
+.projects-photo-source {
+  opacity: 0;
+}
+
+.projects-photo-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--ink, #090b11);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.projects-photo-letterform {
+  letter-spacing: -0.055em;
+}
+
+.projects-photo-type-outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.65;
+  stroke-opacity: 0.44;
+  vector-effect: non-scaling-stroke;
+}
+
+.projects-photo-frame-edge {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-opacity: 0.2;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Root rebuilds the chosen preview on resize/pause. These rules also keep the
+   semantic heading and real image visible during that short rebuild interval. */
+.motion-paused .projects-photo-visual,
+.reduced-motion .projects-photo-visual {
+  display: none;
+}
+
+.motion-paused .projects-photo-source,
+.motion-paused .projects-photo-target,
+.reduced-motion .projects-photo-source,
+.reduced-motion .projects-photo-target {
+  opacity: 1 !important;
+}
+
+@media (max-width: 1099px), (max-height: 649px), (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .projects-heading.projects-photo-stage {
+    min-height: 0;
+    padding-bottom: 45px;
+  }
+
+  .projects-photo-stage > .section-kicker {
+    position: static;
+  }
+
+  .projects-photo-visual {
+    display: none;
+  }
+
+  .projects-photo-source,
+  .projects-photo-target {
+    opacity: 1 !important;
+  }
+}
+
+@media print {
+  .projects-heading.projects-photo-stage {
+    min-height: 0;
+  }
+
+  .projects-photo-visual {
+    display: none;
+  }
+
+  .projects-photo-source,
+  .projects-photo-target {
+    opacity: 1 !important;
+  }
+}

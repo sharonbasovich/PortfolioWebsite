@@ -4,6 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#eef1fa" />
+    <script>
+      (() => {
+        let theme;
+        try { theme = localStorage.getItem("sb-theme"); } catch {}
+        if (theme !== "light" && theme !== "dark")
+          theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === "dark" ? "#0d111a" : "#eef1fa";
+      })();
+    </script>
     <title>Sharon Basovich</title>
     <meta
       name="description"
@@ -25,16 +37,20 @@
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232d43ff'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='white'%3Esb%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20261023" />
     <link rel="stylesheet" href="pointer-ribbon.css" />
-    <link rel="stylesheet" href="project-evidence.css" />
+    <link rel="stylesheet" href="project-evidence.css?v=20261023" />
+    <link rel="stylesheet" href="projects-type.css" />
+    <link rel="stylesheet" href="projects-photo.css" />
+    <link rel="stylesheet" href="projects-depth.css" />
+    <link rel="stylesheet" href="theme.css" />
     <script src="../vendor/gsap/gsap.min.js" defer></script>
     <script src="../vendor/gsap/ScrollTrigger.min.js" defer></script>
     <script src="../vendor/gsap/SplitText.min.js" defer></script>
     <script type="importmap">
       { "imports": { "three": "../vendor/three/three.module.js" } }
     </script>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="main.js?v=20261023"></script>
     <noscript
       ><style>
         .world-frame,
@@ -162,57 +178,18 @@
           <h1 id="name"><span>Sharon</span> <span>Basovich.</span></h1>
           <div class="hero-intro">
             <p>
-              I'm studying Computer Science at the University of Waterloo. I've
-              previously built software at Magna and RBC. Outside of code, I'm
-              into horology, science fiction, and skiing.
+              Hi! I'm studying Computer Science at the University of Waterloo,
+              previously interned at Magna and RBC, and I'm into horology,
+              science fiction, and mechanical keyboards.
             </p>
           </div>
         </div>
         <div class="hero-window art-window" data-world-window>
           <svg class="pointer-trace" aria-hidden="true"><path></path></svg>
-          <div class="hero-interaction">
-            <button
-              class="scene-burst roll-link magnetic"
-              type="button"
-              aria-label="Take the 3D object apart"
-              aria-pressed="false"
-              hidden
-            >
-              <span class="roll-label button-label"
-                ><span class="roll-original">Take it apart</span
-                ><span class="roll-duplicate" aria-hidden="true"
-                  >Take it apart</span
-                ></span
-              ><span class="link-arrow button-arrow" aria-hidden="true"
-                ><svg class="arrow-original" viewBox="0 0 20 20" fill="none">
-                  <path
-                    d="M5 15 15 5M5 5h10v10"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  /></svg
-                ><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none">
-                  <path
-                    d="M5 15 15 5M5 5h10v10"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  /></svg
-              ></span>
-            </button>
-          </div>
-        </div>
-        <div class="hero-foot">
-          <p>Always curious. Always building.</p>
-          <a class="hero-hello" href="mailto:sharon@basovich.com"
-            >Let's talk <span aria-hidden="true">↗</span></a
-          >
         </div>
       </section>
 
-      <section class="flow-bridge" aria-label="Curiosity in motion">
+      <section class="flow-bridge" aria-label="About me">
         <svg
           class="flow-route"
           viewBox="0 0 1440 650"
@@ -253,7 +230,7 @@
           <circle class="route-dot" r="5" cx="1070" cy="0" />
         </svg>
         <div class="flow-words" aria-hidden="true">
-          <span>Curiosity,</span><span>in motion.</span>
+          <span>About</span><span>me</span>
         </div>
         <div class="flow-proof">
           <p>
@@ -268,8 +245,8 @@
             ><span>Hours saved annually<br />at RBC</span>
           </p>
           <p>
-            <strong>1st</strong
-            ><span>APEX<br />International research hackathon</span>
+            <strong>0.1%</strong
+            ><span>Judges Award<br />VEX Robotics World Championship</span>
           </p>
         </div>
       </section>
@@ -283,20 +260,19 @@
         <div class="work-layout">
           <div class="work-story">
             <div class="work-heading">
-              <p class="section-kicker">Selected work</p>
-              <h2 id="work-title">Many sources.<br />One view.</h2>
+              <h2 id="work-title">Internships</h2>
             </div>
             <article class="work-record">
               <div class="record-heading">
                 <h3>RBC</h3>
                 <span>Summer 2026</span>
               </div>
-              <p class="record-role">Software Engineer</p>
+              <p class="record-role">Software Engineering · Toronto, ON</p>
               <p>
-                I shipped a platform used by
+                I built an internal engineering intelligence platform serving
                 <strong
                   >200+ banking applications across 1,200 repositories</strong
-                >. Scheduled GraphQL/REST pipelines bring SonarQube, DAST,
+                > daily. Automated GraphQL and REST pipelines bring SonarQube, DAST,
                 GitHub, and Snyk data into MongoDB.
               </p>
               <dl class="work-metrics">
@@ -314,9 +290,10 @@
                 </div>
               </dl>
               <p>
-                A React dashboard gives service owners and managers a shared
-                view of health scores, saving
-                <strong>12,000+ hours annually</strong>.
+                A modular React dashboard in an Nx monorepo gives service owners
+                and managers a shared view of health scores and vulnerabilities,
+                saving <strong>12,000+ hours annually</strong>. I maintained
+                Vitest and Playwright tests to catch regressions.
               </p>
               <ul class="technology-list" aria-label="RBC technologies">
                 <li>React</li>
@@ -331,16 +308,34 @@
                 <h3>Magna</h3>
                 <span>Summer 2024</span>
               </div>
-              <p class="record-role">Software Automation Engineer</p>
-              <p>
-                I automated force and leverage analysis with
-                <strong>VBA, Excel, and CATIA V5</strong>, generating reports
-                for engineers.
+              <p class="record-role">
+                Software Automation Engineering · Newmarket, ON
               </p>
               <p>
-                I also streamlined materials data for Teamcenter PLM, built
-                wiring-harness prototypes, and tested hood-latch system failures
-                in a validation lab.
+                I automated surface-geometry, force, and leverage analysis
+                with <strong>VBA, Excel, and CATIA V5</strong>, producing
+                safety compliance reports for engineers and automating
+                <strong>50+ hours of manual work</strong>.
+              </p>
+              <dl class="work-metrics">
+                <div>
+                  <dt>Manual hours automated</dt>
+                  <dd>50<span>+</span></dd>
+                </div>
+                <div>
+                  <dt>Material records</dt>
+                  <dd>100<span>+</span></dd>
+                </div>
+                <div>
+                  <dt>Engineering drawings</dt>
+                  <dd>78</dd>
+                </div>
+              </dl>
+              <p>
+                I streamlined ingestion of <strong>100+ material records</strong> and
+                <strong>78 engineering drawings</strong> into Siemens Teamcenter PLM.
+                I also soldered wiring-harness prototypes and tested
+                hood-latch systems in a validation lab.
               </p>
               <ul class="technology-list" aria-label="Magna technologies">
                 <li>VBA</li>
@@ -366,7 +361,7 @@
       >
         <div class="projects-heading">
           <p class="section-kicker">Selected projects</p>
-          <h2 id="projects-title">Bits meet<br />the real world.</h2>
+          <h2 id="projects-title">My projects</h2>
         </div>
         <div class="project-gallery">
           <nav class="project-switcher" aria-label="Choose a project" hidden>
@@ -720,17 +715,6 @@
                     /></svg></span
               ></a>
             </nav>
-            <div class="contact-about">
-              <p>
-                I'm Sharon, a Computer Science co-op student at the University
-                of Waterloo. I've built engineering automation at Magna and
-                tools for engineering teams at RBC.
-              </p>
-              <p>
-                Off-screen: horology, science fiction, skiing, cooking, and
-                mechanical keyboards.
-              </p>
-            </div>
           </div>
           <div
             class="contact-window art-window"

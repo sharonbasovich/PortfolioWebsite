@@ -1,0 +1,22 @@
+/* Enabled desktop preview only; native/mobile headings keep their normal DOM. */
+.projects-heading.projects-type {
+  position: relative;
+  isolation: isolate;
+}
+.projects-type .projects-type__heading {
+  max-width: none;
+  color: var(--ink);
+  font-size: clamp(72px, 8.6vw, 144px);
+  line-height: 1.04;
+  letter-spacing: -0.065em;
+  white-space: nowrap;
+  overflow: visible;
+}
+.projects-type .projects-type__word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.projects-type .projects-type__char {
+  display: inline-block;
+  backface-visibility: hidden;
+}
