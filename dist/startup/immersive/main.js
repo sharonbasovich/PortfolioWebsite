@@ -45,7 +45,10 @@ const ribbon = createPointerRibbon(trace);
 const pointer = { x: 0, y: 0, active: false, movedAt: 0 };
 let traceBounds;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-const compactQuery = matchMedia("(max-width: 800px)");
+// Rotation must not give a phone the desktop render budget.
+const compactQuery = matchMedia(
+  "(max-width: 800px), (hover: none), (pointer: coarse)",
+);
 const desktopQuery = matchMedia("(min-width: 1100px) and (min-height: 650px)");
 const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
