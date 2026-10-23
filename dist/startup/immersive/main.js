@@ -1,5 +1,5 @@
 import Lenis from "../vendor/lenis/lenis.js";
-import { createWorld } from "./world.js";
+import { createWorld } from "./world.js?v=20261023-dock";
 import { createPointerRibbon } from "./pointer-ribbon.js";
 import { installProjectEvidence } from "./project-evidence.js";
 import { installTheme } from "./theme.js";
@@ -8,15 +8,17 @@ import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js";
 import { mountProjectMotion as mountDepthMotion } from "./projects-depth.js";
 
 const theme = installTheme();
-const projectMotionChoice = new URLSearchParams(location.search).get("projects-motion");
-const projectMotionMount = new Map([
+const requestedProjectMotion = new URLSearchParams(location.search).get("projects-motion");
+const projectMotions = new Map([
   ["1", mountTypeMotion], ["2", mountPhotoMotion], ["3", mountDepthMotion],
-]).get(projectMotionChoice);
+]);
+const projectMotionChoice = projectMotions.has(requestedProjectMotion) ? requestedProjectMotion : "2";
+const projectMotionMount = projectMotions.get(projectMotionChoice);
 const projectHeading = document.querySelector(".projects-heading h2");
 const projectStage = document.querySelector(".projects-heading");
 let projectMotion;
-if (projectMotionMount) {
-  projectStage.dataset.motionPreview = projectMotionChoice;
+projectStage.dataset.motionPreview = projectMotionChoice;
+if (projectMotions.has(requestedProjectMotion)) {
   const comparison = document.createElement("nav");
   comparison.className = "motion-comparison";
   comparison.setAttribute("aria-label", "Project title previews");
@@ -161,6 +163,17 @@ let viewport = {
   compact: compactQuery.matches,
 };
 const diagnostics = { choreographyBuilds: 0, scrollCorrections: 0 };
+let impactInteraction = false;
+const impactInputs = ["wheel", "touchmove", "keydown"];
+function markImpactInteraction(event) {
+  if (!event.isTrusted) return;
+  if (event.type === "keydown" &&
+      !["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) return;
+  impactInteraction = true;
+  for (const type of impactInputs) window.removeEventListener(type, markImpactInteraction);
+}
+for (const type of impactInputs)
+  window.addEventListener(type, markImpactInteraction, { passive: true });
 
 // One ticker drives Lenis, ScrollTrigger and WebGL. Smoothing the gallery a
 // second time would make the text and its 3D frame drift apart.
@@ -437,6 +450,7 @@ function paint(time = 0, delta = 1 / 60) {
         desktopQuery.matches && !paused && gsap && ScrollTrigger && !lostContext,
       ),
       progress: routeClock.progress,
+      impactEnabled: impactInteraction,
       startFrame: allFrames.find((item) => item.chapter === 0),
       endFrame: allFrames.find((item) => item.chapter === 1),
       path: (desktopQuery.matches || paused) ? carrierRoutePoints.map((point) => ({
@@ -833,6 +847,7 @@ if (rail && thumb) {
   };
   rail.addEventListener("pointerdown", (event) => {
     if (event.button !== 0) return;
+    markImpactInteraction(event);
     const thumbBounds = thumb.getBoundingClientRect();
     drag = {
       offset: event.target.closest(".scroll-thumb")
@@ -915,6 +930,7 @@ document.addEventListener("click", (event) => {
   const id = link.getAttribute("href"),
     target = document.querySelector(id);
   if (!target) return;
+  markImpactInteraction(event);
   event.preventDefault();
   const offset =
     document.querySelector(".site-header").getBoundingClientRect().height + 12;
@@ -976,6 +992,7 @@ async function initialize() {
         viewport: { ...viewport, layoutHeight },
         diagnostics: { ...diagnostics },
         nativeScroll: !finePointer.matches,
+        impactEnabled: impactInteraction,
         scrollY,
         world: world?.getStats?.() || null,
       }),
@@ -988,6 +1005,11 @@ async function initialize() {
         paint(sceneTime, 0);
       },
       repaint: () => paint(sceneTime, 0),
+      freezeClock: () => gsap?.ticker.remove(tick),
+      stepMotion: (delta = 1 / 60) => {
+        sceneTime += delta;
+        paint(sceneTime, delta);
+      },
       finishReveals: () => {
         for (const trigger of ScrollTrigger?.getAll() || [])
           if (trigger.vars.once && trigger.animation)
@@ -1111,6 +1133,7 @@ window.addEventListener("pagehide", (event) => {
   if (event.persisted) return;
   disposed = true;
   clearTimeout(resizeTimer);
+  for (const type of impactInputs) window.removeEventListener(type, markImpactInteraction);
   lenis?.destroy();
   context?.revert();
   projectMotion?.dispose();

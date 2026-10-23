@@ -15,8 +15,9 @@ one page and differ only at the projects introduction:
   opens into a frame and docks into the original project photograph.
 - `?projects-motion=3`: the heading advances in depth while the project arrives.
 
-Each uses one reversible, unpinned GSAP scroll timeline. No primary treatment has
-been chosen. Query previews include links to compare them. Touch, small-screen
+Each uses one reversible, unpinned GSAP scroll timeline. The user subsequently
+selected photo through type as the default. Comparison links appear only with
+an explicit valid preview query. Touch, small-screen
 and reduced-motion layouts retain a semantic static heading. Pausing retains the
 desktop introduction's document space and restores its visible position.
 
@@ -50,3 +51,25 @@ Visual review included desktop and mobile dark themes, achievement captions,
 internships, the three preview treatments and the contact ending. The clean and
 creative root pages, resume, project evidence assets and vendor libraries are
 outside this change.
+
+## Selected treatment and docking impact
+
+The normal immersive URL now uses the selected photo reveal, and the contact
+section's “Say hello” kicker has been removed. The user selected metallic sparks
+for the internship docking moment: a short fan of cool silver and cobalt streaks,
+with no ring. It uses one LineSegments draw in the existing renderer and ticker,
+then disappears after 0.56 seconds. It renders only in the internship window.
+
+A forward crossing near the completed dock fires one burst; scrolling back into
+the approach rearms it. The burst requires real scroll/navigation interaction,
+so initial fragment positioning cannot fabricate an impact. Pausing freezes the
+burst. Touch layouts retain their native path without particles, and initially
+reduced-motion pages never trigger them. The module owns and disposes its geometry
+and material independently of the mechanical model.
+
+Seventeen browser checks passed for the selected default and impact, including
+forward/reverse/repeated docking, pause, expiry, direct fragment entry, contact
+layout and mobile/reduced-motion behavior. No runtime or shader errors were
+recorded. During a burst the tested scene submitted 10 draws versus 9 after it
+settled. Repeated impacts held geometry, texture and program counts at 15/3/7.
+These are Chromium/SwiftShader observations, not a physical-device FPS claim.

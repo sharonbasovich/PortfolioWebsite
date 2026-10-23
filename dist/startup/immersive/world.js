@@ -1,6 +1,7 @@
 import * as THREE from "../vendor/three/three.module.js";
 import { RoomEnvironment } from "../vendor/three/addons/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "../vendor/three/addons/geometries/RoundedBoxGeometry.js";
+import { createDockSparks } from "./dock-sparks.js?v=20261023-dock";
 
 // The site owns the ticker and scroll timeline. This module only renders the current state.
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -46,6 +47,10 @@ export function createWorld(
   renderer.info.autoReset = false;
 
   const scene = new THREE.Scene();
+  const dockSparks = createDockSparks({ compact });
+  scene.add(dockSparks.object);
+  let dockArmed = false;
+  let previousDockProgress = null;
   const camera = new THREE.PerspectiveCamera(compact ? 43 : 36, 1, 0.1, 100);
   camera.position.set(0, 0, compact ? 13.7 : 12.5);
   camera.lookAt(0, 0, 0);
@@ -1718,6 +1723,29 @@ export function createWorld(
     advancedPoses.clear();
     carrierPose.draws = 0;
     updateCarrier(handoff, seconds, dt);
+    if (state.motion !== false) {
+      if (handoff?.enabled && handoff.impactEnabled && !compact) {
+        const progress = clamp(handoff.progress);
+        if (progress < 0.85) dockArmed = true;
+        if (progress >= 0.995) {
+          const target = handoff.endFrame?.rect;
+          const targetVisible = target && target.top < screenHeight &&
+            target.top + target.height > 0 && target.left < screenWidth &&
+            target.left + target.width > 0;
+          if (dockArmed && previousDockProgress !== null &&
+              previousDockProgress < 0.995 && targetVisible) dockSparks.trigger();
+          dockArmed = false;
+        }
+        previousDockProgress = progress;
+      } else {
+        dockArmed = false;
+        previousDockProgress = null;
+        dockSparks.reset();
+      }
+    }
+    dockSparks.update(dt, { enabled: state.motion !== false });
+    const showDockSparks = dockSparks.object.visible;
+    dockSparks.object.visible = false;
     world.visible = true;
     carrier.visible = false;
 
@@ -1751,6 +1779,12 @@ export function createWorld(
     // actual geometry where its DOM window is, with independent pose histories.
     for (const item of visibleFrames) {
       applyFramePose(item, seconds, dt);
+      dockSparks.object.visible = showDockSparks && item.chapter === 1;
+      if (dockSparks.object.visible) {
+        world.updateMatrixWorld(true);
+        dockSparks.object.matrix.copy(floatingModule.matrixWorld);
+        dockSparks.object.matrixWorldNeedsUpdate = true;
+      }
       carrier.visible = assembly.visible && (!carrierPose.enabled ||
         (carrierPose.owner !== "flight" && frameKey(item) === carrierPose.ownerKey));
       if (carrier.visible) {
@@ -1766,6 +1800,7 @@ export function createWorld(
       renderer.clear(false, true, false);
       renderer.render(scene, camera);
     }
+    dockSparks.object.visible = false;
 
     renderer.setRenderTarget(null);
     renderer.setScissorTest(false);
@@ -1873,6 +1908,7 @@ export function createWorld(
       cpuSubmissionMs: Math.round(submissionMs * 100) / 100,
       observedIntervalMs: Math.round(frameIntervalMs * 100) / 100,
       burstTarget: state.burst,
+      dockSparks: dockSparks.getStats(),
       burstValue: Math.round(burstValue * 1000) / 1000,
       apertureValue: Math.round(apertureValue * 1000) / 1000,
       carrier: {
@@ -1895,6 +1931,7 @@ export function createWorld(
   function dispose() {
     if (disposed) return;
     disposed = true;
+    dockSparks.dispose();
     window.removeEventListener("pointermove", onPointerMove);
     document.documentElement.removeEventListener(
       "pointerleave",
