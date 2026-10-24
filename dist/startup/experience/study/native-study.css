@@ -1,0 +1,19 @@
+/* Only the requested comparison uses intrinsic image frames. The accepted
+   production/default document retains its existing responsive layout. */
+.motion-study .project-gallery:not(.study-gallery) .project-window.has-project-evidence {
+  width: min(100%, calc(min(600px, 68svh) * var(--study-ratio, 1.5)));
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: var(--study-ratio, 1.5);
+  margin-inline: auto;
+}
+.motion-study .project-gallery:not(.study-gallery) .project-evidence--logo .project-evidence-media {
+  padding: 16px;
+}
+.motion-study .project-gallery:not(.study-gallery) .project-evidence {
+  --evidence-scale: 1;
+}
+.motion-study .project-gallery:not(.study-gallery) .project-evidence:not(.project-evidence--logo) .project-evidence-media {
+  padding: 0;
+}

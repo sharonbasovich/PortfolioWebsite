@@ -7,10 +7,25 @@ import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
 import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261024-robotics";
 
+const motionStudyRequested = new URLSearchParams(location.search).get("motion-study") === "1";
+const initialStudyProjectsHash = motionStudyRequested && location.hash === "#projects";
+let studyModules = null;
+if (motionStudyRequested) {
+  try {
+    const [galleryStudy, glyphStudy] = await Promise.all([
+      import("./study/morph-gallery.js?v=20261024-study"),
+      import("./study/glyph-photo.js?v=20261024-study"),
+    ]);
+    studyModules = { ...galleryStudy, ...glyphStudy };
+  } catch (error) {
+    console.warn("The motion study is unavailable; keeping the existing gallery.", error);
+  }
+}
+
 const theme = installTheme();
 const projectHeading = document.querySelector(".projects-heading h2");
 const projectStage = document.querySelector(".projects-heading");
-let projectMotion;
+let projectMotion, studyGallery;
 
 const gsap = window.gsap,
   ScrollTrigger = window.ScrollTrigger,
@@ -26,6 +41,14 @@ const gallery = document.querySelector(".project-gallery"),
   track = document.querySelector(".project-panels");
 const panels = [...document.querySelectorAll(".project-panel")];
 const projectEvidence = installProjectEvidence(panels);
+if (studyModules) {
+  root.classList.add("motion-study");
+  for (const panel of panels) {
+    const image = panel.querySelector(".project-evidence img");
+    const ratio = Number(image?.getAttribute("width")) / Number(image?.getAttribute("height"));
+    if (Number.isFinite(ratio) && ratio > 0) panel.style.setProperty("--study-ratio", ratio);
+  }
+}
 const rail = document.querySelector(".scroll-rail"),
   thumb = document.querySelector(".scroll-thumb");
 const projectSwitcher = document.querySelector(".project-switcher");
@@ -537,6 +560,7 @@ function paint(time = 0, delta = 1 / 60) {
   updateTrace(delta);
   updateProjectNavigation();
   projectEvidence.update(deckClock.index, { native: !deckTrigger, paused });
+  studyGallery?.update(deckClock.index);
   if (route) {
     const progress = routeDrawProgress();
     routeReveal.style.strokeDashoffset = String(1 - progress);
@@ -587,7 +611,7 @@ function buildChoreography(entrance = false) {
     introBounds.bottom > innerHeight * 0.35;
   const preservePanel =
     finePointer.matches && !entrance && !preserveProjectIntro && activeWindow?.chapter === 2
-      ? panels[activeWindow.project]
+      ? panels[studyGallery ? clamp(Math.round(deckClock.index), 0, panels.length - 1) : activeWindow.project]
       : null;
   const anchor =
     finePointer.matches && !entrance && !preservePanel
@@ -600,6 +624,8 @@ function buildChoreography(entrance = false) {
   context?.revert();
   projectMotion?.dispose();
   projectMotion = undefined;
+  studyGallery?.dispose();
+  studyGallery = undefined;
   context = undefined;
   deckTrigger = undefined;
   deckTimeline = undefined;
@@ -619,7 +645,16 @@ function buildChoreography(entrance = false) {
   motionButton.setAttribute("aria-pressed", String(paused));
   if (!paused && gsap && ScrollTrigger) {
     context = gsap.context(() => {
-      if (desktopQuery.matches && world && !lostContext) {
+      if (desktopQuery.matches && world && !lostContext && studyModules) {
+        gallery.classList.add("is-horizontal");
+        projectSwitcher.hidden = false;
+        studyGallery = studyModules.mountMorphGallery({
+          gallery, track, panels, clock: deckClock, gsap, ScrollTrigger,
+          holdDuration: projectHoldDuration, transferDuration: projectTransferDuration,
+        });
+        deckTimeline = studyGallery.timeline;
+        deckTrigger = studyGallery.trigger;
+      } else if (desktopQuery.matches && world && !lostContext) {
         gallery.classList.add("is-horizontal");
         projectSwitcher.hidden = false;
         const deck = gsap.timeline({
@@ -806,11 +841,23 @@ function buildChoreography(entrance = false) {
             0.2,
           );
       }
-      if (mountPhotoMotion) projectMotion = mountPhotoMotion({
-        heading: projectHeading, stage: projectStage, firstProject: panels[0],
-        gsap, ScrollTrigger, SplitText,
-        enabled: desktopQuery.matches,
-      });
+      if (studyModules && studyGallery) {
+        projectMotion = studyModules.mountGlyphPhoto({
+          heading: projectHeading, stage: projectStage, gsap, ScrollTrigger,
+          target: {
+            getBounds: studyGallery.getFirstBounds,
+            image: studyGallery.firstImage,
+            ratio: studyGallery.ratio,
+            gallery,
+          },
+        });
+      } else if (!studyModules) {
+        projectMotion = mountPhotoMotion({
+          heading: projectHeading, stage: projectStage, firstProject: panels[0],
+          gsap, ScrollTrigger, SplitText,
+          enabled: desktopQuery.matches,
+        });
+      }
       gsap.from(".flow-proof p", {
         y: 26, scale: 0.94, opacity: 0,
         duration: 0.65, stagger: 0.12, ease: "back.out(1.25)",
@@ -979,8 +1026,11 @@ document.addEventListener("click", (event) => {
   event.preventDefault();
   const offset =
     document.querySelector(".site-header").getBoundingClientRect().height + 12;
+  const studyProjectStart = studyGallery && id === "#projects"
+    ? ScrollTrigger?.getById("study-glyph-reveal")?.start
+    : undefined;
   scrollToPosition(
-    scrollY + target.getBoundingClientRect().top - offset,
+    studyProjectStart ?? scrollY + target.getBoundingClientRect().top - offset,
     paused,
   );
   if (event.detail === 0) {
@@ -1032,6 +1082,9 @@ async function initialize() {
         activeChapter,
         selectedProject,
         deckProgress: deckTrigger?.progress,
+        deckIndex: deckClock.index,
+        motionStudy: Boolean(studyGallery),
+        studyIntro: projectMotion?.getState?.(),
         routeProgress: routeClock.progress,
         routeDrawProgress: routeDrawProgress(),
         viewport: { ...viewport, layoutHeight },
@@ -1043,6 +1096,13 @@ async function initialize() {
       }),
       jumpProject: (index) => {
         goToProject(index, true);
+        paint(sceneTime, 0);
+      },
+      seekStudyIntro: (progress) => {
+        const trigger = ScrollTrigger?.getById("study-glyph-reveal");
+        if (!trigger) return;
+        scrollToPosition(trigger.start + clamp(progress) * (trigger.end - trigger.start), true);
+        ScrollTrigger.update();
         paint(sceneTime, 0);
       },
       freezeEntrance: () => {
@@ -1077,6 +1137,14 @@ document.fonts.ready.then(() => {
   if (disposed) return;
   ScrollTrigger?.refresh();
   refreshMeasurements();
+  // Native fragment positioning precedes this optional stage's layout. Align
+  // its initial bookmark once; ordinary scroll/resize never resets the reader.
+  const intro = initialStudyProjectsHash && location.hash === "#projects" && ScrollTrigger?.getById("study-glyph-reveal");
+  if (intro) {
+    scrollToPosition(intro.start, true);
+    ScrollTrigger.update();
+    paint(gsap?.ticker.time || 0, 0);
+  }
 });
 window.addEventListener(
   "scroll",
@@ -1194,6 +1262,7 @@ window.addEventListener("pagehide", (event) => {
   lenis?.destroy();
   context?.revert();
   projectMotion?.dispose();
+  studyGallery?.dispose();
   gsap?.ticker.remove(tick);
   ribbon.dispose();
   projectEvidence.dispose();

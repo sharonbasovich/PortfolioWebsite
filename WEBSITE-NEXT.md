@@ -1,3 +1,21 @@
+# Review-only title/gallery morph study — 24 October 2026
+
+Branch codex/title-gallery-motion-preview, accepted production base7578e08.
+Sharon requested a trial before deciding whether to proceed. Do NOT merge this
+branch to main or update production aliases without that selection. Preview flag
+?motion-study=1 enables real DM Sans glyph-outline morphing into the Robotics
+photo and a fixed-centre gallery aperture matching all four intrinsic image
+ratios. Only the right-hand text slides. No flag retains accepted animation.
+Native phone/reduced/pause fallbacks retain all content and source-ratio frames.
+Existing project order, facts, links, side-sheet details and all PDFs unchanged.
+Marble black background remains deferred. Source/provenance and verification:
+docs/title-gallery-motion-study.md. Local IAB plus25 targeted emulated browser
+checks pass; corrected initial hash timing and intro/frame stacking. The isolated
+Chromium uses SwiftShader, so these are geometry/behavior checks, not hardware FPS.
+Production remains7578e08 until user reviews the branch deployment.
+
+--- Accepted baseline ---
+
 # Robotics first and recovered trophy photograph — 24 October 2026
 
 Branch codex/robotics-first-trophies; prior production/rollback4630e6d.

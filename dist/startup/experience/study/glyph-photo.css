@@ -1,0 +1,49 @@
+/* A preview-only vector silhouette. Its sticky space is ordinary document flow;
+   the gallery continues to own the one ScrollTrigger pin. */
+.projects-heading.study-glyph-stage {
+  position: relative;
+  z-index: 4;
+  display: block;
+  --photo-viewport-height: min(780px, calc(100svh - 160px));
+  --photo-hold-distance: clamp(360px, 70svh, 760px);
+  height: calc(var(--photo-viewport-height) + var(--photo-hold-distance));
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+}
+.study-glyph-source { position: absolute; opacity: 0; }
+.study-glyph-visual {
+  position: sticky;
+  top: 100px;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: var(--photo-viewport-height);
+  overflow: visible;
+  color: var(--ink, #090b11);
+  pointer-events: none;
+}
+.study-glyph-solid { fill: currentColor; }
+.study-glyph-edge {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-opacity: .18;
+  vector-effect: non-scaling-stroke;
+}
+.motion-paused .study-glyph-visual,
+.reduced-motion .study-glyph-visual { display: none; }
+.motion-paused .study-glyph-source,
+.reduced-motion .study-glyph-source { position: static; opacity: 1 !important; }
+.motion-paused .study-glyph-stage,
+.reduced-motion .study-glyph-stage { height: auto; min-height: 0; padding-bottom: 45px; }
+@media (max-width: 1099px), (max-height: 649px), (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .projects-heading.study-glyph-stage { height: auto; min-height: 0; padding-bottom: 45px; }
+  .study-glyph-visual { display: none; }
+  .study-glyph-source { position: static; opacity: 1 !important; }
+}
+@media print {
+  .projects-heading.study-glyph-stage { height: auto; min-height: 0; }
+  .study-glyph-visual { display: none; }
+  .study-glyph-source { position: static; opacity: 1 !important; }
+}
