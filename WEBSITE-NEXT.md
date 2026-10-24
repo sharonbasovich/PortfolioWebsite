@@ -1,3 +1,18 @@
+# Accepted morph gallery promoted — 24 October 2026
+
+Sharon selected the trial and explicitly requested live publication. Branch
+codex/live-morph-gallery promotes89bd747 to the default homepage without a flag.
+Removed original photo-through-type module/CSS and whole-track horizontal slide.
+The larger selector/progress row appears only while the gallery pin is active;
+otherwise it is invisible/inert. The destination frame's whole opacity is owned
+by the title handoff, fixing the premature empty black background. Existing
+native phone/reduced/pause layouts and all content/PDFs retained.25 scoped browser
+checks pass, including source ratios, no placeholder, pin-time controls and row
+fit at1100px/1280px. Docs/title-gallery-motion-study.md records implementation.
+Marble black backdrop stays deferred. Rollback7578e08 remains available.
+
+--- Earlier review checkpoint ---
+
 # Review-only title/gallery morph study — 24 October 2026
 
 Branch codex/title-gallery-motion-preview, accepted production base7578e08.

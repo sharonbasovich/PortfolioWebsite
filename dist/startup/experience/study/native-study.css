@@ -1,5 +1,4 @@
-/* Only the requested comparison uses intrinsic image frames. The accepted
-   production/default document retains its existing responsive layout. */
+/* Native, paused and reduced-motion cards retain each image's source ratio. */
 .motion-study .project-gallery:not(.study-gallery) .project-window.has-project-evidence {
   width: min(100%, calc(min(600px, 68svh) * var(--study-ratio, 1.5)));
   height: auto;

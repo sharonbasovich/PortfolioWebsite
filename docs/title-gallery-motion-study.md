@@ -1,9 +1,8 @@
-# Title and gallery motion study — October 24, 2026
+# Accepted title and gallery motion — October 24, 2026
 
-This is a reviewable experiment on `codex/title-gallery-motion-preview`, based on
-accepted production commit `7578e08`. It is enabled only with `?motion-study=1`.
-The unflagged page retains its accepted title/gallery motion. Do not merge or
-deploy this branch to the production aliases until Sharon selects the trial.
+Sharon selected preview `89bd747` for the live homepage on October 24. This is
+now the default experience, with no query flag. The old photo-through-type
+implementation and horizontally sliding image track have been removed.
 
 The title's real DM Sans weight-500 outlines expand into adjoining image-mask
 regions, then the finished Robotics photograph docks into the gallery. There is
@@ -13,6 +12,10 @@ right-hand project copy slides. Existing content, side-sheet details, selectors,
 keyboard navigation, pause, light/dark controls, and resume downloads are retained.
 Touch, reduced motion, short/small viewports and unavailable WebGL use native
 vertical cards with source-ratio frames. There is no new renderer or RAF loop.
+The enlarged selector and 8px progress bar appear only while the gallery's
+ScrollTrigger pin is active. Outside that interval the controls are invisible
+and inert. The complete destination frame, including its background and edge,
+stays transparent until the photo arrives, avoiding an empty black placeholder.
 
 ## Sources and authoring
 
@@ -39,4 +42,7 @@ Local QA reports/screenshots live outside public output in the workspace's
 `tmp/immersive-oct22-qa/`. SwiftShader results verify behavior/geometry, not real
 phone GPU performance or hardware FPS. The physical Pixel 6a was not available.
 
-The comparison preserves production and both audience-specific resume files.
+The adoption pass adds 25 successful browser assertions, including default-route
+activation, hidden destination before arrival, visible final frame, controls
+hidden before pin, and enlarged navigation fitting 1100px/1280px laptops. Both
+audience-specific resume files and the clean portfolio remain unchanged.

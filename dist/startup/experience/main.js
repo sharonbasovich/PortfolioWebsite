@@ -5,27 +5,16 @@ import { installProjectDetails } from "./project-details.js?v=20261024-robotics"
 import { installProjectEvidence } from "./project-evidence.js?v=20261024-robotics";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
-import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261024-robotics";
+import { mountMorphGallery } from "./study/morph-gallery.js?v=20261024-live-morph";
+import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261024-live-morph";
 
-const motionStudyRequested = new URLSearchParams(location.search).get("motion-study") === "1";
-const initialStudyProjectsHash = motionStudyRequested && location.hash === "#projects";
-let studyModules = null;
-if (motionStudyRequested) {
-  try {
-    const [galleryStudy, glyphStudy] = await Promise.all([
-      import("./study/morph-gallery.js?v=20261024-study"),
-      import("./study/glyph-photo.js?v=20261024-study"),
-    ]);
-    studyModules = { ...galleryStudy, ...glyphStudy };
-  } catch (error) {
-    console.warn("The motion study is unavailable; keeping the existing gallery.", error);
-  }
-}
+const initialProjectsHash = location.hash === "#projects";
 
 const theme = installTheme();
 const projectHeading = document.querySelector(".projects-heading h2");
 const projectStage = document.querySelector(".projects-heading");
 let projectMotion, studyGallery;
+let galleryEngaged = null;
 
 const gsap = window.gsap,
   ScrollTrigger = window.ScrollTrigger,
@@ -41,7 +30,7 @@ const gallery = document.querySelector(".project-gallery"),
   track = document.querySelector(".project-panels");
 const panels = [...document.querySelectorAll(".project-panel")];
 const projectEvidence = installProjectEvidence(panels);
-if (studyModules) {
+{
   root.classList.add("motion-study");
   for (const panel of panels) {
     const image = panel.querySelector(".project-evidence img");
@@ -287,6 +276,12 @@ function updateTrace(delta) {
   ribbon.update(pointer, delta, !paused && finePointer.matches);
 }
 function updateProjectNavigation() {
+  const engaged = Boolean(deckTrigger?.isActive);
+  if (engaged !== galleryEngaged) {
+    galleryEngaged = engaged;
+    gallery.classList.toggle("gallery-engaged", engaged);
+    projectSwitcher.inert = !engaged;
+  }
   projectSwitcher?.style.setProperty(
     "--project-index",
     String(clamp(deckClock.index, 0, panels.length - 1)),
@@ -606,7 +601,7 @@ function tick(time, deltaMs) {
 function buildChoreography(entrance = false) {
   diagnostics.choreographyBuilds++;
   const introBounds = projectStage.getBoundingClientRect();
-  const preserveProjectIntro = mountPhotoMotion && !entrance &&
+  const preserveProjectIntro = projectMotion?.getState?.().enabled && !entrance &&
     finePointer.matches && introBounds.top < innerHeight * 0.85 &&
     introBounds.bottom > innerHeight * 0.35;
   const preservePanel =
@@ -645,129 +640,15 @@ function buildChoreography(entrance = false) {
   motionButton.setAttribute("aria-pressed", String(paused));
   if (!paused && gsap && ScrollTrigger) {
     context = gsap.context(() => {
-      if (desktopQuery.matches && world && !lostContext && studyModules) {
+      if (desktopQuery.matches && world && !lostContext) {
         gallery.classList.add("is-horizontal");
         projectSwitcher.hidden = false;
-        studyGallery = studyModules.mountMorphGallery({
+        studyGallery = mountMorphGallery({
           gallery, track, panels, clock: deckClock, gsap, ScrollTrigger,
           holdDuration: projectHoldDuration, transferDuration: projectTransferDuration,
         });
         deckTimeline = studyGallery.timeline;
         deckTrigger = studyGallery.trigger;
-      } else if (desktopQuery.matches && world && !lostContext) {
-        gallery.classList.add("is-horizontal");
-        projectSwitcher.hidden = false;
-        const deck = gsap.timeline({
-          scrollTrigger: {
-            trigger: gallery,
-            start: "top top",
-            end: () => `+=${innerHeight * 3.2 * panels.length / 3}`,
-            pin: true,
-            scrub: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            refreshPriority: 2,
-          },
-        });
-        gsap.set(panels.map((panel) => panel.querySelector("h3")), {
-          clipPath: "inset(0 0 0% 0)",
-        });
-        deck.to(deckClock, { index: 0, duration: projectHoldDuration });
-        for (let index = 1; index < panels.length; index++) {
-          deck.to(track, {
-            x: () => -innerWidth * index,
-            duration: projectTransferDuration,
-            ease: "power2.inOut",
-          });
-          deck.to(
-            deckClock,
-            { index, duration: projectTransferDuration, ease: "power2.inOut" },
-            "<",
-          );
-          deck.to({}, { duration: projectHoldDuration });
-        }
-        // Copy shares the deck clock: each transfer finishes before its reading
-        // hold, and reversing or keyboard-seeking restores the same clear state.
-        // The context reverts every inline style for native/reduced-motion views.
-        const copyTransition = (panel, entering) => {
-          const copy = panel.querySelector(".project-copy");
-          const metadata = copy.querySelector(".project-index");
-          const title = copy.querySelector("h3");
-          const details = [
-            ...copy.querySelectorAll(
-              ":scope > p, :scope > .hpc-subprojects, :scope > .project-date, :scope > .project-more, :scope > .technology-list, :scope > .project-actions, :scope > .project-link",
-            ),
-          ];
-          const sequence = gsap.timeline();
-          if (entering) {
-            sequence
-              .fromTo(
-                metadata,
-                { y: 8, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
-                0.18,
-              )
-              .fromTo(
-                title,
-                { y: 18, clipPath: "inset(0 0 100% 0)" },
-                {
-                  y: 0,
-                  clipPath: "inset(0 0 0% 0)",
-                  duration: 0.58,
-                  ease: "power3.out",
-                },
-                0.16,
-              )
-              .fromTo(
-                details,
-                { x: 18, opacity: 0 },
-                {
-                  x: 0,
-                  opacity: 1,
-                  duration: 0.44,
-                  stagger: 0.04,
-                  ease: "power2.out",
-                },
-                0.3,
-              );
-          } else {
-            sequence
-              .to(
-                metadata,
-                { y: -6, opacity: 0, duration: 0.24, ease: "power2.in" },
-                0,
-              )
-              .to(
-                title,
-                {
-                  y: -12,
-                  clipPath: "inset(100% 0 0% 0)",
-                  duration: 0.42,
-                  ease: "power2.inOut",
-                },
-                0,
-              )
-              .to(
-                details,
-                {
-                  x: -16,
-                  opacity: 0,
-                  duration: 0.28,
-                  stagger: 0.03,
-                  ease: "power2.in",
-                },
-                0,
-              );
-          }
-          return sequence;
-        };
-        for (let index = 0; index < panels.length - 1; index++) {
-          const transfer = projectHoldDuration + index * projectCycleDuration;
-          deck.add(copyTransition(panels[index], false), transfer);
-          deck.add(copyTransition(panels[index + 1], true), transfer);
-        }
-        deckTimeline = deck;
-        deckTrigger = deck.scrollTrigger;
       }
       if (bridge && finePointer.matches) {
         gsap.fromTo(
@@ -841,21 +722,16 @@ function buildChoreography(entrance = false) {
             0.2,
           );
       }
-      if (studyModules && studyGallery) {
-        projectMotion = studyModules.mountGlyphPhoto({
+      if (studyGallery) {
+        projectMotion = mountGlyphPhoto({
           heading: projectHeading, stage: projectStage, gsap, ScrollTrigger,
           target: {
             getBounds: studyGallery.getFirstBounds,
             image: studyGallery.firstImage,
+            arrival: studyGallery.frame,
             ratio: studyGallery.ratio,
             gallery,
           },
-        });
-      } else if (!studyModules) {
-        projectMotion = mountPhotoMotion({
-          heading: projectHeading, stage: projectStage, firstProject: panels[0],
-          gsap, ScrollTrigger, SplitText,
-          enabled: desktopQuery.matches,
         });
       }
       gsap.from(".flow-proof p", {
@@ -866,7 +742,7 @@ function buildChoreography(entrance = false) {
       for (const heading of document.querySelectorAll(
         ".work-heading h2, .projects-heading h2, .contact h2",
       )) {
-        if (!finePointer.matches || (heading === projectHeading && mountPhotoMotion && desktopQuery.matches)) continue;
+        if (!finePointer.matches || (heading === projectHeading && projectMotion?.getState?.().enabled)) continue;
         SplitText?.create(heading, {
           type: "lines",
           mask: "lines",
@@ -1137,9 +1013,9 @@ document.fonts.ready.then(() => {
   if (disposed) return;
   ScrollTrigger?.refresh();
   refreshMeasurements();
-  // Native fragment positioning precedes this optional stage's layout. Align
+  // Native fragment positioning precedes the project stage's layout. Align
   // its initial bookmark once; ordinary scroll/resize never resets the reader.
-  const intro = initialStudyProjectsHash && location.hash === "#projects" && ScrollTrigger?.getById("study-glyph-reveal");
+  const intro = initialProjectsHash && location.hash === "#projects" && ScrollTrigger?.getById("study-glyph-reveal");
   if (intro) {
     scrollToPosition(intro.start, true);
     ScrollTrigger.update();

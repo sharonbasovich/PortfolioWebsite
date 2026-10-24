@@ -1,5 +1,4 @@
-/* Experimental classes are mounted only by ?motion-study=1. No default UI or
-   native layout changes are made by loading this stylesheet. */
+/* The accepted project gallery uses one stationary, source-ratio image frame. */
 .project-gallery.study-gallery {
   height: 100svh;
   min-height: 100svh;
@@ -24,6 +23,34 @@
 }
 .study-gallery .project-panel > .project-window { visibility: hidden; }
 .study-gallery .project-copy { will-change: transform, opacity; }
+.study-gallery .project-switcher {
+  height: 64px;
+  gap: clamp(18px, 1.8vw, 30px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 180ms ease-out, transform 180ms ease-out, visibility 180ms;
+}
+.study-gallery.gallery-engaged .project-switcher {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+}
+.study-gallery .project-switcher button {
+  font-size: clamp(19px, 1.65vw, 24px);
+  min-height: 52px;
+  gap: 10px;
+}
+.study-gallery .project-switcher button span { font-size: 14px; }
+.study-gallery .project-switcher button::after { width: 9px; height: 9px; }
+.study-gallery .project-progress {
+  flex-basis: clamp(200px, 18vw, 260px);
+  width: clamp(200px, 18vw, 260px);
+  height: 8px;
+  border-radius: 5px;
+}
 .study-gallery-frame {
   position: absolute;
   z-index: 3;
@@ -45,4 +72,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .study-gallery .project-copy { will-change: auto; }
+  .study-gallery .project-switcher { transition: none; }
 }

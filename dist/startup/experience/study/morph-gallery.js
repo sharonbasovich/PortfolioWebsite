@@ -49,7 +49,7 @@ function restore({ node, style, hidden, inert }) {
 }
 
 /**
- * Preview-only gallery. One SVG viewport owns the changing image aperture;
+ * One SVG viewport owns the changing image aperture;
  * semantic project copy stays in the existing DOM and moves only on the right.
  * Geometry reads happen at mount/refresh, never in the scroll-linked paint.
  * The timeline uses the calling page's GSAP clock and its existing stop math.

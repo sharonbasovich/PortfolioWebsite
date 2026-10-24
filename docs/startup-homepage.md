@@ -60,8 +60,15 @@ Reduced motion and pause use an immediate state. No new renderer or ticker.
 The shared project link is positioned so its animated underline stays within its
 own bounds on cards and inside the dialog, including keyboard focus/click.
 
-The accepted photo-through-type project heading follows the first project's
-Lions Robotics trophy photograph into its gallery frame. The other images are
+The accepted project heading morphs real DM Sans letter outlines into the first
+Lions Robotics trophy photograph, which then docks into its gallery frame. One
+stationary image aperture morphs between each source's aspect ratio; only the
+right-hand copy slides. The enlarged selector and progress bar appear when the
+gallery pins and hide outside that interval. The whole destination frame stays
+hidden until arrival, preventing an empty black placeholder. No query flag is
+needed. The old photo-through-type module is removed. See
+[motion implementation and provenance](title-gallery-motion-study.md).
+The other images are
 the official Marble/UW HPC logos and Sharon's supplied SkyCell launch photograph
 (cropped using CSS). The new Robotics photograph is fully contained and uses a
 3:2 phone frame, preserving all four robots and trophies. The requested Marble

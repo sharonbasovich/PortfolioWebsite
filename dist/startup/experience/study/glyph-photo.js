@@ -18,15 +18,16 @@ const setRect = (element, bounds, radius) => {
 };
 
 /**
- * Preview: each real letter outline expands into its own part of the image mask.
+ * Each real letter outline expands into its own part of the image mask.
  * There is no expanding central aperture. The finished image then docks into the
  * shared gallery frame. Geometry reads happen only on refresh, and a paused
  * MorphSVG timeline follows one scroll clock without another RAF or WebGL pass.
  *
- * target: { gallery, image, ratio, getBounds() }. getBounds returns the FIRST
+ * target: { gallery, image, arrival?, ratio, getBounds() }. getBounds returns the FIRST
  * image's screen rect independent of the gallery's currently selected project.
- * The parent layer may crossfade projects; target.image.opacity is this intro's
- * independent first-image arrival, and must not be overwritten by that layer.
+ * The parent layer may crossfade projects; arrival (or image as a fallback)
+ * belongs to this intro. Passing the complete frame hides its background and
+ * edge until the photograph arrives, avoiding an empty placeholder underneath.
  */
 export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } = {}) {
   const noop = { dispose() {}, refresh() {}, getState: () => ({ enabled: false }) };
@@ -41,6 +42,7 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
   gsap.registerPlugin(plugin);
   const photograph = target.image.getAttribute("href") || target.image.getAttributeNS("http://www.w3.org/1999/xlink", "href") || target.image.currentSrc || target.image.src;
   if (!photograph) return noop;
+  const arrival = target.arrival?.style ? target.arrival : target.image;
   const serial = ++sequence;
   const maskId = `study-letter-mask-${serial}`;
   const clipId = `study-letter-clip-${serial}`;
@@ -58,14 +60,14 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
   const old = {
     headingOpacity: heading.style.getPropertyValue("opacity"),
     headingPriority: heading.style.getPropertyPriority("opacity"),
-    imageOpacity: target.image.style.getPropertyValue("opacity"),
-    imagePriority: target.image.style.getPropertyPriority("opacity"),
+    arrivalOpacity: arrival.style.getPropertyValue("opacity"),
+    arrivalPriority: arrival.style.getPropertyPriority("opacity"),
     photoStage: stage.classList.contains("projects-photo-stage"),
   };
   stage.classList.add("projects-photo-stage", "study-glyph-stage");
   heading.classList.add("study-glyph-source");
   heading.style.setProperty("opacity", "0");
-  target.image.style.opacity = "0";
+  arrival.style.opacity = "0";
   stage.append(visual);
 
   const clock = { progress: 0 };
@@ -164,7 +166,7 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
     solid.style.opacity = (1 - reveal).toFixed(4);
     edge.style.opacity = (phase(shape, .94, 1) * (1 - handoff)).toFixed(4);
     visual.style.opacity = (1 - handoff).toFixed(4);
-    target.image.style.opacity = handoff.toFixed(4);
+    arrival.style.opacity = handoff.toFixed(4);
   }
 
   function refresh() { if (measure()) paint(clock.progress); }
@@ -181,7 +183,7 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
     if (!old.photoStage) stage.classList.remove("projects-photo-stage");
     heading.classList.remove("study-glyph-source");
     restore(heading, "opacity", old.headingOpacity, old.headingPriority);
-    restore(target.image, "opacity", old.imageOpacity, old.imagePriority);
+    restore(arrival, "opacity", old.arrivalOpacity, old.arrivalPriority);
   }
   if (!measure()) { dispose(); return noop; }
   paint(0);
