@@ -1,7 +1,7 @@
 import Lenis from "../vendor/lenis/lenis.js";
 import { createWorld } from "./world.js?v=20261023-header";
 import { createPointerRibbon } from "./pointer-ribbon.js";
-import { installProjectEvidence } from "./project-evidence.js";
+import { installProjectEvidence } from "./project-evidence.js?v=20261023-hpc";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
 import { mountProjectMotion as mountTypeMotion } from "./projects-type.js";
@@ -57,7 +57,15 @@ const rail = document.querySelector(".scroll-rail"),
   thumb = document.querySelector(".scroll-thumb");
 const projectSwitcher = document.querySelector(".project-switcher");
 const projectButtons = [...document.querySelectorAll("[data-select-project]")];
-const projectStops = [1 / 9, 0.5, 8 / 9];
+const projectHoldDuration = 1.2;
+const projectTransferDuration = 0.9;
+const projectCycleDuration = projectHoldDuration + projectTransferDuration;
+const projectTimelineDuration = panels.length * projectHoldDuration +
+  Math.max(0, panels.length - 1) * projectTransferDuration;
+const projectStops = panels.map((_, index) =>
+  (index * projectCycleDuration + projectHoldDuration / 2) / projectTimelineDuration,
+);
+gallery.style.setProperty("--project-count", String(Math.max(1, panels.length)));
 const chapters = [...document.querySelectorAll(".chapter")];
 const sectionLinks = [
   ...document.querySelectorAll(
@@ -639,7 +647,7 @@ function buildChoreography(entrance = false) {
           scrollTrigger: {
             trigger: gallery,
             start: "top top",
-            end: () => `+=${innerHeight * 3.2}`,
+            end: () => `+=${innerHeight * 3.2 * panels.length / 3}`,
             pin: true,
             scrub: true,
             anticipatePin: 1,
@@ -650,29 +658,20 @@ function buildChoreography(entrance = false) {
         gsap.set(panels.map((panel) => panel.querySelector("h3")), {
           clipPath: "inset(0 0 0% 0)",
         });
-        deck.to(deckClock, { index: 0, duration: 1.2 });
-        deck.to(track, {
-          x: () => -innerWidth,
-          duration: 0.9,
-          ease: "power2.inOut",
-        });
-        deck.to(
-          deckClock,
-          { index: 1, duration: 0.9, ease: "power2.inOut" },
-          "<",
-        );
-        deck.to({}, { duration: 1.2 });
-        deck.to(track, {
-          x: () => -innerWidth * 2,
-          duration: 0.9,
-          ease: "power2.inOut",
-        });
-        deck.to(
-          deckClock,
-          { index: 2, duration: 0.9, ease: "power2.inOut" },
-          "<",
-        );
-        deck.to({}, { duration: 1.2 });
+        deck.to(deckClock, { index: 0, duration: projectHoldDuration });
+        for (let index = 1; index < panels.length; index++) {
+          deck.to(track, {
+            x: () => -innerWidth * index,
+            duration: projectTransferDuration,
+            ease: "power2.inOut",
+          });
+          deck.to(
+            deckClock,
+            { index, duration: projectTransferDuration, ease: "power2.inOut" },
+            "<",
+          );
+          deck.to({}, { duration: projectHoldDuration });
+        }
         // Copy shares the deck clock: each transfer finishes before its reading
         // hold, and reversing or keyboard-seeking restores the same clear state.
         // The context reverts every inline style for native/reduced-motion views.
@@ -682,7 +681,7 @@ function buildChoreography(entrance = false) {
           const title = copy.querySelector("h3");
           const details = [
             ...copy.querySelectorAll(
-              ":scope > p, :scope > .technology-list, :scope > .project-actions, :scope > .project-link",
+              ":scope > p, :scope > .hpc-subprojects, :scope > .technology-list, :scope > .project-actions, :scope > .project-link",
             ),
           ];
           const sequence = gsap.timeline();
@@ -749,7 +748,7 @@ function buildChoreography(entrance = false) {
           return sequence;
         };
         for (let index = 0; index < panels.length - 1; index++) {
-          const transfer = 1.2 + index * 2.1;
+          const transfer = projectHoldDuration + index * projectCycleDuration;
           deck.add(copyTransition(panels[index], false), transfer);
           deck.add(copyTransition(panels[index + 1], true), transfer);
         }

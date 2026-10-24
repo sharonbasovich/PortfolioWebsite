@@ -1,0 +1,102 @@
+/* The HPC group uses the existing project typography and two-column frame.
+   Its compact copy accommodates two works in progress without a new layout. */
+.project-panel--hpc .project-index {
+  margin-bottom: 18px;
+}
+.project-panel--hpc .project-copy h3 {
+  margin-bottom: 18px;
+  font-size: clamp(38px, 3.6vw, 58px);
+  line-height: 1.03;
+}
+.project-panel--hpc .project-copy > p,
+.hpc-subproject p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.hpc-subprojects {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+.hpc-subproject h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+}
+.hpc-project-status {
+  color: var(--cobalt);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.hpc-subproject p {
+  margin-top: 5px;
+}
+.project-panel--hpc .project-actions {
+  gap: 18px;
+}
+.project-panel--hpc .project-link {
+  gap: 12px;
+  margin-top: 18px;
+  font-size: 13px;
+}
+
+/* Preserve the gallery's fixed reading window on shorter laptops. Native
+   layouts remain content-sized rather than inheriting these density rules. */
+@media (min-width: 1100px) and (min-height: 650px) and (max-height: 760px) and (hover: hover) and (pointer: fine) {
+  .project-panel--hpc .project-index {
+    margin-bottom: 14px;
+    font-size: 11px;
+  }
+  .project-panel--hpc .project-copy h3 {
+    margin-bottom: 14px;
+    font-size: 36px;
+  }
+  .project-panel--hpc .project-copy > p,
+  .hpc-subproject p {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .hpc-subprojects {
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .hpc-subproject h4 {
+    font-size: 15px;
+  }
+  .project-panel--hpc .project-link {
+    min-height: 44px;
+    margin-top: 14px;
+  }
+}
+
+@media (max-width: 650px) {
+  .project-panel--hpc .project-index {
+    margin-bottom: 20px;
+  }
+  .project-panel--hpc .project-index span:last-child {
+    max-width: 190px;
+  }
+  .project-panel--hpc .project-copy h3 {
+    font-size: 45px;
+  }
+  .hpc-subprojects {
+    gap: 22px;
+    margin-top: 22px;
+  }
+  .hpc-subproject h4 {
+    font-size: 16px;
+  }
+  .project-panel--hpc .project-actions {
+    gap: 16px;
+  }
+}

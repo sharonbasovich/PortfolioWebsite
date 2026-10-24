@@ -1552,6 +1552,7 @@ footer a {
   margin-top: 10px;
 }
 .project-gallery {
+  --project-count: 3;
   --project-index: 0;
 }
 .project-switcher {
@@ -1611,7 +1612,7 @@ footer a {
 }
 .project-progress i {
   position: absolute;
-  width: 33.333%;
+  width: calc(100% / var(--project-count));
   height: 100%;
   background: var(--cobalt);
   transform: translateX(calc(var(--project-index) * 100%));

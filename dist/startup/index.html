@@ -32,14 +32,16 @@
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232d43ff'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='white'%3Esb%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./immersive/style.css?v=20261023-polish" />
+    <link rel="stylesheet" href="./immersive/style.css?v=20261023-hpc" />
     <link rel="stylesheet" href="./immersive/pointer-ribbon.css" />
-    <link rel="stylesheet" href="./immersive/project-evidence.css?v=20261023" />
+    <link rel="stylesheet" href="./immersive/project-evidence.css?v=20261023-hpc" />
     <link rel="stylesheet" href="./immersive/projects-type.css" />
     <link rel="stylesheet" href="./immersive/projects-photo.css?v=20261023-visible" />
     <link rel="stylesheet" href="./immersive/projects-depth.css" />
     <link rel="stylesheet" href="./immersive/refinements.css?v=20261023-header" />
     <link rel="stylesheet" href="./immersive/native-presentation.css?v=20261023-polish" />
+    <link rel="stylesheet" href="./immersive/hpc-project.css?v=20261023-hpc" />
+    <link rel="stylesheet" href="./immersive/hpc-evidence.css?v=20261023-hpc" />
     <link rel="stylesheet" href="./immersive/theme.css?v=20261023-header" />
     <link rel="stylesheet" href="./immersive/mobile-header.css?v=20261023-header" />
     <script src="./vendor/gsap/gsap.min.js" defer></script>
@@ -48,7 +50,7 @@
     <script type="importmap">
       {"imports":{"three":"./vendor/three/three.module.js"}}
     </script>
-    <script type="module" src="./immersive/main.js?v=20261023-header"></script>
+    <script type="module" src="./immersive/main.js?v=20261023-hpc"></script>
     <noscript
       ><style>
         .world-frame,
@@ -371,6 +373,9 @@
             <button type="button" data-select-project="2">
               <span>03</span> Marble
             </button>
+            <button type="button" data-select-project="3">
+              <span>04</span> UWaterloo HPC
+            </button>
             <span class="project-progress" aria-hidden="true"><i></i></span>
           </nav>
           <div class="project-panels">
@@ -385,7 +390,7 @@
               ></div>
               <div class="project-copy">
                 <div class="project-index">
-                  <span>01 / 03</span><span>Top 10 at Undercity</span>
+                  <span>01 / 04</span><span>Top 10 at Undercity</span>
                 </div>
                 <h3 id="robot-title">Tic-Tac-Toe<br />Drawing Robot</h3>
                 <p>
@@ -448,7 +453,7 @@
               ></div>
               <div class="project-copy">
                 <div class="project-index">
-                  <span>02 / 03</span
+                  <span>02 / 04</span
                   ><span>1st at APEX · International research hackathon</span>
                 </div>
                 <h3 id="skycell-title">SkyCell</h3>
@@ -546,7 +551,7 @@
               ></div>
               <div class="project-copy">
                 <div class="project-index">
-                  <span>03 / 03</span><span>Marble Investments</span>
+                  <span>03 / 04</span><span>Marble Investments</span>
                 </div>
                 <h3 id="marble-title">Structure<br />from noise.</h3>
                 <p>
@@ -592,6 +597,54 @@
                         stroke-linejoin="round"
                       /></svg></span
                 ></a>
+              </div>
+            </article>
+            <article
+              class="project-panel project-panel--hpc"
+              data-project="3"
+              aria-labelledby="hpc-title"
+            >
+              <div
+                class="project-window art-window"
+                data-world-window
+              ></div>
+              <div class="project-copy">
+                <div class="project-index">
+                  <span>04 / 04</span>
+                  <span>Core Developer · Waterloo, ON · Present</span>
+                </div>
+                <h3 id="hpc-title" aria-label="UWaterloo High Performance Computing">UWaterloo<br />HPC</h3>
+                <p>
+                  University of Waterloo design team sponsored by
+                  Citadel &amp; Jane Street.
+                </p>
+                <div class="hpc-subprojects">
+                  <section class="hpc-subproject" aria-labelledby="xpu-title">
+                    <h4 id="xpu-title">XPU <span class="hpc-project-status">In progress</span></h4>
+                    <p>
+                      Developing a C++23 interface for CPU and NVIDIA CUDA
+                      memory management, math, data layouts, and execution.
+                    </p>
+                  </section>
+                  <section class="hpc-subproject" aria-labelledby="vmc-title">
+                    <h4 id="vmc-title">Variational Monte Carlo <span class="hpc-project-status">In progress</span></h4>
+                    <p>
+                      Building a C++ engine for homogeneous electron-gas
+                      simulations using a Slater–Jastrow trial wavefunction
+                      and Metropolis sampling.
+                    </p>
+                  </section>
+                </div>
+                <div class="project-actions">
+                  <a class="project-link roll-link" href="https://github.com/UWHPC/xpu">
+                    <span class="roll-label button-label"><span class="roll-original">XPU source</span><span class="roll-duplicate" aria-hidden="true">XPU source</span></span>
+                    <span class="link-arrow button-arrow" aria-hidden="true"><svg class="arrow-original" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                  </a>
+                  <a class="project-link roll-link" href="https://github.com/UWHPC/variational-monte-carlo">
+                    <span class="roll-label button-label"><span class="roll-original">Monte Carlo source</span><span class="roll-duplicate" aria-hidden="true">Monte Carlo source</span></span>
+                    <span class="link-arrow button-arrow" aria-hidden="true"><svg class="arrow-original" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                  </a>
+                </div>
               </div>
             </article>
           </div>

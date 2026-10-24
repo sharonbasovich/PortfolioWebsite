@@ -1,3 +1,26 @@
+# Startup UWaterloo HPC projects and approved resume — 23 October 2026
+
+Branch codex/startup-uwhpc-projects; prior production/rollback 637db9e.
+The existing projects UI gains a fourth UWaterloo HPC group containing XPU and
+Variational Monte Carlo, both explicitly in progress. Core Developer role,
+Waterloo location, and Citadel & Jane Street sponsorship match the approved
+resume. Source links point to the verified public UWHPC repositories. The left
+panel is a labeled concept overview, not a simulation or performance result.
+Other project copy and the accepted design are retained. Four-panel navigation,
+progress, and scroll timing derive from the panel count; no additional renderer
+or animation clock. Native mobile content stays unpinned and content-sized.
+
+Both startup PDF routes now contain the approved final PDF with SHA256
+b95a74b618d5fa26e5177c461121710d2ef6a413cfba157acb2bf3c216525de8.
+The big-tech site and its PDF are unchanged. Canonical resume files untouched.
+38 scoped desktop/mobile/navigation checks pass, including short laptops,
+320px touch, landscape, pause/resume, reduced motion and WebGL fallback.
+Screenshots inspected. See docs/startup-homepage.md for scope and evidence.
+Regenerate root from immersive/index.html before publishing. Standing routine
+push/deploy authorization applies; verify actual public downloads after deploy.
+
+--- Earlier checkpoint ---
+
 # Startup root homepage and resume synchronization — 23 October 2026
 
 Branch codex/promote-immersive-homepage. Prior production/rollback3ea5c4b.

@@ -30,6 +30,30 @@ The canonical LaTeX sources and reviewed PDFs live outside this repository and
 are maintained by the resume workflow; do not edit them during website sync.
 The current win count is 11 on both sites. Historical dated notes are unchanged.
 
+## Startup HPC project group
+
+The fourth project panel groups two in-progress UWaterloo High Performance
+Computing projects. It records the Core Developer role in Waterloo, ON, and the
+University of Waterloo design team's Citadel & Jane Street sponsorship.
+
+- XPU: a C++23 interface for CPU and NVIDIA CUDA memory management, math, data
+  layouts, and execution. Source: https://github.com/UWHPC/xpu.
+- Variational Monte Carlo: a C++ homogeneous electron-gas simulation engine using
+  a Slater-Jastrow trial wavefunction and Metropolis sampling. Source:
+  https://github.com/UWHPC/variational-monte-carlo.
+
+Both links were checked against the public team repositories. The accompanying
+diagrams are explicitly conceptual; they do not represent completed work,
+simulation output, or measured performance. Existing project content is retained.
+The gallery derives its stops, transfer sequence, and progress width from the
+panel count. Native mobile layouts remain content-sized with no gallery pin.
+
+The approved startup PDF SHA256 is
+`b95a74b618d5fa26e5177c461121710d2ef6a413cfba157acb2bf3c216525de8`.
+Both startup download names contain those exact bytes. The big-tech PDF remains
+`453bf82cbe455a3d950520f48a99b3f2ce64df193f734a23a86b43ce17b86086`.
+The canonical resume sources and PDFs were read and copied, not edited.
+
 ## Verification
 
 Sixteen local browser checks passed across desktop and touch layouts: root URL,
@@ -40,3 +64,11 @@ reported. Both final PDFs were rendered and checked for one page, displayed name
 compatibility copies match the reviewed source hashes. Workspace evidence:
 `tmp/immersive-oct22-qa/homepage-check.json`, `audience-resume-check.json` and
 `audience-resume-copies.json`.
+
+The subsequent HPC addition passes 38 scoped browser checks: four-project
+navigation and reverse scrolling, three desktop sizes including 1100x650,
+four touch layouts from 320x568 through landscape, unclipped diagram and copy,
+source-link targets, pause/resume, reduced motion, and WebGL fallback. There were
+no unexpected runtime or asset errors. Desktop and mobile screenshots were
+inspected. Evidence: `tmp/immersive-oct22-qa/uwhpc-check.json` and
+`uwhpc-desktop-*.png` / `uwhpc-mobile-*.png` in the workspace.
