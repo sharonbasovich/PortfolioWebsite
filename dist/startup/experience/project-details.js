@@ -1,8 +1,3 @@
-const PREVIEWS = new Map([
-  ["1", "Card expansion"],
-  ["2", "Side sheet"],
-  ["3", "Iris reveal"],
-]);
 let instance = 0;
 
 const cleanClone = (element) => {
@@ -14,7 +9,7 @@ const cleanClone = (element) => {
 };
 
 /** One shared native dialog keeps disclosure out of the pinned gallery layout.
- * Experimental treatments run only on localhost until Sharon selects one.
+ * The selected side sheet shares the page's existing motion system.
  * onOpen/onClose should stop/restore the page's existing scroller, not its
  * animation clock: these timelines share the existing GSAP ticker.
  */
@@ -26,14 +21,11 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
   })).filter(({ button, template }) => button && template);
   if (!records.length) return { dispose() {} };
 
-  const query = new URLSearchParams(location.search).get("details-motion");
-  const local = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
-  const choice = local && PREVIEWS.has(query) ? query : null;
   const id = `project-details-${++instance}`;
   const dialog = document.createElement("dialog");
   dialog.id = id;
   dialog.className = "project-details-dialog";
-  dialog.dataset.motion = choice || "static";
+  dialog.dataset.motion = "2";
   dialog.setAttribute("aria-labelledby", `${id}-title`);
   dialog.setAttribute("aria-describedby", `${id}-context`);
   dialog.innerHTML = `
@@ -68,8 +60,7 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
   let locked = false;
   let disposed = false;
   let previousOverflow;
-  let comparison;
-  const noMotion = () => !choice || !gsap || reduced.matches ||
+  const noMotion = () => !gsap || reduced.matches ||
     document.documentElement.matches(".motion-paused, .is-paused");
 
   function clearMotion() {
@@ -96,11 +87,7 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
     source = undefined;
   }
 
-  function makeTimeline(record) {
-    // Read geometry once at the event boundary; no per-frame layout reads.
-    const origin = record.panel.querySelector(".project-copy").getBoundingClientRect();
-    const button = record.button.getBoundingClientRect();
-    const target = sheet.getBoundingClientRect();
+  function makeTimeline() {
     const rows = [...body.querySelectorAll("li")];
     const sequence = gsap.timeline({
       paused: true,
@@ -108,32 +95,11 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
       onReverseComplete: () => finishClose(),
     });
     sequence.fromTo(shade, { opacity: 0 }, { opacity: 1, duration: 0.36 }, 0);
-    if (choice === "1") {
-      sequence.fromTo(sheet, {
-        x: origin.left + origin.width / 2 - target.left - target.width / 2,
-        y: origin.top + origin.height / 2 - target.top - target.height / 2,
-        scaleX: Math.max(0.35, Math.min(0.9, origin.width / target.width)),
-        scaleY: Math.max(0.35, Math.min(0.9, origin.height / target.height)),
-        transformOrigin: "50% 50%",
-        opacity: 0.45,
-      }, { x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1, duration: 0.48 }, 0);
-      sequence.fromTo(header, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.24 }, 0.16);
-      sequence.fromTo(rows, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.24, stagger: 0.045 }, 0.20);
-    } else if (choice === "2") {
-      sequence.fromTo(sheet, { x: 64, clipPath: "inset(0 0 0 100%)" }, {
-        x: 0, clipPath: "inset(0 0 0 0%)", duration: 0.46,
-      }, 0);
-      sequence.fromTo(header, { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: 0.24 }, 0.16);
-      sequence.fromTo(rows, { opacity: 0, x: 26 }, { opacity: 1, x: 0, duration: 0.24, stagger: 0.045 }, 0.20);
-    } else {
-      const x = Math.max(1, Math.min(99, 100 * (button.left + button.width / 2 - target.left) / target.width));
-      const y = Math.max(1, Math.min(99, 100 * (button.top + button.height / 2 - target.top) / target.height));
-      sequence.fromTo(sheet, { clipPath: `circle(0% at ${x}% ${y}%)`, scale: 0.985 }, {
-        clipPath: `circle(145% at ${x}% ${y}%)`, scale: 1, duration: 0.5,
-      }, 0);
-      sequence.fromTo(header, { opacity: 0, y: 9 }, { opacity: 1, y: 0, duration: 0.24 }, 0.14);
-      sequence.fromTo(rows, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.24, stagger: 0.045 }, 0.20);
-    }
+    sequence.fromTo(sheet, { x: 64, clipPath: "inset(0 0 0 100%)" }, {
+      x: 0, clipPath: "inset(0 0 0 0%)", duration: 0.46,
+    }, 0);
+    sequence.fromTo(header, { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: 0.24 }, 0.16);
+    sequence.fromTo(rows, { opacity: 0, x: 26 }, { opacity: 1, x: 0, duration: 0.24, stagger: 0.045 }, 0.20);
     sequence.fromTo(footer, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.20 }, 0.32);
     return sequence;
   }
@@ -181,7 +147,7 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
     }
     closeButton.focus({ preventScroll: true });
     if (!noMotion()) {
-      timeline = makeTimeline(record);
+      timeline = makeTimeline();
       timeline.play(0);
     }
   }
@@ -216,26 +182,6 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
   const pauseObserver = new MutationObserver(settleReduced);
   pauseObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
-  if (choice) {
-    comparison = document.createElement("nav");
-    comparison.className = "project-details-comparison";
-    comparison.setAttribute("aria-label", "Project detail motion previews");
-    const label = document.createElement("span");
-    label.textContent = "View more previews";
-    comparison.append(label);
-    for (const [key, name] of PREVIEWS) {
-      const link = document.createElement("a");
-      const url = new URL(location.href);
-      url.searchParams.set("details-motion", key);
-      url.hash = "projects";
-      link.href = url.href;
-      link.textContent = `${key}. ${name}`;
-      if (choice === key) link.setAttribute("aria-current", "page");
-      comparison.append(link);
-    }
-    document.body.append(comparison);
-  }
-
   const dispose = () => {
     if (disposed) return;
     disposed = true;
@@ -248,7 +194,6 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
     pauseObserver.disconnect();
     reduced.removeEventListener("change", settleReduced);
     dialog.remove();
-    comparison?.remove();
     window.removeEventListener("pagehide", dispose);
   };
   window.addEventListener("pagehide", dispose);

@@ -40,8 +40,10 @@ The current win count is 11 on both sites. Historical dated notes are unchanged.
 
 The cards and their selection menu follow the approved startup résumé order:
 Marble Investments, UWaterloo High Performance Computing, SkyCell, Lions Robotics.
-Only the HPC menu label is abbreviated. Each front has the exact project title,
-a short italic summary, skills, source/demo links, and a View more control.
+The HPC menu label is abbreviated and its heading is UW HPC, as requested on
+October 24. Each front has a short italic summary, skills, source/demo links,
+and a View more control. The top-right metadata is time and location. Marble
+links to its website. Summaries use Sharon's supplied October 24 wording.
 The templates contain the three active résumé bullets verbatim, with LaTeX
 formatting converted to ordinary Unicode text. The unrelated drawing robot and
 its photographs are removed. Lions Robotics uses the actual robot photograph and
@@ -49,22 +51,25 @@ source repository at https://github.com/sharonbasovich/828555Sworlds.
 
 One native dialog displays the matching résumé bullets with keyboard focus,
 Escape/backdrop dismissal, focus restoration, bounded small-screen scrolling,
-and page-scroll locking. Opening details does not resize the gallery. Production
-disclosure is static until a motion treatment is selected. Three complete GSAP
-comparisons run only on localhost via `?details-motion=1`, `2`, or `3`: card
-expansion, side sheet, and iris reveal. All share the same content and semantics;
-reduced motion and pause use an immediate state. No new renderer or ticker.
+and page-scroll locking. Opening details does not resize the gallery. Sharon
+selected option 2, the side sheet, on October 24. Its directional wipe and bullet
+cascade are the default. Alternate treatments and comparison controls are removed.
+Reduced motion and pause use an immediate state. No new renderer or ticker.
+The shared project link is positioned so its animated underline stays within its
+own bounds on cards and inside the dialog, including keyboard focus/click.
 
 The accepted photo-through-type project heading follows the first project's
-Marble workflow SVG into its actual gallery frame, rather than retaining the
-removed drawing-robot image. Evidence selection is keyed by project, independent
-of carousel position.
+official Marble logo into its gallery frame. The other images are the official
+UW HPC logo, Sharon's supplied SkyCell launch photograph (cropped using CSS),
+and the retained Lions robot photograph. There are no image captions. Original
+asset bytes are retained; sources/hashes are in the project-evidence provenance.
+Evidence selection is keyed by project, independent of carousel position.
 
 ## Startup HPC project group
 
 The second project panel groups two in-progress UWaterloo High Performance
-Computing projects. It records the Core Developer role in Waterloo, ON, and the
-University of Waterloo design team's Citadel & Jane Street sponsorship.
+Computing projects. Its detail bullets retain the University of Waterloo design
+team's Citadel & Jane Street sponsorship and both works in progress.
 
 - XPU: a C++23 interface for CPU and NVIDIA CUDA memory management, math, data
   layouts, and execution. Source: https://github.com/UWHPC/xpu.
@@ -72,9 +77,7 @@ University of Waterloo design team's Citadel & Jane Street sponsorship.
   a Slater-Jastrow trial wavefunction and Metropolis sampling. Source:
   https://github.com/UWHPC/variational-monte-carlo.
 
-Both links were checked against the public team repositories. The accompanying
-diagrams are explicitly conceptual; they do not represent completed work,
-simulation output, or measured performance.
+Both links were checked against the public team repositories.
 The gallery derives its stops, transfer sequence, and progress width from the
 panel count. Native mobile layouts remain content-sized with no gallery pin.
 
@@ -85,6 +88,19 @@ Both startup download names contain those exact bytes. The big-tech PDF remains
 The canonical resume sources and PDFs were read and copied, not edited.
 
 ## Verification
+
+October 24 update: 159 scoped browser checks pass across 1280x720 and 1100x650
+desktops and 320x568, 393x851, 430x932, and 851x393 touch layouts. This covers
+the four supplied summaries, time/location metadata, exact twelve résumé bullets,
+four image sources with no captions, selected side-sheet opening/closing, focus
+and scroll restoration, reduced motion, and link-bounded underlines under hover,
+keyboard focus and intercepted clicks. Official logo originals and the supplied
+photo were hash-checked; the photo is unchanged and cropped only in CSS. In-app
+desktop and device screenshots were inspected. No runtime, asset or shader errors.
+Evidence: workspace `tmp/immersive-oct22-qa/project-brand-check.json`,
+`brand-card-*.png`, `brand-iab-*.png`, and `brand-mobile-*.png`.
+
+Earlier October 23 checkpoint:
 
 Consolidation/project verification: 108 primary browser checks plus 28 final
 evidence/resize checks pass. Coverage includes 1280x720 and 1100x650 desktops;
@@ -97,7 +113,8 @@ browser supplied device sizes unavailable in its controls. Screenshots were
 inspected. Five legacy redirect cases and both pages' local references pass.
 Evidence: workspace `tmp/immersive-oct22-qa/project-cards-check.json`,
 `project-fit-final.json`, `project-card-*.png`, `project-details-*.png`.
-The three new treatments remain comparison previews pending Sharon's choice.
+At that checkpoint the three treatments were comparison previews. Sharon selected
+the side sheet on October 24; the unused alternatives have since been removed.
 
 Earlier verification history:
 

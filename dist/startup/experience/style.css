@@ -718,6 +718,7 @@ footer {
   margin-top: 25px;
 }
 .project-link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 28px;

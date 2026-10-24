@@ -1,3 +1,36 @@
+# Project images, summaries and selected side sheet — 24 October 2026
+
+Branch codex/project-brand-images; prior production/rollback9294aaf.
+Sharon selected option2. Side-sheet wipe/cascade is the default on desktop and
+phones; old reveal alternatives/local comparison UI removed. Native dialog,
+Escape/backdrop, focus restore/trap, scroll locking and pause/reduced motion remain.
+Project-link position:relative restores the containing block for its absolute
+animated underline, fixing card and cloned-modal lines extending across sections.
+
+Project fronts use Sharon's new italic summaries, including the team's Marble
+growth from $250K to $3M AUM. Dates and locations occupy top-right metadata.
+UW HPC is abbreviated in the heading and HPC in the selector. All twelve résumé
+bullets and skills remain. Marble now links to its website rather than the PDF.
+Official original Marble/UWHPC logos replace diagrams; supplied SkyCell launch
+photo replaces archived replay screenshot; Lions robot photo retained. Captions
+removed. CSS crop keeps both balloons and payload visible without changing the
+photo bytes. Old media/styles removed, credits/provenance updated with sources.
+Source remains root index.html with experience/ assets, no duplicate page.
+Canonical résumés/PDFs and the big-tech homepage are outside this change's scope.
+159 browser checks pass across desktop, short laptop, four touch layouts, exact
+content, image sources/no captions, default side sheet/reduced motion, and bounded
+hover/focus/click underlines on cards and cloned modal links. In-app and device
+screenshots inspected; independent content/integration review clear. Actual source
+photo and official logos retained byte-for-byte. No runtime/asset/shader errors.
+
+Sharon additionally requested a separate SkyCell chat. Created
+01a16c17-9168-7651-9ab0-22f9add6ca96 in this project with isolated SkyCell checkout
+and preview-only publishing scope. It must not modify this portfolio repo or
+the current skycell.vercel.app production alias. The chat is user-owned and
+continues independently. No further messaging authorization is inferred.
+
+--- Earlier checkpoint ---
+
 # Single startup document and route consolidation — 23 October 2026
 
 The editable homepage is now dist/startup/index.html. There is no separate

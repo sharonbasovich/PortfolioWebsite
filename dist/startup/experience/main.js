@@ -1,11 +1,11 @@
 import Lenis from "../vendor/lenis/lenis.js";
 import { createWorld } from "./world.js?v=20261023-header";
 import { createPointerRibbon } from "./pointer-ribbon.js";
-import { installProjectDetails } from "./project-details.js?v=20261023-projects";
-import { installProjectEvidence } from "./project-evidence.js?v=20261023-projects";
+import { installProjectDetails } from "./project-details.js?v=20261024-brand";
+import { installProjectEvidence } from "./project-evidence.js?v=20261024-brand";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
-import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261023-projects";
+import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261024-brand";
 
 const theme = installTheme();
 const projectHeading = document.querySelector(".projects-heading h2");
