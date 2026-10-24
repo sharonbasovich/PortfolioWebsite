@@ -40,8 +40,9 @@ function fittedPhoto(bounds) {
 }
 
 /**
- * Option 2 preview: one real photograph moves from letterforms into the existing
- * first-project photograph. One scrubbed timeline; no pin, input or render loop.
+ * Read the title first, then reveal one real photograph through its letterforms
+ * and move it into the existing first-project photograph. One scrubbed timeline;
+ * no pin, input or render loop.
  * Call inside the page's GSAP context. Revert that context before dispose().
  */
 export function mountProjectMotion({
@@ -100,15 +101,19 @@ export function mountProjectMotion({
   const words = heading.textContent.trim().split(/\s+/);
   const lines = [words.shift() || "My", words.join(" ") || "projects"];
   const maskType = node("g", { fill: "white" });
+  const solidType = node("g", { class: "projects-photo-type-solid" });
   const outlineType = node("g", { class: "projects-photo-type-outline" });
   const type = lines.map((line) => {
     const fill = node("text", { class: "projects-photo-letterform" });
+    const solid = node("text", { class: "projects-photo-letterform" });
     const outline = node("text", { class: "projects-photo-letterform" });
     fill.textContent = line;
+    solid.textContent = line;
     outline.textContent = line;
     maskType.append(fill);
+    solidType.append(solid);
     outlineType.append(outline);
-    return { fill, outline };
+    return { fill, solid, outline };
   });
   const opening = node("rect", { fill: "white", x: 0, y: 0, width: 0, height: 0 });
   mask.append(maskType, opening);
@@ -119,7 +124,7 @@ export function mountProjectMotion({
     preserveAspectRatio: "xMidYMid slice",
   });
   const edge = node("rect", { class: "projects-photo-frame-edge" });
-  visual.append(definitions, image, outlineType, edge);
+  visual.append(definitions, image, solidType, outlineType, edge);
   stage.classList.add("projects-photo-stage");
   heading.classList.add("projects-photo-source");
   original.classList.add("projects-photo-target");
@@ -167,8 +172,8 @@ export function mountProjectMotion({
       String(Math.max(box.height, destination.y + destination.height) + 40),
     );
     const typography = getComputedStyle(heading);
-    for (const { fill, outline } of type) {
-      for (const text of [fill, outline]) {
+    for (const { fill, solid, outline } of type) {
+      for (const text of [fill, solid, outline]) {
         text.style.fontFamily = typography.fontFamily;
         text.style.fontWeight = typography.fontWeight;
         text.setAttribute("font-size", "100");
@@ -177,9 +182,12 @@ export function mountProjectMotion({
       }
     }
     const longest = Math.max(...type.map(({ fill }) => fill.getBBox().width), 1);
-    const size = Math.min((start.width / longest) * 100, box.height * 0.425);
-    type.forEach(({ fill, outline }, index) => {
-      for (const text of [fill, outline]) {
+    // Leave enough room around both lines for the complete title to enter the
+    // viewport before its reading hold ends; the old 85%-tall type lost its
+    // second line to the aperture while it was still below the fold.
+    const size = Math.min((start.width / longest) * 100, box.height * 0.36);
+    type.forEach(({ fill, solid, outline }, index) => {
+      for (const text of [fill, solid, outline]) {
         text.setAttribute("font-size", String(size));
         text.setAttribute("y", String(index * size * 0.88));
       }
@@ -188,8 +196,8 @@ export function mountProjectMotion({
     const top = Math.min(...bounds.map((bound) => bound.y));
     const bottom = Math.max(...bounds.map((bound) => bound.y + bound.height));
     const offsetY = (box.height - (bottom - top)) / 2 - top;
-    type.forEach(({ fill, outline }, index) => {
-      for (const text of [fill, outline]) {
+    type.forEach(({ fill, solid, outline }, index) => {
+      for (const text of [fill, solid, outline]) {
         text.setAttribute("x", String(gutter));
         text.setAttribute("y", String(offsetY + index * size * 0.88));
       }
@@ -201,9 +209,12 @@ export function mountProjectMotion({
   function paint(progress) {
     if (disposed || !layout) return;
     const p = clamp(progress);
-    const open = phase(p, 0.14, 0.5);
-    const dock = phase(p, 0.5, 0.9);
-    const handoff = phase(p, 0.84, 0.97);
+    // Most of the approach is deliberately still: read both words before the
+    // photograph takes over. Every phase uses the same reversible scroll clock.
+    const photographReveal = phase(p, 0.56, 0.68);
+    const open = phase(p, 0.66, 0.8);
+    const dock = phase(p, 0.76, 0.97);
+    const handoff = phase(p, 0.96, 1);
     const bounds = {};
     for (const key of ["x", "y", "width", "height"])
       bounds[key] = mix(layout.start[key], layout.destination[key], dock);
@@ -217,8 +228,10 @@ export function mountProjectMotion({
     const radius = mix(24, 10, dock);
     rectangle(opening, aperture, radius);
     rectangle(edge, bounds, radius);
-    maskType.setAttribute("opacity", (1 - phase(p, 0.34, 0.52)).toFixed(4));
-    outlineType.setAttribute("opacity", (1 - phase(p, 0.28, 0.48)).toFixed(4));
+    image.style.opacity = photographReveal.toFixed(4);
+    solidType.setAttribute("opacity", (1 - photographReveal).toFixed(4));
+    maskType.setAttribute("opacity", (1 - phase(p, 0.74, 0.84)).toFixed(4));
+    outlineType.setAttribute("opacity", (1 - phase(p, 0.66, 0.8)).toFixed(4));
     edge.style.opacity = String(open * (1 - handoff));
     visual.style.opacity = (1 - handoff).toFixed(4);
     original.style.opacity = handoff.toFixed(4);
@@ -247,7 +260,9 @@ export function mountProjectMotion({
       id: "projects-photo-reveal",
       trigger: stage,
       start: "top 85%",
-      end: "bottom 25%",
+      // Complete while the real first project is naturally arriving, before
+      // the existing horizontal gallery pins at the top of the viewport.
+      end: "bottom 20%",
       scrub: true,
       invalidateOnRefresh: true,
       onRefresh(self) {

@@ -1,3 +1,28 @@
+# Current immersive refinement — 23 October 2026
+
+Authoritative source: this repository, branch codex/immersive-oct23-polish.
+Published destination: https://basovichsharon.vercel.app/immersive/
+Prior production/rollback: 764e46cabf76d55e4ee2a5606ea11087cf44f17e.
+User explicitly authorizes push and deployment without another approval.
+
+Refined the accepted GSAP/Three.js direction: delayed small header brand,
+immediate hero opening, stronger idle movement, corrected counterweight geometry
+and camera clearance, normalized route draw, one-time achievement reveals,
+fivefold docking sparks, readable photo-through-type hold, larger project
+controls, contact layout and header anchor. Native phone rendering now puts the
+single canvas in the active art window, with event-only outgoing snapshots, so
+touch scrolling no longer separates the pixels from the DOM border. Temporary
+context loss preserves the layout. Portrait and landscape spacing is content-led.
+
+Verification: 60 broad browser checks, 7 native rendering/recovery checks,
+9 Pixel-sized checks, 34 mechanical geometry/camera checks, syntax and whitespace.
+No observed runtime/shader errors. Details: docs/immersive-personalization-qa.md.
+No physical-phone FPS claim. Clean/creative root homepages, resume, assets/vendor
+remain unchanged. Existing project content is pending the user's later review.
+Pause motion remains. No new engine, external models or template replacement.
+
+--- Earlier reference checkpoint ---
+
 # Lusion reference review — 22 October 2026
 
 User asked to inspect Lusion's pages for further compatible refinements.

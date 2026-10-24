@@ -3,8 +3,8 @@ import * as THREE from "three";
 // A single short impact, driven by the site's existing ticker. The parent owns
 // its placement: copy the docked module's world matrix onto object before drawing.
 export function createDockSparks({ compact = false } = {}) {
-  const count = compact ? 22 : 32;
-  const duration = 0.56;
+  const count = compact ? 22 : 160;
+  const duration = 0.62;
   const positions = new Float32Array(count * 6);
   const starts = new Float32Array(count * 6);
   const directions = new Float32Array(count * 6);
@@ -28,16 +28,16 @@ export function createDockSparks({ compact = false } = {}) {
   for (let index = 0; index < count; index += 1) {
     const fan = index / Math.max(1, count - 1);
     const angle = (-0.175 + fan * 3.49) + (noise(index, 1) - 0.5) * 0.12;
-    const distance = 0.84 + noise(index, 2) * 0.56;
+    const distance = 1.05 + noise(index, 2) * 0.75;
     const originX = (noise(index, 3) - 0.5) * 0.22;
     const originY = (noise(index, 4) - 0.5) * 0.12;
     const originZ = 0.34 + noise(index, 5) * 0.05;
     const directionX = Math.cos(angle) * distance;
     const directionY = Math.sin(angle) * distance * 0.84;
     const directionZ = 0.1 + noise(index, 6) * 0.25;
-    const lifetime = 0.35 + noise(index, 7) * 0.19;
-    const delay = noise(index, 8) * 0.018;
-    const length = 0.11 + noise(index, 9) * 0.14;
+    const lifetime = 0.38 + noise(index, 7) * 0.22;
+    const delay = noise(index, 8) * 0.024;
+    const length = 0.15 + noise(index, 9) * 0.19;
     const color = palette[index % palette.length];
     for (let endpoint = 0; endpoint < 2; endpoint += 1) {
       const vertex = index * 2 + endpoint;
@@ -67,7 +67,7 @@ export function createDockSparks({ compact = false } = {}) {
   geometry.setAttribute("aLifetime", new THREE.BufferAttribute(lifetimes, 1));
   geometry.setAttribute("aDelay", new THREE.BufferAttribute(delays, 1));
   geometry.setAttribute("aLength", new THREE.BufferAttribute(lengths, 1));
-  geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0.05, 0.5), 1.8);
+  geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0.05, 0.5), 2.25);
   const uniforms = { uAge: { value: 0 } };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -97,8 +97,8 @@ export function createDockSparks({ compact = false } = {}) {
         vec3 point = head - normalize(aDirection) * sparkLength * (1.0 - aEnd);
         float visible = step(aDelay, uAge) * (1.0 - step(aLifetime, elapsed));
         float ignition = clamp(elapsed / 0.012, 0.0, 1.0);
-        vAlpha = visible * ignition * pow(1.0 - life, 1.35) * mix(0.04, 1.0, aEnd);
-        vColor = aColor * mix(0.64, 1.0, aEnd);
+        vAlpha = visible * ignition * pow(1.0 - life, 1.15) * mix(0.08, 1.0, aEnd);
+        vColor = aColor * mix(0.72, 1.12, aEnd);
         gl_Position = projectionMatrix * modelViewMatrix * vec4(point, 1.0);
       }
     `,

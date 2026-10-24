@@ -1,0 +1,20 @@
+.has-scroll-brand .site-header .brand {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 320ms var(--ease-out), transform 420ms var(--ease-out);
+}
+.has-scroll-brand.brand-is-visible .site-header .brand {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.flow-route {
+  bottom: auto;
+  height: var(--route-height, 72%);
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .has-scroll-brand .site-header .brand { transition: none; transform: none; }
+}
+.motion-paused .site-header .brand { transition: none; }

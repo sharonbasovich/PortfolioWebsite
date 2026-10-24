@@ -12,6 +12,7 @@
           theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
+        document.documentElement.classList.add("has-scroll-brand");
         document.querySelector('meta[name="theme-color"]').content =
           theme === "dark" ? "#0d111a" : "#eef1fa";
       })();
@@ -37,12 +38,14 @@
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232d43ff'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='white'%3Esb%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="style.css?v=20261023" />
+    <link rel="stylesheet" href="style.css?v=20261023-polish" />
     <link rel="stylesheet" href="pointer-ribbon.css" />
     <link rel="stylesheet" href="project-evidence.css?v=20261023" />
     <link rel="stylesheet" href="projects-type.css" />
-    <link rel="stylesheet" href="projects-photo.css" />
+    <link rel="stylesheet" href="projects-photo.css?v=20261023-polish" />
     <link rel="stylesheet" href="projects-depth.css" />
+    <link rel="stylesheet" href="refinements.css?v=20261023-polish" />
+    <link rel="stylesheet" href="native-presentation.css?v=20261023-polish" />
     <link rel="stylesheet" href="theme.css" />
     <script src="../vendor/gsap/gsap.min.js" defer></script>
     <script src="../vendor/gsap/ScrollTrigger.min.js" defer></script>
@@ -50,7 +53,7 @@
     <script type="importmap">
       { "imports": { "three": "../vendor/three/three.module.js" } }
     </script>
-    <script type="module" src="main.js?v=20261023-dock"></script>
+    <script type="module" src="main.js?v=20261023-polish"></script>
     <noscript
       ><style>
         .world-frame,
@@ -120,7 +123,7 @@
         ></a>
         <a
           class="nav-contact roll-link magnetic"
-          href="mailto:sharon@basovich.com"
+          href="#contact"
           ><span class="roll-label button-label"
             ><span class="roll-original">Let's talk</span
             ><span class="roll-duplicate" aria-hidden="true"
@@ -204,12 +207,12 @@
               <stop offset="0.8" stop-color="#4d6aff" />
               <stop offset="1" stop-color="#2d43ff" />
             </linearGradient>
+            <mask id="route-reveal-mask" maskUnits="userSpaceOnUse" x="-100" y="-100" width="1640" height="850">
+              <path class="route-reveal" pathLength="1" fill="none" stroke="white" stroke-width="80" stroke-linecap="round" stroke-dasharray="1 1" stroke-dashoffset="1"
+                d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670" />
+            </mask>
           </defs>
-          <path
-            class="route-base"
-            d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
-          />
-          <g class="route-tube">
+          <g class="route-tube" mask="url(#route-reveal-mask)" opacity="0">
             <path
               class="route-depth"
               d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
@@ -227,7 +230,6 @@
               d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670"
             />
           </g>
-          <circle class="route-dot" r="5" cx="1070" cy="0" />
         </svg>
         <div class="flow-words" aria-hidden="true">
           <span>About</span><span>me</span>
@@ -360,7 +362,6 @@
         aria-labelledby="projects-title"
       >
         <div class="projects-heading">
-          <p class="section-kicker">Selected projects</p>
           <h2 id="projects-title">My projects</h2>
         </div>
         <div class="project-gallery">

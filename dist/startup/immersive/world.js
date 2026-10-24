@@ -1,7 +1,7 @@
 import * as THREE from "../vendor/three/three.module.js";
 import { RoomEnvironment } from "../vendor/three/addons/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "../vendor/three/addons/geometries/RoundedBoxGeometry.js";
-import { createDockSparks } from "./dock-sparks.js?v=20261023-dock";
+import { createDockSparks } from "./dock-sparks.js?v=20261023-polish";
 
 // The site owns the ticker and scroll timeline. This module only renders the current state.
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -12,7 +12,7 @@ const smooth = (start, end, value) => {
 
 export function createWorld(
   canvas,
-  { compact = false, initialBurst = 0 } = {},
+  { compact = false, initialBurst = 0, contained = false } = {},
 ) {
   if (!canvas) return null;
 
@@ -304,21 +304,35 @@ export function createWorld(
   piece(mainArm, -0.45, -0.51, 0.56, -1.46, -0.76, 1.13);
 
   const counterweight = new THREE.Group();
+  counterweight.name = "ivory-counterweight";
+  counterweight.rotation.z = 0.22;
   const ivoryBlock = addMesh(
     counterweight,
     rounded(0.98, 0.66, 0.92, 0.19),
     a.ivory,
   );
-  ivoryBlock.rotation.z = 0.22;
+  ivoryBlock.name = "ivory-counterweight-shell";
+  // A flush face insert belongs to the same local frame as the shell. The old
+  // unrotated shoe sat below the tilted shell and looked like metal clipping
+  // through its underside.
   addMesh(
     counterweight,
-    rounded(0.91, 0.11, 0.47, 0.05),
+    rounded(0.62, 0.075, 0.1, 0.035),
     a.chrome,
     0,
-    -0.28,
-    0.15,
+    -0.1,
+    0.45,
   );
-  piece(counterweight, -1.35, 0.8, 0.73, -1.08, 0.9, 0.8);
+  // The ring and counterweight have separate depth envelopes, including the
+  // assembled pose. Opening the movement increases their clearance further.
+  piece(counterweight, -1.58, 1.28, 1.48, -1.08, 0.9, 0.8);
+  const counterweightFitMatrix = new THREE.Matrix4();
+  const counterweightFitPoint = new THREE.Vector3();
+  const counterweightFitCorners = [];
+  for (const x of [-0.49, 0.49])
+    for (const y of [-0.33, 0.33])
+      for (const z of [-0.46, 0.5])
+        counterweightFitCorners.push(new THREE.Vector3(x, y, z));
 
   const rightBlock = new THREE.Group();
   const blade = addMesh(
@@ -1115,8 +1129,11 @@ export function createWorld(
 
   function resize() {
     if (disposed) return;
-    screenWidth = Math.max(1, innerWidth);
-    screenHeight = Math.max(1, innerHeight);
+    // Native scrolling can put the single canvas inside its active DOM frame.
+    // Its compositor position then moves with the page instead of waiting for
+    // the next WebGL scissor update on a viewport-fixed canvas.
+    screenWidth = Math.max(1, contained ? canvas.clientWidth : innerWidth);
+    screenHeight = Math.max(1, contained ? canvas.clientHeight : innerHeight);
     const ratio = Math.min(
       devicePixelRatio || 1,
       (softwareRenderer ? (compact ? 0.9 : 1) : compact ? 1.25 : 1.5) *
@@ -1251,31 +1268,44 @@ export function createWorld(
           part.restRotation.z + local.rotation.z,
         );
       });
-      assembly.position.set(0, Math.sin(ambientTime * 0.42) * 0.04, 0);
+      // A slow, visible rocking cycle keeps the mechanism alive away from the
+      // cursor. It shares the frozen site clock, with a smaller native-phone
+      // amplitude and no extra simulation, allocation or rendering pass.
+      const idle = chapter === 0 ? (compact ? 0.58 : 1) : 0.4;
+      assembly.position.set(
+        Math.sin(ambientTime * 0.37) * 0.045 * idle,
+        Math.sin(ambientTime * 0.53) * 0.12 * idle,
+        0,
+      );
       assembly.rotation.set(
-        -0.17 + progress * 0.12 + py * 0.16 + torqueY,
-        -0.23 + rotation * 0.42 + progress * 0.2 + px * 0.26 + torqueX,
-        -0.12 + rotation * 0.065 - drift * 0.065,
+        -0.17 + Math.sin(ambientTime * 0.43) * 0.045 * idle +
+          progress * 0.12 + py * 0.16 + torqueY,
+        -0.23 + Math.sin(ambientTime * 0.36 + 0.65) * 0.09 * idle +
+          rotation * 0.42 + progress * 0.2 + px * 0.26 + torqueX,
+        -0.12 + Math.sin(ambientTime * 0.31) * 0.027 * idle +
+          rotation * 0.065 - drift * 0.065,
       );
       assembly.scale.setScalar(1);
-      outerRing.rotation.z = ambientTime * 0.038 + progress * 0.7;
-      innerRing.rotation.z = -ambientTime * 0.03 - progress * 0.38;
+      outerRing.rotation.z = ambientTime * 0.068 + progress * 0.7;
+      innerRing.rotation.z = -ambientTime * 0.058 - progress * 0.38;
     }
 
     if (satellites.visible) {
       const spread = 2.85 + 0.7 * smooth(1.65, 2.5, rect.width / rect.height);
       leftSatellite.position.set(
         -spread - progress * 0.8,
-        0.13 + Math.sin(ambientTime * 0.36) * 0.04,
+        0.13 + Math.sin(ambientTime * 0.47) * 0.14,
         -0.32,
       );
       rightSatellite.position.set(
         spread + progress * 0.8,
-        -0.1 + Math.sin(ambientTime * 0.34 + 1.7) * 0.04,
+        -0.1 + Math.sin(ambientTime * 0.41 + 1.7) * 0.14,
         -0.45,
       );
-      leftSatellite.rotation.y = -0.18 - progress * 0.22 + px * 0.07;
-      rightSatellite.rotation.y = 0.15 + progress * 0.22 + px * 0.07;
+      leftSatellite.rotation.y = -0.18 + Math.sin(ambientTime * 0.38) * 0.09 -
+        progress * 0.22 + px * 0.07;
+      rightSatellite.rotation.y = 0.15 + Math.sin(ambientTime * 0.35 + 1.7) * 0.09 +
+        progress * 0.22 + px * 0.07;
       satellites.scale.setScalar(1);
     }
 
@@ -1342,9 +1372,30 @@ export function createWorld(
       (panoramic ? 8.7 : chapter === 1 ? 6.1 : chapter === 2 ? 4.25 : 4.45) *
       burstFit;
     const tangent = Math.tan((camera.fov * Math.PI) / 360) * 2;
-    const distance =
+    let distance =
       Math.max(heightToFit / tangent, widthToFit / (camera.aspect * tangent)) *
       (1 - zoom * 0.11);
+    if (chapter < 2) {
+      // The white shell sits ahead of the ring, so its apparent size includes
+      // perspective depth. Fit its actual rigid envelope instead of enlarging
+      // the nominal scene or allowing its edges to leave either mechanical
+      // frame. These eight cached corners cover the flush inset, idle rocking
+      // and the narrower portrait window used by the internship scene.
+      world.updateMatrix();
+      assembly.updateMatrix();
+      counterweight.updateMatrix();
+      counterweightFitMatrix
+        .multiplyMatrices(world.matrix, assembly.matrix)
+        .multiply(counterweight.matrix);
+      for (const corner of counterweightFitCorners) {
+        counterweightFitPoint.copy(corner).applyMatrix4(counterweightFitMatrix);
+        const projectedSpan = Math.max(
+          Math.abs(counterweightFitPoint.y) / (tangent * 0.5),
+          Math.abs(counterweightFitPoint.x) / (tangent * 0.5 * camera.aspect),
+        );
+        distance = Math.max(distance, counterweightFitPoint.z + projectedSpan * 1.14);
+      }
+    }
     pose.cameraTarget.set(
       Math.sin(rotation * 0.28) * distance * 0.085 + drift * 0.07,
       progress * distance * 0.015,
@@ -1888,6 +1939,7 @@ export function createWorld(
       renderer: rendererName,
       softwareRenderer,
       compact,
+      contained,
       pixelRatio,
       qualityScale,
       width: canvas.width,

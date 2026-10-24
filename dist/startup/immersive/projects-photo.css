@@ -36,6 +36,10 @@
   letter-spacing: -0.055em;
 }
 
+.projects-photo-type-solid {
+  fill: currentColor;
+}
+
 .projects-photo-type-outline {
   fill: none;
   stroke: currentColor;

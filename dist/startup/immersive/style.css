@@ -1562,24 +1562,25 @@ footer a {
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 32px;
-  height: 48px;
+  gap: clamp(28px, 3vw, 44px);
+  height: 56px;
 }
 .project-switcher button {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 44px;
+  gap: 12px;
+  min-height: 48px;
   padding: 0;
   color: var(--muted);
   background: none;
   border: 0;
-  font-size: 13px;
+  font-size: clamp(16px, 1.3vw, 18px);
+  font-weight: 500;
   transition: color 160ms ease-out;
   white-space: nowrap;
 }
 .project-switcher button span {
-  font-size: 10px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 .project-switcher button[aria-current],
@@ -1588,8 +1589,8 @@ footer a {
 }
 .project-switcher button::after {
   content: "";
-  width: 5px;
-  height: 5px;
+  width: 7px;
+  height: 7px;
   background: currentColor;
   border-radius: 50%;
   opacity: 0;
@@ -1600,9 +1601,11 @@ footer a {
 }
 .project-progress {
   position: relative;
-  width: 100px;
-  height: 2px;
+  flex: 0 0 clamp(180px, 17vw, 220px);
+  width: clamp(180px, 17vw, 220px);
+  height: 5px;
   margin-left: auto;
+  border-radius: 3px;
   background: var(--line);
   overflow: hidden;
 }
@@ -1750,6 +1753,9 @@ footer a {
   .project-panel {
     padding-top: 40px;
   }
+  .project-gallery:not(.is-horizontal) .project-panel {
+    min-height: 0;
+  }
   .project-window {
     height: 47svh;
     min-height: 300px;
@@ -1782,17 +1788,22 @@ footer a {
     top: 11px;
   }
   .hero {
-    padding-top: 144px;
+    min-height: 0;
+    padding-top: 132px;
+    padding-bottom: 24px;
   }
   .hero h1 {
     font-size: clamp(52px, 14.1vw, 82px);
     line-height: 1.01;
   }
   .hero-window {
-    height: 43svh;
-    min-height: 330px;
-    margin-top: 26px;
+    height: clamp(260px, 43svh, 420px);
+    min-height: 0;
+    margin-top: 24px;
     border-radius: 18px;
+  }
+  .hero-overview {
+    gap: 20px;
   }
   .hero-intro p {
     font-size: 14px;
@@ -1814,10 +1825,10 @@ footer a {
     min-width: 167px;
   }
   .flow-bridge {
-    min-height: 620px;
+    min-height: 0;
     height: auto;
-    padding-top: 100px;
-    padding-bottom: 45px;
+    padding-top: 72px;
+    padding-bottom: 36px;
   }
   .flow-words {
     font-size: 16vw;
@@ -1847,8 +1858,8 @@ footer a {
     }
   }
   .flow-proof {
-    margin-top: 80px;
-    gap: 23px 18px;
+    margin-top: 56px;
+    gap: 20px 18px;
     grid-template-columns: 1fr 1fr;
   }
   .flow-proof p:last-child {
@@ -1865,6 +1876,17 @@ footer a {
   }
   .work-heading h2 {
     font-size: 48px;
+  }
+  .work {
+    padding-top: 52px;
+    padding-bottom: 52px;
+  }
+  .work-layout {
+    gap: 32px;
+  }
+  .work-window {
+    height: clamp(260px, 38svh, 380px);
+    min-height: 0;
   }
   .work-record > p:not(.record-role) {
     font-size: 15px;
@@ -1884,7 +1906,7 @@ footer a {
   }
   .project-panel {
     padding-top: 28px;
-    padding-bottom: 70px;
+    padding-bottom: 56px;
     gap: 31px;
   }
   .project-index {
@@ -1906,7 +1928,7 @@ footer a {
     border-radius: 18px;
   }
   .contact {
-    padding-top: 70px;
+    padding-top: 48px;
   }
   .contact-copy h2 {
     font-size: 78px;
@@ -1920,6 +1942,55 @@ footer a {
   }
   .motion {
     bottom: 10px;
+  }
+}
+/* A phone turned sideways keeps the same native document, with a shorter
+   art budget rather than portrait-sized minimum heights. */
+@media (min-width: 651px) and (max-width: 900px) and (max-height: 500px) {
+  .hero {
+    min-height: 0;
+    padding-top: 104px;
+    padding-bottom: 24px;
+  }
+  .hero-overview {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 5.5vw, 52px);
+    white-space: normal;
+  }
+  .hero-window,
+  .work-window {
+    height: clamp(220px, 52svh, 280px);
+    min-height: 0;
+  }
+  .hero-window {
+    margin-top: 24px;
+  }
+  .flow-bridge {
+    min-height: 0;
+    height: auto;
+    padding-top: 64px;
+    padding-bottom: 36px;
+  }
+  .flow-words {
+    font-size: clamp(68px, 11vw, 100px);
+    margin-top: 0;
+  }
+  .flow-proof {
+    margin-top: 44px;
+  }
+  .work {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+  .work-layout {
+    gap: 32px;
+  }
+  .contact {
+    padding-top: 48px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1960,22 +2031,43 @@ footer a {
   align-items: center;
 }
 .contact {
+  display: flex;
+  flex-direction: column;
   min-height: 100svh;
-  padding-bottom: 56px;
+  padding-bottom: 64px;
 }
 .contact footer {
-  margin-top: 36px;
+  flex: 0 0 auto;
+  margin-top: clamp(24px, 4svh, 40px);
 }
 @media (min-width: 1001px) {
   .contact {
-    padding-top: clamp(84px, 10svh, 120px);
+    --contact-top: clamp(84px, 10svh, 120px);
+    --contact-footer-gap: clamp(24px, 4svh, 40px);
+    padding-top: var(--contact-top);
   }
   .contact-layout {
+    flex: 1 0 auto;
     align-items: center;
   }
   .contact-window {
-    height: min(50svh, 540px);
+    /* Fill the ending's available height; the footer and fixed motion
+       controls keep a reserved band below the sculpture. */
+    height: clamp(360px, calc(100svh - var(--contact-top) - var(--contact-footer-gap) - 129px), 680px);
+    max-height: 680px;
     margin-top: 0;
+  }
+}
+@media (min-width: 1001px) and (max-height: 720px) {
+  .contact-copy h2 {
+    margin-bottom: 20px;
+    font-size: clamp(72px, 7.6vw, 104px);
+  }
+  .contact .email {
+    margin-top: 24px;
+  }
+  .contact-links {
+    margin-top: 30px;
   }
 }
 @media (max-width: 1000px) {

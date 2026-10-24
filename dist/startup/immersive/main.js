@@ -1,10 +1,11 @@
 import Lenis from "../vendor/lenis/lenis.js";
-import { createWorld } from "./world.js?v=20261023-dock";
+import { createWorld } from "./world.js?v=20261023-polish";
 import { createPointerRibbon } from "./pointer-ribbon.js";
 import { installProjectEvidence } from "./project-evidence.js";
 import { installTheme } from "./theme.js";
+import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
 import { mountProjectMotion as mountTypeMotion } from "./projects-type.js";
-import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js";
+import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261023-polish";
 import { mountProjectMotion as mountDepthMotion } from "./projects-depth.js";
 
 const theme = installTheme();
@@ -42,6 +43,9 @@ const gsap = window.gsap,
   ScrollTrigger = window.ScrollTrigger,
   SplitText = window.SplitText;
 const root = document.documentElement;
+const brand = document.querySelector(".brand");
+const heroName = document.querySelector(".hero h1");
+let stickyBrandShown = null;
 const canvas = document.querySelector("#world"),
   frame = document.querySelector(".world-frame");
 const motionButton = document.querySelector(".motion");
@@ -66,7 +70,9 @@ const sectionLinks = [
 const bridge = document.querySelector(".flow-bridge");
 const route = document.querySelector(".route-line"),
   routeTube = document.querySelector(".route-tube"),
-  routeDot = document.querySelector(".route-dot");
+  routeReveal = document.querySelector(".route-reveal"),
+  routeSvg = document.querySelector(".flow-route");
+const proof = document.querySelector(".flow-proof");
 const routeLength = route?.getTotalLength() || 1;
 const routePoints = Array.from({ length: 49 }, (_, index) => {
   const point = route.getPointAtLength((routeLength * index) / 48);
@@ -122,10 +128,15 @@ if (gsap && ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger, ...(SplitText ? [SplitText] : []));
   ScrollTrigger.config({ ignoreMobileResize: true });
 }
+const nativePresentation = createNativePresentation({ frame, canvas });
+let worldContained = !finePointer.matches;
+let nativeWidth = 0, nativeHeight = 0, lastNativeView = null;
+nativePresentation.setMode(worldContained);
+if (worldContained) nativePresentation.activate(heroWindow);
 let compact = compactQuery.matches,
   world;
 try {
-  world = createWorld(canvas, { compact });
+  world = createWorld(canvas, { compact, contained: worldContained });
 } catch (error) {
   console.warn(
     "The 3D scene is unavailable; the page remains readable.",
@@ -209,6 +220,7 @@ function scrollToPosition(top, immediate = false) {
     });
 }
 function refreshMeasurements() {
+  bridge.style.setProperty("--route-height", `${Math.max(180, proof.offsetTop - 34)}px`);
   for (const item of windows)
     item.radius =
       parseFloat(getComputedStyle(item.element).borderTopLeftRadius) || 28;
@@ -235,10 +247,8 @@ function refreshMeasurements() {
   );
   ribbon.resize(traceBounds.width, traceBounds.height);
   if (routeTube) {
-    routeTube.style.strokeDasharray = String(routeLength);
-    routeTube.style.strokeDashoffset = String(
-      routeLength * (1 - routeDrawProgress()),
-    );
+    routeReveal.style.strokeDashoffset = String(1 - routeDrawProgress());
+    routeTube.style.opacity = routeDrawProgress() > 0 ? "1" : "0";
   }
 }
 
@@ -353,14 +363,21 @@ function paint(time = 0, delta = 1 / 60) {
   const heroBounds = document.querySelector(".hero").getBoundingClientRect();
   const workBounds = document.querySelector(".work").getBoundingClientRect();
   const bridgeBounds = bridge.getBoundingClientRect();
+  const routeBounds = routeSvg.getBoundingClientRect();
+  const brandShown = heroName.getBoundingClientRect().bottom <= 108 || document.activeElement === brand;
+  if (brandShown !== stickyBrandShown) {
+    stickyBrandShown = brandShown;
+    root.classList.toggle("brand-is-visible", brandShown);
+    brand.tabIndex = brandShown ? 0 : -1;
+    brand.setAttribute("aria-hidden", String(!brandShown));
+  }
   if (!finePointer.matches && !paused)
     routeClock.progress = clamp(
       (layoutHeight * 0.8 - bridgeBounds.top) /
         (bridgeBounds.height + layoutHeight * 0.55),
     );
-  const heroOpening = ease(
-    clamp((-heroBounds.top - 20) / (layoutHeight * 0.34)),
-  );
+  const openingProgress = clamp(-heroBounds.top / Math.min(170, layoutHeight * 0.18));
+  const heroOpening = 1 - (1 - openingProgress) ** 2;
   const visible = [];
   const allFrames = [];
   let dominant,
@@ -385,6 +402,7 @@ function paint(time = 0, delta = 1 / 60) {
     );
     const galleryOffset = deckTrigger ? deckClock.index - item.project : 0;
     const view = {
+      element: item.element,
       rect,
       chapter: item.chapter,
       project: item.project,
@@ -454,13 +472,34 @@ function paint(time = 0, delta = 1 / 60) {
       startFrame: allFrames.find((item) => item.chapter === 0),
       endFrame: allFrames.find((item) => item.chapter === 1),
       path: (desktopQuery.matches || paused) ? carrierRoutePoints.map((point) => ({
-        x: bridgeBounds.left + point.x * bridgeBounds.width,
-        y: bridgeBounds.top + point.y * bridgeBounds.height,
+        x: routeBounds.left + point.x * routeBounds.width,
+        y: routeBounds.top + point.y * routeBounds.height,
       })) : [],
     };
     const flight =
       handoff.enabled && handoff.progress > 0 && handoff.progress < 1;
-    if (visible.length || flight || paused)
+    if (worldContained) {
+      const nativeView = visible.reduce((bestView, view) => {
+        const area = item => Math.max(0, Math.min(innerHeight, item.rect.bottom) - Math.max(0, item.rect.top)) * item.rect.width;
+        return !bestView || area(view) > area(bestView) ? view : bestView;
+      }, null);
+      if (nativeView) {
+        const changed = nativePresentation.activate(nativeView.element, () => {
+          if (lastNativeView) world.renderFrames(sceneTime, 0, [lastNativeView], null);
+        });
+        const width = nativeView.element.clientWidth, height = nativeView.element.clientHeight;
+        if (changed || width !== nativeWidth || height !== nativeHeight) {
+          world.resize();
+          nativeWidth = width;
+          nativeHeight = height;
+        }
+        lastNativeView = {
+          ...nativeView,
+          rect: { left: 0, top: 0, width, height, right: width, bottom: height },
+        };
+        world.renderFrames(sceneTime, paused ? 0 : delta, [lastNativeView], null);
+      }
+    } else if (visible.length || flight || paused)
       world.renderFrames(sceneTime, paused ? 0 : delta, visible, handoff);
     frame.style.visibility =
       visible.length || flight || paused ? "visible" : "hidden";
@@ -498,11 +537,8 @@ function paint(time = 0, delta = 1 / 60) {
   projectEvidence.update(deckClock.index, { native: !deckTrigger, paused });
   if (route) {
     const progress = routeDrawProgress();
-    routeTube.style.strokeDashoffset = String(routeLength * (1 - progress));
-    const position = route.getPointAtLength(routeLength * progress);
-    routeDot.setAttribute("cx", position.x);
-    routeDot.setAttribute("cy", position.y);
-    routeDot.style.opacity = progress > 0 ? "1" : "0";
+    routeReveal.style.strokeDashoffset = String(1 - progress);
+    routeTube.style.opacity = progress > 0 ? "1" : "0";
   }
 }
 function tick(time, deltaMs) {
@@ -770,6 +806,11 @@ function buildChoreography(entrance = false) {
         heading: projectHeading, stage: projectStage, firstProject: panels[0],
         gsap, ScrollTrigger, SplitText,
         enabled: desktopQuery.matches,
+      });
+      gsap.from(".flow-proof p", {
+        y: 26, scale: 0.94, opacity: 0,
+        duration: 0.65, stagger: 0.12, ease: "back.out(1.25)",
+        scrollTrigger: { trigger: proof, start: "top 92%", once: true },
       });
       for (const heading of document.querySelectorAll(
         ".work-heading h2, .projects-heading h2, .contact h2",
@@ -1071,13 +1112,21 @@ function scheduleViewportRefresh(force = false) {
         return;
       }
       layoutHeight = innerHeight;
-      if (world && compact !== compactQuery.matches) {
+      if (world && (compact !== compactQuery.matches || worldContained !== !finePointer.matches)) {
         const opening = world.state.burst;
         world.dispose();
         compact = compactQuery.matches;
+        worldContained = !finePointer.matches;
+        nativePresentation.setMode(worldContained);
+        if (worldContained) nativePresentation.activate(
+          activeWindow?.element?.classList.contains("has-project-evidence") ? heroWindow : activeWindow?.element || heroWindow,
+        );
+        nativeWidth = nativeHeight = 0;
+        lastNativeView = null;
         try {
           world = createWorld(canvas, {
             compact,
+            contained: worldContained,
             initialBurst: opening,
           });
           if (world) world.state.burst = opening;
@@ -1102,12 +1151,15 @@ window.addEventListener(
 canvas.addEventListener("webglcontextlost", (event) => {
   event.preventDefault();
   lostContext = true;
-  root.classList.add("world-unavailable");
+  // A recoverable GPU reset must not collapse native-scroll art-window heights.
+  root.classList.add("world-context-lost");
   frame.style.display = "none";
   buildChoreography();
 });
 canvas.addEventListener("webglcontextrestored", () => {
+  nativeWidth = nativeHeight = 0;
   lostContext = false;
+  root.classList.remove("world-context-lost");
   if (!world) {
     root.classList.add("world-unavailable");
     frame.style.display = "none";
@@ -1140,6 +1192,7 @@ window.addEventListener("pagehide", (event) => {
   gsap?.ticker.remove(tick);
   ribbon.dispose();
   projectEvidence.dispose();
+  nativePresentation.dispose();
   theme.dispose();
   world?.dispose();
 });
