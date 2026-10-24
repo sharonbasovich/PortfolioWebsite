@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "echo Static site ready",
+  "buildCommand": "node dist/startup/build-homepage.mjs",
   "installCommand": "",
   "outputDirectory": "dist"
 }

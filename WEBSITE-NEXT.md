@@ -1,3 +1,24 @@
+# Startup root homepage and resume synchronization — 23 October 2026
+
+Branch codex/promote-immersive-homepage. Prior production/rollback3ea5c4b.
+The immersive experience is now generated as the basovichsharon root homepage;
+/immersive/ remains available, with root canonical metadata. Its HTML is the
+single editable source. Both Vercel static builds run build-homepage.mjs; do not
+run Next.js build or maintain a second root document manually. See
+`docs/startup-homepage.md` for commands, route behavior and download mapping.
+
+Coordinated resume updates: both current sites show11 wins. Big-tech site retains
+its design/Eigenvale and links to Sharon_Basovich_Resume.pdf. Startup links to
+Basovich_Sharon_Resume.pdf (no Eigenvale, includes in-progress UWaterloo HPC).
+Both generic resume.pdf URLs remain correct compatibility copies. PDFs were
+reviewed and verified against the final workspace outputs; canonical Tex untouched.
+No new HPC carousel slide was added: this sync preserves the selected project
+structure and reflects the startup-only content in its resume download.
+16 local root/alias/browser checks pass. Deployment/download verification follows
+publication. Existing routine publication permission applies.
+
+--- Earlier checkpoint ---
+
 # Latest header, theme and route-layer fixes — 23 October 2026
 
 Branch codex/immersive-header-layering. Prior production/rollback009a002.
