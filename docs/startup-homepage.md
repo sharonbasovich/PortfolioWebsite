@@ -38,16 +38,18 @@ The current win count is 11 on both sites. Historical dated notes are unchanged.
 
 ## Resume-matched projects
 
-The cards and their selection menu follow the approved startup résumé order:
-Marble Investments, UWaterloo High Performance Computing, SkyCell, Lions Robotics.
+The cards and their selection menu follow Sharon's latest requested order:
+Lions Robotics, Marble Investments, UW HPC, SkyCell. The résumé bullet content
+is unchanged; the gallery order was explicitly changed on October 24.
 The HPC menu label is abbreviated and its heading is UW HPC, as requested on
 October 24. Each front has a short italic summary, skills, source/demo links,
 and a View more control. The top-right metadata is time and location. Marble
 links to its website. Summaries use Sharon's supplied October 24 wording.
 The templates contain the three active résumé bullets verbatim, with LaTeX
 formatting converted to ordinary Unicode text. The unrelated drawing robot and
-its photographs are removed. Lions Robotics uses the actual robot photograph and
-source repository at https://github.com/sharonbasovich/828555Sworlds.
+its photographs are removed. Lions Robotics uses the four-robots-and-trophies
+photograph recovered from the earlier portfolio. Its software source remains
+https://github.com/sharonbasovich/828555Sworlds.
 
 One native dialog displays the matching résumé bullets with keyboard focus,
 Escape/backdrop dismissal, focus restoration, bounded small-screen scrolling,
@@ -59,15 +61,18 @@ The shared project link is positioned so its animated underline stays within its
 own bounds on cards and inside the dialog, including keyboard focus/click.
 
 The accepted photo-through-type project heading follows the first project's
-official Marble logo into its gallery frame. The other images are the official
-UW HPC logo, Sharon's supplied SkyCell launch photograph (cropped using CSS),
-and the retained Lions robot photograph. There are no image captions. Original
+Lions Robotics trophy photograph into its gallery frame. The other images are
+the official Marble/UW HPC logos and Sharon's supplied SkyCell launch photograph
+(cropped using CSS). The new Robotics photograph is fully contained and uses a
+3:2 phone frame, preserving all four robots and trophies. The requested Marble
+black background was deferred; its existing light backdrop remains. There are no
+image captions. Original
 asset bytes are retained; sources/hashes are in the project-evidence provenance.
 Evidence selection is keyed by project, independent of carousel position.
 
 ## Startup HPC project group
 
-The second project panel groups two in-progress UWaterloo High Performance
+The third project panel groups two in-progress UWaterloo High Performance
 Computing projects. Its detail bullets retain the University of Waterloo design
 team's Citadel & Jane Street sponsorship and both works in progress.
 
@@ -88,6 +93,14 @@ Both startup download names contain those exact bytes. The big-tech PDF remains
 The canonical resume sources and PDFs were read and copied, not edited.
 
 ## Verification
+
+Latest October 24 photo/order update: 22 focused desktop/touch checks pass for
+Lions-first navigation, the new first-photo handoff, unchanged bullet templates,
+full 1200x800 trophy image, detail selection and preserved Marble backdrop. Card
+contents were also compared by project key with the previous Git revision after
+normalizing only sequence numbers and line endings. Evidence: workspace
+`tmp/immersive-oct22-qa/robotics-first-check.json`, `robotics-first-content.json`,
+and `robotics-first-desktop/native.png` / `robotics-trophies-iab.png`.
 
 October 24 update: 159 scoped browser checks pass across 1280x720 and 1100x650
 desktops and 320x568, 393x851, 430x932, and 851x393 touch layouts. This covers

@@ -15,8 +15,8 @@ const photographs = {
     alt: "SkyCell balloon train with two balloons and suspended payload against a blue sky",
   },
   robotics: {
-    key: "robotics", file: "lions-worlds-robot.jpg", width: 1605, height: 1906,
-    alt: "The Lions Robotics VEX V5 robot, from Sharon's Worlds software repository",
+    key: "robotics", file: "lions-robots-trophies.jpg", width: 1200, height: 800,
+    alt: "Four Lions Robotics VEX robots displayed with competition trophies",
   },
 };
 

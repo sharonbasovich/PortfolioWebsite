@@ -3,7 +3,7 @@
 Each project frame contains an image without a caption. The two logos were
 fetched from the official websites Sharon identified. SkyCell uses the supplied
 actual balloon-launch photo, framed with CSS object-fit/position/scale; the
-original file bytes are unchanged. The existing Lions Robotics photo is retained.
+original file bytes are unchanged. The Lions Robotics photo was recovered from the earlier portfolio.
 
 ## marble-logo.svg
 
@@ -25,11 +25,16 @@ original file bytes are unchanged. The existing Lions Robotics photo is retained
 - 659 × 880; actual balloon train and suspended payload, not the archived replay screenshot.
 - SHA256: `5f0d1e59ea0bd0d51d95d06ebdbcae5aa87c486326d0f4f6fddd82fbe7ec89fd`
 
-## lions-worlds-robot.jpg
+## lions-robots-trophies.jpg
 
-- Source: https://raw.githubusercontent.com/sharonbasovich/828555Sworlds/main/robot.jpg
-- 1605 × 1906; actual VEX V5 robot. The repository distinguishes experimental MCL from the competition odometry/IMU stack; no new MCL deployment claim is added.
-- SHA256: `01e95bc39487b3f17b8b9264628132e3a2bdeedc9dff7a1eec481d03e82cf60f`
+- Original: https://i.postimg.cc/8zXm1g34/robotics.jpg
+- Pinned old portfolio reference: https://github.com/sharonbasovich/PortfolioWebsite/blob/4630e6d0d2b147204123158af1a01ea366d08faf/data/portfolio.json#L34
+- 1200 × 800, 310,202 bytes. Four VEX robots with four competition trophies;
+  the photo is kept unchanged and fully contained, not cropped.
+- SHA256: `dbab4df29e94f2f427e33dd33e5f051c660320454665bf313de534dd3243599d`
+- The photograph is not labeled as showing the Worlds Judges Award; visible
+  competition award labels differ. The accompanying résumé text is unchanged.
 
-The prior diagrams, replay screenshot, and their unused styles were removed. The
-project-title mask/handoff follows the current first-project Marble logo.
+Lions Robotics is first in the selector/gallery at Sharon's request. The existing
+photo-through-type title animation follows this first project's current image.
+The requested Marble black background was deferred; its light logo frame remains.

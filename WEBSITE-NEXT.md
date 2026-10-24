@@ -1,3 +1,27 @@
+# Robotics first and recovered trophy photograph — 24 October 2026
+
+Branch codex/robotics-first-trophies; prior production/rollback4630e6d.
+User deferred the Marble black backdrop. Its light background and other styling
+remain unchanged. Lions Robotics is now first in both selector and gallery,
+followed by Marble Investments, HPC, SkyCell. Updated all sequential indices,
+while project-key media and dynamic gallery timing preserve correct associations.
+The first-project photo-through-type heading now follows the Lions image.
+
+Exact requested image recovered from the earlier portfolio's data/portfolio.json:
+https://i.postimg.cc/8zXm1g34/robotics.jpg (1200x800, original unchanged, SHA256
+dbab4df29e94f2f427e33dd33e5f051c660320454665bf313de534dd3243599d).
+It shows four VEX robots and four competition trophies. Full photo contained,
+with a 3:2 phone frame rather than a tall letterbox. Replaced old single-robot
+asset; updated credits/provenance. All card summaries, dates, links, skills and
+twelve resume bullets are unchanged. No resume/canonical/big-tech edits.
+22 scoped browser checks pass: reordered navigation/reversal, first-project title
+handoff, exact image dimensions/contain framing, all twelve resume bullets, first
+dialog content, no overflow, and Marble background preservation on desktop/phone.
+Raw UTF-8 per-project comparison confirms unchanged card content apart from index
+numbers. Desktop in-app and native screenshots inspected; no runtime/asset errors.
+
+--- Earlier checkpoint ---
+
 # Project images, summaries and selected side sheet — 24 October 2026
 
 Branch codex/project-brand-images; prior production/rollback9294aaf.
