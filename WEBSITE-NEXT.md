@@ -1,3 +1,18 @@
+# Docking flash and selector size corrected — 24 October 2026
+
+Branch codex/docking-flash-fix, base705b153. The frame background bug was fixed,
+but complementary photo/frame opacity fades then exposed25% page background
+at their midpoint. Now the docked frame fades in behind an opaque outgoing
+photo atp=.94–.97, then that photo fades out atp=.97–1. At least one remains
+opaque in either scroll direction. No premature dark placeholder returns.
+Selector label clamp17.5–21px, indices13px, active dot8px and60px row sit halfway
+between the original and enlarged versions; requested progress bar remains8px.
+Seven focused browser checks pass, including reverse/refresh/pause and full
+coverage. Pixel samples confirm the washed-out midpoint is corrected. No other
+content, layout, canonical resumes or clean homepage changes.
+
+--- Earlier accepted checkpoint ---
+
 # Accepted morph gallery promoted — 24 October 2026
 
 Sharon selected the trial and explicitly requested live publication. Branch

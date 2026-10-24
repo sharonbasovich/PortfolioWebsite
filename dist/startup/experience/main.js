@@ -5,8 +5,8 @@ import { installProjectDetails } from "./project-details.js?v=20261024-robotics"
 import { installProjectEvidence } from "./project-evidence.js?v=20261024-robotics";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
-import { mountMorphGallery } from "./study/morph-gallery.js?v=20261024-live-morph";
-import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261024-live-morph";
+import { mountMorphGallery } from "./study/morph-gallery.js?v=20261024-dock-flash";
+import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261024-dock-flash";
 
 const initialProjectsHash = location.hash === "#projects";
 

@@ -16,6 +16,11 @@ The enlarged selector and 8px progress bar appear only while the gallery's
 ScrollTrigger pin is active. Outside that interval the controls are invisible
 and inert. The complete destination frame, including its background and edge,
 stays transparent until the photo arrives, avoiding an empty black placeholder.
+The docked frame fills beneath the opaque moving photo before that photo fades,
+so the handoff never exposes the page background. Complementary simultaneous
+fades previously exposed up to 25% background and caused a white flash.
+The selector was subsequently moderated to 17.5–21px labels and 13px indices,
+halfway between the original and enlarged versions; the progress bar stays 8px.
 
 ## Sources and authoring
 
@@ -46,3 +51,6 @@ The adoption pass adds 25 successful browser assertions, including default-route
 activation, hidden destination before arrival, visible final frame, controls
 hidden before pin, and enlarged navigation fitting 1100px/1280px laptops. Both
 audience-specific resume files and the clean portfolio remain unchanged.
+Seven targeted handoff checks also pass for forward/reverse coverage, refresh,
+pause/resume, pre-dock invisibility, and the moderated selector. Captured image
+patches confirm the mid-handoff colour washout is gone.

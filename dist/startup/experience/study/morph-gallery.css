@@ -24,7 +24,7 @@
 .study-gallery .project-panel > .project-window { visibility: hidden; }
 .study-gallery .project-copy { will-change: transform, opacity; }
 .study-gallery .project-switcher {
-  height: 64px;
+  height: 60px;
   gap: clamp(18px, 1.8vw, 30px);
   opacity: 0;
   visibility: hidden;
@@ -39,12 +39,12 @@
   transform: none;
 }
 .study-gallery .project-switcher button {
-  font-size: clamp(19px, 1.65vw, 24px);
-  min-height: 52px;
+  font-size: clamp(17.5px, 1.475vw, 21px);
+  min-height: 50px;
   gap: 10px;
 }
-.study-gallery .project-switcher button span { font-size: 14px; }
-.study-gallery .project-switcher button::after { width: 9px; height: 9px; }
+.study-gallery .project-switcher button span { font-size: 13px; }
+.study-gallery .project-switcher button::after { width: 8px; height: 8px; }
 .study-gallery .project-progress {
   flex-basis: clamp(200px, 18vw, 260px);
   width: clamp(200px, 18vw, 260px);

@@ -154,7 +154,11 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
     const reveal = phase(p, holdEnd * .22, holdEnd * .43);
     const shape = phase(p, holdEnd * .38, holdEnd * .97);
     const dock = phase(p, holdEnd + (1 - holdEnd) * .05, .94);
-    const handoff = phase(p, .955, 1);
+    // Fill the destination beneath the still-opaque outgoing photo first.
+    // Complementary fades expose the page (25% at their midpoint), causing
+    // a white flash. Docking finishes at .94, before this overlap begins.
+    const arrivalProgress = phase(p, .94, .97);
+    const handoff = phase(p, .97, 1);
     morph.progress(shape);
     const bounds = {};
     for (const key of ["x", "y", "width", "height"]) bounds[key] = mix(expanded[key], destination[key], dock);
@@ -166,7 +170,7 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
     solid.style.opacity = (1 - reveal).toFixed(4);
     edge.style.opacity = (phase(shape, .94, 1) * (1 - handoff)).toFixed(4);
     visual.style.opacity = (1 - handoff).toFixed(4);
-    arrival.style.opacity = handoff.toFixed(4);
+    arrival.style.opacity = arrivalProgress.toFixed(4);
   }
 
   function refresh() { if (measure()) paint(clock.progress); }
