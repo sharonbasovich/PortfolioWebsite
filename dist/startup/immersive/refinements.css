@@ -10,6 +10,7 @@
   pointer-events: auto;
 }
 .flow-route {
+  z-index: 0;
   bottom: auto;
   height: var(--route-height, 72%);
   overflow: hidden;

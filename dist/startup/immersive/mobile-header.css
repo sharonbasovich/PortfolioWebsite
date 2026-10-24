@@ -1,0 +1,85 @@
+/* Keep every navigation control in the same touch row. In particular, the
+   contact action must not inherit the former absolute brand-row position. */
+@media (max-width: 1000px) {
+  .site-header {
+    gap: 12px;
+  }
+  .site-header nav {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+  .site-header nav a {
+    min-width: 44px;
+    min-height: 44px;
+    padding-inline: 10px;
+    gap: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .site-header nav .nav-contact {
+    position: relative;
+    inset: auto;
+    margin: 0;
+  }
+}
+
+@media (max-width: 650px) {
+  .site-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 10px clamp(12px, 4vw, 24px) 12px;
+  }
+  .site-header .brand {
+    align-self: flex-start;
+    min-height: 44px;
+  }
+  /* The initially hidden brand no longer leaves an empty 44px first row. */
+  .has-scroll-brand:not(.brand-is-visible) .site-header .brand {
+    display: none;
+  }
+  .site-header nav {
+    display: grid;
+    grid-template-columns:
+      minmax(44px, 0.8fr)
+      minmax(58px, 1.1fr)
+      minmax(58px, 1.1fr)
+      44px
+      minmax(74px, 1.35fr);
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .site-header nav a,
+  .site-header nav a:not(.nav-contact) {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 4px;
+    gap: 0;
+    font-size: 14px;
+    letter-spacing: -0.15px;
+    white-space: nowrap;
+  }
+  .site-header nav .nav-contact {
+    padding-inline: 8px;
+  }
+  .site-header nav .link-arrow {
+    display: none;
+  }
+  .site-header nav .theme-toggle {
+    justify-self: center;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
+/* The five-control row leaves room for the chapter label beside Pause below.
+   Avoid the legacy small-phone top offset overlapping the expanded brand row. */
+@media (max-width: 360px) {
+  .scene-status { top: auto; bottom: 16px; }
+}

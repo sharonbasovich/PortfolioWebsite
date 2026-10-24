@@ -1,8 +1,8 @@
 import Lenis from "../vendor/lenis/lenis.js";
-import { createWorld } from "./world.js?v=20261023-polish";
+import { createWorld } from "./world.js?v=20261023-header";
 import { createPointerRibbon } from "./pointer-ribbon.js";
 import { installProjectEvidence } from "./project-evidence.js";
-import { installTheme } from "./theme.js";
+import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
 import { mountProjectMotion as mountTypeMotion } from "./projects-type.js";
 import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261023-visible";
@@ -71,6 +71,7 @@ const bridge = document.querySelector(".flow-bridge");
 const route = document.querySelector(".route-line"),
   routeTube = document.querySelector(".route-tube"),
   routeReveal = document.querySelector(".route-reveal"),
+  routeCutout = document.querySelector(".route-carrier-cutout"),
   routeSvg = document.querySelector(".flow-route");
 const proof = document.querySelector(".flow-proof");
 const routeWords = document.querySelector(".flow-words");
@@ -553,6 +554,17 @@ function paint(time = 0, delta = 1 / 60) {
     const progress = routeDrawProgress();
     routeReveal.style.strokeDashoffset = String(1 - progress);
     routeTube.style.opacity = progress > 0 ? "1" : "0";
+    // Projected carrier bounds come from the frame just rendered. Subtract its
+    // footprint from the SVG so the trail always passes behind the metal,
+    // including bends and the final move away from the line into the dock.
+    const occluder = !lostContext && world?.getCarrierOccluder();
+    if (occluder && routeBounds.width > 0 && routeBounds.height > 0) {
+      const scaleX = 1440 / routeBounds.width, scaleY = 650 / routeBounds.height;
+      routeCutout.setAttribute("x", ((occluder.left - routeBounds.left - 2) * scaleX).toFixed(2));
+      routeCutout.setAttribute("y", ((occluder.top - routeBounds.top - 2) * scaleY).toFixed(2));
+      routeCutout.setAttribute("width", ((occluder.right - occluder.left + 4) * scaleX).toFixed(2));
+      routeCutout.setAttribute("height", ((occluder.bottom - occluder.top + 4) * scaleY).toFixed(2));
+    } else routeCutout.setAttribute("width", "0");
   }
 }
 function tick(time, deltaMs) {

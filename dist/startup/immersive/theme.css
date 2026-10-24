@@ -62,40 +62,7 @@
   --theme-route-stop-4: #8fa4ff;
   --theme-route-stop-5: #647aff;
 }
-/* A readable system theme also works when JavaScript is unavailable. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    color-scheme: dark;
-    --paper: #0d111a;
-    --ink: #edf2ff;
-    --muted: #a6b1c7;
-    --cobalt: #8fa4ff;
-    --line: #c8d4f32b;
-    --white: #151c2a;
-    --theme-copy: #bdc7da;
-    --theme-detail: #a6b1c7;
-    --theme-contact-copy: #bdc7da;
-    --theme-paper-fade: #0d111a00;
-    --theme-paper-glass: #0d111af2;
-    --theme-control: #151c2af2;
-    --theme-control-hover: #202a3d;
-    --theme-control-border: #c8d4f32b;
-    --theme-control-border-hover: #c8d4f354;
-    --theme-nav-hover: #c8d4f314;
-    --theme-rail-thumb: #edf2ff99;
-    --theme-rail-hover: #edf2ff0d;
-    --theme-action: #2d43ff;
-    --theme-action-ink: #ffffff;
-    --theme-action-hover: #4055ff;
-    --theme-route-base: #8fa4ff38;
-    --theme-route-depth: #000000;
-    --theme-route-stop-1: #8fa4ff;
-    --theme-route-stop-2: #637fff;
-    --theme-route-stop-3: #5067e3;
-    --theme-route-stop-4: #8fa4ff;
-    --theme-route-stop-5: #647aff;
-  }
-}
+/* Light is also the default when JavaScript is unavailable. */
 :root[data-theme="light"] {
   color-scheme: light;
 }

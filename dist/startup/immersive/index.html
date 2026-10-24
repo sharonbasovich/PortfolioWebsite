@@ -6,15 +6,9 @@
     <meta name="theme-color" content="#eef1fa" />
     <script>
       (() => {
-        let theme;
-        try { theme = localStorage.getItem("sb-theme"); } catch {}
-        if (theme !== "light" && theme !== "dark")
-          theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        document.documentElement.dataset.theme = theme;
-        document.documentElement.style.colorScheme = theme;
+        document.documentElement.dataset.theme = "light";
+        document.documentElement.style.colorScheme = "light";
         document.documentElement.classList.add("has-scroll-brand");
-        document.querySelector('meta[name="theme-color"]').content =
-          theme === "dark" ? "#0d111a" : "#eef1fa";
       })();
     </script>
     <title>Sharon Basovich</title>
@@ -44,16 +38,17 @@
     <link rel="stylesheet" href="projects-type.css" />
     <link rel="stylesheet" href="projects-photo.css?v=20261023-visible" />
     <link rel="stylesheet" href="projects-depth.css" />
-    <link rel="stylesheet" href="refinements.css?v=20261023-polish" />
+    <link rel="stylesheet" href="refinements.css?v=20261023-header" />
     <link rel="stylesheet" href="native-presentation.css?v=20261023-polish" />
-    <link rel="stylesheet" href="theme.css" />
+    <link rel="stylesheet" href="theme.css?v=20261023-header" />
+    <link rel="stylesheet" href="mobile-header.css?v=20261023-header" />
     <script src="../vendor/gsap/gsap.min.js" defer></script>
     <script src="../vendor/gsap/ScrollTrigger.min.js" defer></script>
     <script src="../vendor/gsap/SplitText.min.js" defer></script>
     <script type="importmap">
       { "imports": { "three": "../vendor/three/three.module.js" } }
     </script>
-    <script type="module" src="main.js?v=20261023-visible"></script>
+    <script type="module" src="main.js?v=20261023-header"></script>
     <noscript
       ><style>
         .world-frame,
@@ -208,8 +203,9 @@
               <stop offset="1" stop-color="#2d43ff" />
             </linearGradient>
             <mask id="route-reveal-mask" maskUnits="userSpaceOnUse" x="-100" y="-100" width="1640" height="850">
-              <path class="route-reveal" pathLength="1" fill="none" stroke="white" stroke-width="80" stroke-linecap="round" stroke-dasharray="1 1" stroke-dashoffset="1"
+              <path class="route-reveal" pathLength="1" fill="none" stroke="white" stroke-width="80" stroke-linecap="butt" stroke-dasharray="1 1" stroke-dashoffset="1"
                 d="M1070 -20 V95 C1070 145 1015 160 935 160 H310 C170 160 160 310 310 310 H1070 C1210 310 1210 480 1070 480 H760 C690 480 690 555 690 670" />
+              <rect class="route-carrier-cutout" fill="black" x="0" y="0" width="0" height="0" />
             </mask>
           </defs>
           <g class="route-tube" mask="url(#route-reveal-mask)" opacity="0">

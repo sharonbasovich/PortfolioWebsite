@@ -6,14 +6,8 @@
     <meta name="theme-color" content="#eef1fa" />
     <script>
       (() => {
-        let theme;
-        try { theme = localStorage.getItem("sb-theme"); } catch {}
-        if (theme !== "light" && theme !== "dark")
-          theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        document.documentElement.dataset.theme = theme;
-        document.documentElement.style.colorScheme = theme;
-        document.querySelector('meta[name="theme-color"]').content =
-          theme === "dark" ? "#0d111a" : "#eef1fa";
+        document.documentElement.dataset.theme = "light";
+        document.documentElement.style.colorScheme = "light";
       })();
     </script>
     <title>Behind the motion — Sharon Basovich</title>
@@ -41,16 +35,6 @@
         --muted: #a6b1c7;
         --link: #8fa4ff;
         --focus: #8fa4ff;
-      }
-      @media (prefers-color-scheme: dark) {
-        :root:not([data-theme]) {
-          color-scheme: dark;
-          --paper: #0d111a;
-          --ink: #edf2ff;
-          --muted: #a6b1c7;
-          --link: #8fa4ff;
-          --focus: #8fa4ff;
-        }
       }
       * {
         box-sizing: border-box;

@@ -158,3 +158,33 @@ allow ScrollTrigger's velocity-based pin anticipation to settle before comparing
 the photo with its destination. Evidence: workspace `tmp/immersive-oct22-qa/`
 `visible-transitions-check.json`, `visible-mobile-check.json` and
 `visible-transition-final.json`; browser screenshots accompany the reports.
+
+
+## Foreground carrier, one-row mobile navigation, light default
+
+The route reveal mask now uses a butt cap: its former 80-unit rounded cap could
+expose line ahead of the traveling piece. A black cutout in that same mask follows
+the carrier's cached projected bounds, with a2 CSS pixel allowance. It clears
+when the carrier docks, on native layouts and during context loss. The line has
+an explicit lower stacking level. This uses the existing projection/render clock,
+without an extra scene pass, context or per-frame pose walk.
+
+All five mobile navigation controls now share one row: Work, Projects, Resume,
+theme and Let's talk. Contact is in document flow instead of positioned on the
+brand row. Controls retain44px targets and fit320px widths. The initially hidden
+brand leaves no empty row; when visible it appears above the same intact nav row.
+The small-phone chapter indicator returns to the bottom beside the motion control,
+so it cannot overlap that brand row. Desktop above1000px is unchanged.
+
+Every fresh page load now starts light, regardless of OS or an old saved theme.
+The toggle changes the current page session; reloads start light again. Both
+immersive and resources bootstraps/CSS follow this policy, including no-JavaScript
+and unavailable-storage cases. System/storage theme listeners were removed.
+
+37 browser checks passed across320,360,393,430,650,851 and1000px widths, both brand
+states, seven carrier-flight phases, docking, reloads and manual theme changes.
+No runtime/shader errors were reported. A pixel comparison intentionally raised
+the SVG above the canvas: all6632 opaque carrier pixels were identical with the
+line visible or hidden (zero crossing pixels). Evidence: workspace
+`tmp/immersive-oct22-qa/header-layer-check.json`, `layer-pixel-check.json` and PNGs.
+These are emulated Chromium/SwiftShader checks, not physical-device FPS results.

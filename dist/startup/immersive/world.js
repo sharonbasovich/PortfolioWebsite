@@ -2013,5 +2013,8 @@ export function createWorld(
     destroy: dispose,
     burst,
     getStats,
+    // Read the existing cached projection without walking poses or allocating.
+    getCarrierOccluder: () => carrierPose.enabled && carrierPose.owner === "flight" &&
+      carrierPose.draws > 0 ? carrierScreenBounds : null,
   };
 }

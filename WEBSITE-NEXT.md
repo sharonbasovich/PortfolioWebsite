@@ -1,3 +1,16 @@
+# Latest header, theme and route-layer fixes — 23 October 2026
+
+Branch codex/immersive-header-layering. Prior production/rollback009a002.
+The About route is masked behind the projected carrier bounds and its oversized
+reveal cap is removed. Mobile nav keeps all five controls on one row with44px
+targets. Each fresh immersive/resources load defaults light regardless of OS/saved
+theme; the in-page dark toggle remains. Current source/QA details are in the latest
+section of docs/immersive-personalization-qa.md.37 browser checks and an opaque
+carrier pixel comparison pass. Prior projects sticky hold/mobile line timing and
+native canvas containment remain. Existing push/deploy authorization applies.
+
+--- Earlier checkpoint ---
+
 # Current transition visibility fixes — 23 October 2026
 
 Branch codex/immersive-visible-transitions. Prior production/rollback e2e7282.

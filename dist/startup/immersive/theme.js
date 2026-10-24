@@ -1,24 +1,11 @@
-const THEME_KEY = "sb-theme";
 const DARK_COLOR = "#0d111a";
 const LIGHT_COLOR = "#eef1fa";
 let installation = null;
 
-const validTheme = (value) => value === "light" || value === "dark";
-
-/** Install the page utility without taking ownership of its motion clock. */
+/** Each page starts light; its toggle changes only the current page session. */
 export function installTheme() {
   if (installation) return installation;
   const root = document.documentElement;
-  const preference = window.matchMedia("(prefers-color-scheme: dark)");
-  let storage = null;
-  let manualTheme = null;
-  try {
-    storage = window.localStorage;
-    const saved = storage.getItem(THEME_KEY);
-    if (validTheme(saved)) manualTheme = saved;
-  } catch {
-    // Storage can be unavailable; the current page still keeps a manual choice.
-  }
   let currentTheme;
   let disposed = false;
   const nav = document.querySelector(".site-header nav");
@@ -57,31 +44,11 @@ export function installTheme() {
     }
   }
 
-  const systemTheme = () => preference.matches ? "dark" : "light";
   const onClick = () => {
-    manualTheme = currentTheme === "dark" ? "light" : "dark";
-    try {
-      storage?.setItem(THEME_KEY, manualTheme);
-    } catch {
-      // Keep the in-memory override even when persistence is blocked or full.
-    }
-    apply(manualTheme);
-  };
-  const onPreference = () => {
-    if (!manualTheme) apply(systemTheme());
-  };
-  const onStorage = (event) => {
-    if (event.key !== THEME_KEY && event.key !== null) return;
-    if (storage && event.storageArea && event.storageArea !== storage) return;
-    manualTheme = validTheme(event.newValue) ? event.newValue : null;
-    apply(manualTheme || systemTheme());
+    apply(currentTheme === "dark" ? "light" : "dark");
   };
   button?.addEventListener("click", onClick);
-  if (preference.addEventListener)
-    preference.addEventListener("change", onPreference);
-  else preference.addListener(onPreference);
-  window.addEventListener("storage", onStorage);
-  apply(manualTheme || systemTheme());
+  apply("light");
 
   const handle = {
     dispose() {
@@ -89,10 +56,6 @@ export function installTheme() {
       disposed = true;
       button?.removeEventListener("click", onClick);
       button?.remove();
-      if (preference.removeEventListener)
-        preference.removeEventListener("change", onPreference);
-      else preference.removeListener(onPreference);
-      window.removeEventListener("storage", onStorage);
       if (installation === handle) installation = null;
     },
   };
