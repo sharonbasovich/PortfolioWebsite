@@ -70,7 +70,9 @@ needed. The old photo-through-type module is removed. See
 [motion implementation and provenance](title-gallery-motion-study.md).
 The other images are
 the official Marble/UW HPC logos and Sharon's supplied SkyCell launch photograph
-(cropped using CSS). The new Robotics photograph is fully contained and uses a
+(cropped in the display only). SkyCell uses a 4:3 frame and 34% vertical focal
+position in both the SVG gallery and native cards, preserving both balloons and
+the payload while removing empty lower sky. The Robotics photograph is fully contained and uses a
 3:2 phone frame, preserving all four robots and trophies. The requested Marble
 black background was deferred; its existing light backdrop remains. There are no
 image captions. Original

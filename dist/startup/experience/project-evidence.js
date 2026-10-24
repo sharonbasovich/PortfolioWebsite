@@ -12,6 +12,7 @@ const photographs = {
   },
   skycell: {
     key: "skycell", file: "skycell-balloon-launch.jpg", width: 659, height: 880,
+    frameRatio: 4 / 3, focusY: 0.34,
     alt: "SkyCell balloon train with two balloons and suspended payload against a blue sky",
   },
   robotics: {
@@ -34,6 +35,11 @@ function makePhoto(specification) {
   image.alt = specification.alt;
   image.width = specification.width;
   image.height = specification.height;
+  if (specification.frameRatio) {
+    image.dataset.frameRatio = String(specification.frameRatio);
+    image.dataset.frameFocusY = String(specification.focusY ?? 0.5);
+    image.style.objectPosition = `50% ${(specification.focusY ?? 0.5) * 100}%`;
+  }
   image.loading = "lazy";
   image.decoding = "async";
   media.append(image);

@@ -23,6 +23,9 @@ original file bytes are unchanged. The Lions Robotics photo was recovered from t
 
 - Source: User-supplied C:/Users/Sharon/Downloads/PXL_20250621_172905846.MP.jpg
 - 659 × 880; actual balloon train and suspended payload, not the archived replay screenshot.
+- Display: 4:3 crop at 50% horizontal / 34% vertical focus, removing empty lower
+  sky while retaining both balloons and the payload. The SVG gallery and native
+  object-fit crop use matching geometry; the original JPEG remains unchanged.
 - SHA256: `5f0d1e59ea0bd0d51d95d06ebdbcae5aa87c486326d0f4f6fddd82fbe7ec89fd`
 
 ## lions-robots-trophies.jpg

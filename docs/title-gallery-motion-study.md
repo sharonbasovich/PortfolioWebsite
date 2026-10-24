@@ -11,7 +11,9 @@ morphs its aperture to each source image's intrinsic ratio; only the existing
 right-hand project copy slides. Existing content, side-sheet details, selectors,
 keyboard navigation, pause, light/dark controls, and resume downloads are retained.
 Touch, reduced motion, short/small viewports and unavailable WebGL use native
-vertical cards with source-ratio frames. There is no new renderer or RAF loop.
+vertical cards with matching image frames. SkyCell uses Sharon's requested
+4:3 display crop at a 34% vertical focal position, removing excess lower sky;
+the other frames retain their source ratios. There is no new renderer or RAF loop.
 The enlarged selector and 8px progress bar appear only while the gallery's
 ScrollTrigger pin is active. Outside that interval the controls are invisible
 and inert. The complete destination frame, including its background and edge,

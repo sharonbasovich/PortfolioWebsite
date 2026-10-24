@@ -1,3 +1,13 @@
+# SkyCell framing tightened — 24 October 2026
+
+Branch codex/skycell-photo-crop, base9a2cd21. User requested less vertical empty
+sky. SkyCell now has a4:3 display crop focused at50%34%, preserving both balloons
+and the payload. Shared image metadata drives the desktop morphing frame and
+native card ratio. SVG cover geometry matches native object-fit/position.
+Original659x880JPEG bytes retained; other projects and title handoff unchanged.
+
+--- Earlier checkpoint ---
+
 # Docking flash and selector size corrected — 24 October 2026
 
 Branch codex/docking-flash-fix, base705b153. The frame background bug was fixed,

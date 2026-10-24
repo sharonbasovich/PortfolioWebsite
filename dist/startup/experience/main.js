@@ -2,10 +2,10 @@ import Lenis from "../vendor/lenis/lenis.js";
 import { createWorld } from "./world.js?v=20261023-header";
 import { createPointerRibbon } from "./pointer-ribbon.js";
 import { installProjectDetails } from "./project-details.js?v=20261024-robotics";
-import { installProjectEvidence } from "./project-evidence.js?v=20261024-robotics";
+import { installProjectEvidence } from "./project-evidence.js?v=20261024-skycrop";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
-import { mountMorphGallery } from "./study/morph-gallery.js?v=20261024-dock-flash";
+import { mountMorphGallery } from "./study/morph-gallery.js?v=20261024-skycrop";
 import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261024-dock-flash";
 
 const initialProjectsHash = location.hash === "#projects";
@@ -34,7 +34,7 @@ const projectEvidence = installProjectEvidence(panels);
   root.classList.add("motion-study");
   for (const panel of panels) {
     const image = panel.querySelector(".project-evidence img");
-    const ratio = Number(image?.getAttribute("width")) / Number(image?.getAttribute("height"));
+    const ratio = Number(image?.dataset.frameRatio) || Number(image?.getAttribute("width")) / Number(image?.getAttribute("height"));
     if (Number.isFinite(ratio) && ratio > 0) panel.style.setProperty("--study-ratio", ratio);
   }
 }

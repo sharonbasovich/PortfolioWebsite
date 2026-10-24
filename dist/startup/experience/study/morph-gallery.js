@@ -77,7 +77,10 @@ export function mountMorphGallery({
     return {
       panel, host, copy,
       source: original.currentSrc || original.src,
-      ratio: width / height,
+      ratio: Number(original.dataset.frameRatio) || width / height,
+      sourceRatio: width / height,
+      crop: Boolean(original.dataset.frameRatio),
+      focusY: clamp(Number(original.dataset.frameFocusY ?? 0.5)),
       alt: original.alt,
       logo: Boolean(panel.querySelector(".project-evidence--logo")),
       color: rgb(getComputedStyle(panel.querySelector(".project-evidence-media") || host).backgroundColor),
@@ -215,12 +218,21 @@ export function mountMorphGallery({
       }
       if (layerOpacity > 0 || (lower === upper && index === lower)) {
         const inset = record.logo ? 0.84 : 1;
-        attributes(record.image, {
+        const imageBounds = {
           x: bounds.x + bounds.width * (1 - inset) / 2,
           y: bounds.y + bounds.height * (1 - inset) / 2,
           width: bounds.width * inset,
           height: bounds.height * inset,
-        });
+        };
+        if (record.crop) {
+          // Match the native image's object-fit:cover and focal position.
+          // The shared aperture crops the excess without editing source bytes.
+          imageBounds.width = Math.max(bounds.width, bounds.height * record.sourceRatio);
+          imageBounds.height = imageBounds.width / record.sourceRatio;
+          imageBounds.x = bounds.x + (bounds.width - imageBounds.width) / 2;
+          imageBounds.y = bounds.y + (bounds.height - imageBounds.height) * record.focusY;
+        }
+        attributes(record.image, imageBounds);
       }
       let opacity = 0;
       let x = 42;
