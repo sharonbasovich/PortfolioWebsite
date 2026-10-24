@@ -41,8 +41,8 @@ function fittedPhoto(bounds) {
 
 /**
  * Read the title first, then reveal one real photograph through its letterforms
- * and move it into the existing first-project photograph. One scrubbed timeline;
- * no pin, input or render loop.
+ * and move it into the existing first-project photograph. A CSS sticky stage
+ * holds the title through the reveal; one scrubbed timeline, no new render loop.
  * Call inside the page's GSAP context. Revert that context before dispose().
  */
 export function mountProjectMotion({
@@ -137,7 +137,8 @@ export function mountProjectMotion({
 
   function measure() {
     if (disposed) return false;
-    const box = stage.getBoundingClientRect();
+    const stageBox = stage.getBoundingClientRect();
+    const box = visual.getBoundingClientRect();
     const photoBox = original.getBoundingClientRect();
     const panelBox = panel.getBoundingClientRect();
     const galleryBox = gallery.getBoundingClientRect();
@@ -154,7 +155,10 @@ export function mountProjectMotion({
     const contained = fittedPhoto(photoBox);
     const destination = {
       x: galleryBox.x - box.x + panel.offsetLeft + contained.x - panelBox.x,
-      y: anchorBox.y - box.y + panel.offsetTop + contained.y - panelBox.y,
+      // Sticky travel is already reserved in the stage height. The photo docks
+      // after that travel, when this viewport resumes moving with the document.
+      y: anchorBox.y - stageBox.y - (stageBox.height - box.height) +
+        panel.offsetTop + contained.y - panelBox.y,
       width: contained.width,
       height: contained.height,
     };
@@ -182,9 +186,7 @@ export function mountProjectMotion({
       }
     }
     const longest = Math.max(...type.map(({ fill }) => fill.getBBox().width), 1);
-    // Leave enough room around both lines for the complete title to enter the
-    // viewport before its reading hold ends; the old 85%-tall type lost its
-    // second line to the aperture while it was still below the fold.
+    // Fit both words within the held viewport, below the fixed site header.
     const size = Math.min((start.width / longest) * 100, box.height * 0.36);
     type.forEach(({ fill, solid, outline }, index) => {
       for (const text of [fill, solid, outline]) {
@@ -202,18 +204,22 @@ export function mountProjectMotion({
         text.setAttribute("y", String(offsetY + index * size * 0.88));
       }
     });
-    layout = { start, destination };
+    const stickyTop = parseFloat(getComputedStyle(visual).top) || 100;
+    const scrollRange = stageBox.height + stickyTop - innerHeight * 0.2;
+    const holdEnd = clamp((stageBox.height - box.height) / scrollRange);
+    layout = { start, destination, holdEnd };
     return true;
   }
 
   function paint(progress) {
     if (disposed || !layout) return;
     const p = clamp(progress);
-    // Most of the approach is deliberately still: read both words before the
-    // photograph takes over. Every phase uses the same reversible scroll clock.
-    const photographReveal = phase(p, 0.56, 0.68);
-    const open = phase(p, 0.66, 0.8);
-    const dock = phase(p, 0.76, 0.97);
+    // The effect begins only after both words fit. Keep type and aperture
+    // phases inside the CSS sticky interval, then dock during natural scrolling.
+    const { holdEnd } = layout;
+    const photographReveal = phase(p, holdEnd * 0.22, holdEnd * 0.6);
+    const open = phase(p, holdEnd * 0.55, holdEnd * 0.98);
+    const dock = phase(p, holdEnd, 0.97);
     const handoff = phase(p, 0.96, 1);
     const bounds = {};
     for (const key of ["x", "y", "width", "height"])
@@ -230,16 +236,21 @@ export function mountProjectMotion({
     rectangle(edge, bounds, radius);
     image.style.opacity = photographReveal.toFixed(4);
     solidType.setAttribute("opacity", (1 - photographReveal).toFixed(4));
-    maskType.setAttribute("opacity", (1 - phase(p, 0.74, 0.84)).toFixed(4));
-    outlineType.setAttribute("opacity", (1 - phase(p, 0.66, 0.8)).toFixed(4));
+    maskType.setAttribute("opacity", (1 - phase(p, layout.holdEnd * 0.8, layout.holdEnd)).toFixed(4));
+    outlineType.setAttribute("opacity", (1 - phase(p, layout.holdEnd * 0.56, layout.holdEnd * 0.98)).toFixed(4));
     edge.style.opacity = String(open * (1 - handoff));
     visual.style.opacity = (1 - handoff).toFixed(4);
     original.style.opacity = handoff.toFixed(4);
   }
 
+  function refresh() {
+    if (measure()) paint(clock.progress);
+  }
+
   function dispose() {
     if (disposed) return;
     disposed = true;
+    ScrollTrigger.removeEventListener("refresh", refresh);
     timeline?.scrollTrigger?.kill();
     timeline?.kill();
     visual.remove();
@@ -259,15 +270,12 @@ export function mountProjectMotion({
     scrollTrigger: {
       id: "projects-photo-reveal",
       trigger: stage,
-      start: "top 85%",
-      // Complete while the real first project is naturally arriving, before
-      // the existing horizontal gallery pins at the top of the viewport.
+      start: "top 100px",
+      // Sticky space is ordinary document flow, so the gallery's existing pin
+      // sees the correct position without another ScrollTrigger pin/spacer.
       end: "bottom 20%",
       scrub: true,
       invalidateOnRefresh: true,
-      onRefresh(self) {
-        if (measure()) paint(self.progress);
-      },
     },
   });
   timeline.to(clock, {
@@ -276,6 +284,10 @@ export function mountProjectMotion({
     ease: "none",
     onUpdate: () => paint(clock.progress),
   });
+  // Read the gallery only after all pins have finished refreshing; measuring
+  // inside this trigger's onRefresh can see the gallery's temporary revert.
+  ScrollTrigger.addEventListener("refresh", refresh);
+  refresh();
   paint(timeline.progress());
   return { dispose };
 }

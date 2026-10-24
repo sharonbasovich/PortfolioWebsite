@@ -5,7 +5,7 @@ import { installProjectEvidence } from "./project-evidence.js";
 import { installTheme } from "./theme.js";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
 import { mountProjectMotion as mountTypeMotion } from "./projects-type.js";
-import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261023-polish";
+import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261023-visible";
 import { mountProjectMotion as mountDepthMotion } from "./projects-depth.js";
 
 const theme = installTheme();
@@ -73,12 +73,14 @@ const route = document.querySelector(".route-line"),
   routeReveal = document.querySelector(".route-reveal"),
   routeSvg = document.querySelector(".flow-route");
 const proof = document.querySelector(".flow-proof");
+const routeWords = document.querySelector(".flow-words");
 const routeLength = route?.getTotalLength() || 1;
 const routePoints = Array.from({ length: 49 }, (_, index) => {
   const point = route.getPointAtLength((routeLength * index) / 48);
   return { x: point.x / 1440, y: point.y / 650 };
 });
 const routeClock = { progress: 0 };
+let nativeRouteDraw = 0, nativeRouteTextInset = 0;
 const heroWindow = document.querySelector(".hero-window");
 const trace = document.querySelector(".pointer-trace");
 const ribbon = createPointerRibbon(trace);
@@ -106,7 +108,8 @@ const carrierRoutePoints = routePoints.map((_, index) => {
   };
 });
 const routeDrawProgress = () =>
-  paused ? 1 : clamp((routeClock.progress - dockingEnd) / (1 - dockingEnd));
+  paused ? 1 : !finePointer.matches ? nativeRouteDraw :
+    clamp((routeClock.progress - dockingEnd) / (1 - dockingEnd));
 const windows = [...document.querySelectorAll("[data-world-window]")].map(
   (element) => {
     const panel = element.closest(".project-panel");
@@ -221,6 +224,7 @@ function scrollToPosition(top, immediate = false) {
 }
 function refreshMeasurements() {
   bridge.style.setProperty("--route-height", `${Math.max(180, proof.offsetTop - 34)}px`);
+  nativeRouteTextInset = routeWords.getBoundingClientRect().top - routeSvg.getBoundingClientRect().top;
   for (const item of windows)
     item.radius =
       parseFloat(getComputedStyle(item.element).borderTopLeftRadius) || 28;
@@ -362,7 +366,6 @@ function paint(time = 0, delta = 1 / 60) {
   // Read all DOM geometry first; render every visible window in its own view.
   const heroBounds = document.querySelector(".hero").getBoundingClientRect();
   const workBounds = document.querySelector(".work").getBoundingClientRect();
-  const bridgeBounds = bridge.getBoundingClientRect();
   const routeBounds = routeSvg.getBoundingClientRect();
   const brandShown = heroName.getBoundingClientRect().bottom <= 108 || document.activeElement === brand;
   if (brandShown !== stickyBrandShown) {
@@ -371,11 +374,22 @@ function paint(time = 0, delta = 1 / 60) {
     brand.tabIndex = brandShown ? 0 : -1;
     brand.setAttribute("aria-hidden", String(!brandShown));
   }
-  if (!finePointer.matches && !paused)
-    routeClock.progress = clamp(
-      (layoutHeight * 0.8 - bridgeBounds.top) /
-        (bridgeBounds.height + layoutHeight * 0.55),
+  if (!finePointer.matches && !paused) {
+    // Native scrolling has no flying carrier or docking delay. Draw against
+    // the visible line area rather than the much taller metrics-containing
+    // bridge. Finish with its bottom at 40% viewport, or earlier if necessary
+    // to keep the whole heading below the header on a short landscape phone.
+    // layoutHeight stays stable when a phone's browser toolbar opens/closes.
+    const finishTop = Math.max(
+      layoutHeight * 0.4 - routeBounds.height,
+      112 - nativeRouteTextInset,
     );
+    nativeRouteDraw = clamp(
+      (layoutHeight * 0.85 - routeBounds.top) /
+        Math.max(1, layoutHeight * 0.85 - finishTop),
+    );
+    routeClock.progress = nativeRouteDraw;
+  }
   const openingProgress = clamp(-heroBounds.top / Math.min(170, layoutHeight * 0.18));
   const heroOpening = 1 - (1 - openingProgress) ** 2;
   const visible = [];

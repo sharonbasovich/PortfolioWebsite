@@ -1,3 +1,16 @@
+# Current transition visibility fixes — 23 October 2026
+
+Branch codex/immersive-visible-transitions. Prior production/rollback e2e7282.
+The selected My projects photo reveal now holds inside a CSS sticky viewport
+below the header, then resumes document scrolling for the gallery handoff.
+Mobile About line draw uses the visible route area and finishes while the full
+heading is still visible, including short landscape. Desktop carrier timing,
+native canvas containment, content, roots and resume remain unchanged.
+80 scoped checks pass (46 desktop, 34 final native); see the latest section of
+docs/immersive-personalization-qa.md. Existing push/deploy permission applies.
+
+--- Earlier checkpoint ---
+
 # Current immersive refinement — 23 October 2026
 
 Authoritative source: this repository, branch codex/immersive-oct23-polish.

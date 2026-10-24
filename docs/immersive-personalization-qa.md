@@ -126,3 +126,35 @@ Pixel-sized layouts after the user identified a Pixel 6a. These are Chromium
 emulation / SwiftShader checks, not a physical-device FPS or
 Safari result. The clean/creative homepages, resume and vendor libraries remain
 outside the change.
+
+
+## Keep the transitions in view — 23 October follow-up
+
+The projects photo treatment now uses a CSS sticky viewport below the header.
+Both words fit inside it before the reveal starts. A reserved stretch of ordinary
+document flow holds the title through the photograph and aperture phases, then
+releases it for the existing gallery handoff. The phase boundary derives from
+the measured sticky travel. There is still one scrubbed introduction timeline
+and only the gallery's existing ScrollTrigger pin. Destination measurement runs
+after all pins finish refreshing, so resize cannot capture a temporary pin revert.
+Manual pause preserves introduction space and shows a readable static heading;
+native and reduced-motion layouts retain their static project heading.
+
+The mobile About route no longer inherits the desktop docking delay or the full
+height of the metrics section. Its draw range follows the route's own viewport
+bounds, finishing before the words pass the header. Short landscape layouts use
+an earlier completion point to keep the entire heading visible. The inset is
+measured from bounding rectangles because the SVG has no HTML offsetTop.
+Stable layout height still protects against browser-toolbar resize jumps.
+Desktop carrier timing and the native canvas architecture are unchanged.
+
+Forty-six desktop checks passed at 1100×650, 1280×720, 1440×900 and1680×1050:
+complete-title bounds through six hold phases, reading hold, photo reveal,
+stationary viewport, reverse scroll, photo docking within3 CSS pixels, one pin,
+pause/resume and a single SVG. Thirty-four final native checks passed at320×568,
+393×851, 430×932 and851×393: normalized draw samples, full heading visible at
+completion, reversal, no pin/overflow, and reduced motion. Instant-seek tests
+allow ScrollTrigger's velocity-based pin anticipation to settle before comparing
+the photo with its destination. Evidence: workspace `tmp/immersive-oct22-qa/`
+`visible-transitions-check.json`, `visible-mobile-check.json` and
+`visible-transition-final.json`; browser screenshots accompany the reports.
