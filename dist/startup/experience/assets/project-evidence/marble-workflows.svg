@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="840" viewBox="0 0 1280 840" fill="none">
+  <title>Marble Investments research workflows</title>
+  <desc>Illustrative workflow diagram: a React relationship graph, financial news extraction, and a Python stock pair screener. This is not a production screenshot.</desc>
+  <rect width="1280" height="840" fill="#101724"/>
+  <g font-family="Arial, sans-serif">
+    <text x="54" y="68" fill="#a8b8ff" font-size="23" letter-spacing="2">RESEARCH WORKFLOWS</text>
+    <path d="M640 116v500M54 647h1172" stroke="#dce5ff" stroke-opacity=".16"/>
+    <g fill="#eff3ff" font-size="34"><text x="54" y="151">Relationship research</text><text x="694" y="151">Financial news</text></g>
+    <g fill="#b4bed4" font-size="25"><text x="54" y="201">React research graph</text><text x="694" y="201">2,000 articles daily</text></g>
+    <g stroke="#a8b8ff" stroke-width="2.5" stroke-opacity=".55">
+      <path d="m122 312 128-64 110 93 147-57M122 312l91 106 147-77 83 126 64-183M213 418l-68 126 167-19 131-58 74 103M250 248l-37 170 99 107 48-184M443 467l74 103"/>
+    </g>
+    <g fill="#101724" stroke="#a8b8ff" stroke-width="3"><circle cx="122" cy="312" r="12"/><circle cx="250" cy="248" r="10"/><circle cx="360" cy="341" r="17"/><circle cx="507" cy="284" r="11"/><circle cx="213" cy="418" r="17"/><circle cx="145" cy="544" r="10"/><circle cx="312" cy="525" r="12"/><circle cx="443" cy="467" r="15"/><circle cx="517" cy="570" r="10"/></g>
+    <g fill="#a8b8ff"><circle cx="360" cy="341" r="6"/><circle cx="213" cy="418" r="6"/></g>
+    <g fill="#d4dced" font-size="28"><text x="54" y="608">500+ companies · 1,500+ relationships</text></g>
+    <path d="M707 260v277" stroke="#8095ed" stroke-opacity=".6" stroke-width="2"/>
+    <g fill="#a8b8ff"><circle cx="707" cy="270" r="5"/><circle cx="707" cy="354" r="5"/><circle cx="707" cy="438" r="5"/><circle cx="707" cy="522" r="5"/></g>
+    <g fill="#d4dced" font-size="29"><text x="739" y="280">News feed</text><text x="739" y="364">Deduplication</text><text x="739" y="448">LLM extraction</text><text x="739" y="532">Relevance and portfolio impact</text></g>
+    <g fill="#eff3ff" font-size="30"><text x="54" y="706">Python pair screener</text></g>
+    <g fill="#b4bed4" font-size="27"><text x="54" y="760">1M+ stock pairs</text><text x="710" y="760">50–100 candidates for analyst review</text></g>
+    <path d="M335 750h310m-14-10 14 10-14 10" stroke="#a8b8ff" stroke-width="2"/>
+  </g>
+</svg>

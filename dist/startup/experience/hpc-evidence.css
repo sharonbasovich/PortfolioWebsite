@@ -61,7 +61,7 @@
 .hpc-sampling svg { display: block; width: 100%; max-height: 100px; }
 .hpc-sampling p { margin: 0; color: #d4dced; font-size: 12px; line-height: 1.9; }
 .hpc-sampling p span { color: #b4bed4; }
-.project-gallery:not(.is-horizontal) .project-panel[data-project="3"] .project-window.has-project-evidence {
+.project-gallery:not(.is-horizontal) .project-panel--hpc .project-window.has-project-evidence {
   height: auto;
   min-height: 0;
   max-height: none;

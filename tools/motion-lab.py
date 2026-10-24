@@ -1,4 +1,4 @@
-"""Local-only motion review server; no debug assets are in Vercel's output."""
+"""Review the single startup root document; debug assets stay outside output."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
@@ -56,6 +56,25 @@ class MotionHandler(SimpleHTTPRequestHandler):
     def send_head(self):
         """Inject explicit local fixtures into HTML, preserving ordinary serving."""
         request = urlsplit(self.path)
+        # Match the permanent legacy redirects in the startup Vercel config.
+        # There is one root document; experience/ holds only modules and assets.
+        legacy_pages = {
+            '/immersive': '/',
+            '/immersive/': '/',
+            '/immersive/index.html': '/',
+            '/immersive/resources.html': '/resources.html',
+        }
+        target = legacy_pages.get(request.path)
+        if target is None and request.path.startswith('/immersive/'):
+            target = '/experience/' + request.path[len('/immersive/'):]
+        if target is not None:
+            if request.query:
+                target += '?' + request.query
+            self.send_response(308)
+            self.send_header('Location', target)
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return None
         query = parse_qs(request.query)
         scripts = []
         if query.get('webgl') == ['off']:

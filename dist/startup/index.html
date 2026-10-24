@@ -32,25 +32,25 @@
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232d43ff'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='white'%3Esb%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./immersive/style.css?v=20261023-hpc" />
-    <link rel="stylesheet" href="./immersive/pointer-ribbon.css" />
-    <link rel="stylesheet" href="./immersive/project-evidence.css?v=20261023-hpc" />
-    <link rel="stylesheet" href="./immersive/projects-type.css" />
-    <link rel="stylesheet" href="./immersive/projects-photo.css?v=20261023-visible" />
-    <link rel="stylesheet" href="./immersive/projects-depth.css" />
-    <link rel="stylesheet" href="./immersive/refinements.css?v=20261023-header" />
-    <link rel="stylesheet" href="./immersive/native-presentation.css?v=20261023-polish" />
-    <link rel="stylesheet" href="./immersive/hpc-project.css?v=20261023-hpc" />
-    <link rel="stylesheet" href="./immersive/hpc-evidence.css?v=20261023-hpc" />
-    <link rel="stylesheet" href="./immersive/theme.css?v=20261023-header" />
-    <link rel="stylesheet" href="./immersive/mobile-header.css?v=20261023-header" />
+    <link rel="stylesheet" href="./experience/style.css?v=20261023-projects" />
+    <link rel="stylesheet" href="./experience/pointer-ribbon.css" />
+    <link rel="stylesheet" href="./experience/project-evidence.css?v=20261023-projects" />
+    <link rel="stylesheet" href="./experience/projects-photo.css?v=20261023-projects" />
+    <link rel="stylesheet" href="./experience/refinements.css?v=20261023-header" />
+    <link rel="stylesheet" href="./experience/native-presentation.css?v=20261023-polish" />
+
+    <link rel="stylesheet" href="./experience/hpc-evidence.css?v=20261023-projects" />
+    <link rel="stylesheet" href="./experience/project-cards.css?v=20261023-projects" />
+    <link rel="stylesheet" href="./experience/project-details.css?v=20261023-projects" />
+    <link rel="stylesheet" href="./experience/theme.css?v=20261023-header" />
+    <link rel="stylesheet" href="./experience/mobile-header.css?v=20261023-header" />
     <script src="./vendor/gsap/gsap.min.js" defer></script>
     <script src="./vendor/gsap/ScrollTrigger.min.js" defer></script>
     <script src="./vendor/gsap/SplitText.min.js" defer></script>
     <script type="importmap">
-      {"imports":{"three":"./vendor/three/three.module.js"}}
+      {"imports": {"three": "./vendor/three/three.module.js"}}
     </script>
-    <script type="module" src="./immersive/main.js?v=20261023-hpc"></script>
+    <script type="module" src="./experience/main.js?v=20261023-projects"></script>
     <noscript
       ><style>
         .world-frame,
@@ -364,287 +364,63 @@
         </div>
         <div class="project-gallery">
           <nav class="project-switcher" aria-label="Choose a project" hidden>
-            <button type="button" data-select-project="0" aria-current="true">
-              <span>01</span> Drawing Robot
-            </button>
-            <button type="button" data-select-project="1">
-              <span>02</span> SkyCell
-            </button>
-            <button type="button" data-select-project="2">
-              <span>03</span> Marble
-            </button>
-            <button type="button" data-select-project="3">
-              <span>04</span> UWaterloo HPC
-            </button>
+            <button type="button" data-select-project="0" aria-current="true"><span>01</span> Marble Investments</button>
+            <button type="button" data-select-project="1"><span>02</span> HPC</button>
+            <button type="button" data-select-project="2"><span>03</span> SkyCell</button>
+            <button type="button" data-select-project="3"><span>04</span> Lions Robotics</button>
             <span class="project-progress" aria-hidden="true"><i></i></span>
           </nav>
           <div class="project-panels">
-            <article
-              class="project-panel"
-              data-project="0"
-              aria-labelledby="robot-title"
-            >
-              <div
-                class="project-window art-window"
-                data-world-window
-              ></div>
+            <article class="project-panel project-panel--marble" data-project="0" data-project-key="marble" aria-labelledby="marble-title">
+              <div class="project-window art-window" data-world-window></div>
               <div class="project-copy">
-                <div class="project-index">
-                  <span>01 / 04</span><span>Top 10 at Undercity</span>
-                </div>
-                <h3 id="robot-title">Tic-Tac-Toe<br />Drawing Robot</h3>
-                <p>
-                  A React/TypeScript game and Flask backend synchronized with a
-                  physical plotter. Queued COBS-encoded serial commands drive
-                  the robot; context-aware LLM chat gives it a voice.
-                </p>
-                <ul
-                  class="technology-list"
-                  aria-label="Drawing robot technologies"
-                >
-                  <li>React / TypeScript</li>
-                  <li>Flask</li>
-                  <li>Serial control</li>
-                </ul>
-                <a
-                  class="project-link roll-link"
-                  href="https://github.com/sharonbasovich/undercity"
-                  ><span class="roll-label button-label"
-                    ><span class="roll-original">Source &amp; architecture</span
-                    ><span class="roll-duplicate" aria-hidden="true"
-                      >Source &amp; architecture</span
-                    ></span
-                  ><span class="link-arrow button-arrow" aria-hidden="true"
-                    ><svg
-                      class="arrow-original"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg
-                    ><svg
-                      class="arrow-duplicate"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg></span
-                ></a>
+                <div class="project-index"><span>01 / 04</span><span>$3M AUM Investment Fund · Waterloo, ON</span></div>
+                <h3 id="marble-title">Marble Investments</h3>
+                <div class="project-date">Present</div>
+                <p class="project-summary"><em>Research tools for a $3M AUM investment fund.</em></p>
+                <ul class="technology-list" aria-label="Marble Investments skills"><li>React</li><li>Python</li><li>LLM extraction</li></ul>
+                <button class="project-more" type="button" data-project-details aria-haspopup="dialog" aria-expanded="false"><span>View more</span><span class="project-more-icon" aria-hidden="true">+</span></button>
+                <div class="project-actions"><a class="project-link" href="/Basovich_Sharon_Resume.pdf"><span>Résumé</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+                <template class="project-resume"><ul class="project-resume-bullets"><li>Developed a React research graph persisting 500+ companies and 1,500+ relationships for the investment team</li><li>Created a news pipeline monitoring 2,000 articles daily, with LLM extraction of relevance and impact to portfolio</li><li>Built a Python pair screener evaluating 1M+ stock pairs to shortlist roughly 50–100 candidates for analyst review</li></ul></template>
               </div>
             </article>
-            <article
-              class="project-panel"
-              data-project="1"
-              aria-labelledby="skycell-title"
-            >
-              <div
-                class="project-window art-window"
-                data-world-window
-              ></div>
+            <article class="project-panel project-panel--hpc" data-project="1" data-project-key="hpc" aria-labelledby="hpc-title">
+              <div class="project-window art-window" data-world-window></div>
               <div class="project-copy">
-                <div class="project-index">
-                  <span>02 / 04</span
-                  ><span>1st at APEX · International research hackathon</span>
-                </div>
+                <div class="project-index"><span>02 / 04</span><span>Core Developer · Waterloo, ON</span></div>
+                <h3 id="hpc-title">UWaterloo High Performance Computing</h3>
+                <div class="project-date">Present<span class="project-work-status">In progress</span></div>
+                <p class="project-summary"><em>Building shared CPU/CUDA infrastructure and a Monte Carlo simulation engine.</em></p>
+                <ul class="technology-list" aria-label="UWaterloo High Performance Computing skills"><li>C++23</li><li>CUDA</li><li>Metropolis sampling</li></ul>
+                <button class="project-more" type="button" data-project-details aria-haspopup="dialog" aria-expanded="false"><span>View more</span><span class="project-more-icon" aria-hidden="true">+</span></button>
+                <div class="project-actions"><a class="project-link" href="https://github.com/UWHPC/xpu"><span>XPU source</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="project-link" href="https://github.com/UWHPC/variational-monte-carlo"><span>Monte Carlo source</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+                <template class="project-resume"><ul class="project-resume-bullets"><li>University of Waterloo design team sponsored by Citadel &amp; Jane Street</li><li>Developing XPU, a C++23 interface for CPU/CUDA memory management, math, data layouts, and execution</li><li>Building a C++ variational Monte Carlo engine for homogeneous electron-gas simulations using a Slater–Jastrow trial wavefunction and Metropolis sampling</li></ul></template>
+              </div>
+            </article>
+            <article class="project-panel project-panel--skycell" data-project="2" data-project-key="skycell" aria-labelledby="skycell-title">
+              <div class="project-window art-window" data-world-window></div>
+              <div class="project-copy">
+                <div class="project-index"><span>03 / 04</span><span>1st Place at Apex International Hackathon · Boston, MA</span></div>
                 <h3 id="skycell-title">SkyCell</h3>
-                <p>
-                  A balloon mission reaching 30 km altitude with a 70 km radio
-                  link. Python software parses GPS, integrates sensors, and
-                  recovers radio connections; the ground station decodes,
-                  stores, and visualizes telemetry.
-                </p>
-                <ul class="technology-list" aria-label="SkyCell technologies">
-                  <li>Python</li>
-                  <li>LoRa / Meshtastic</li>
-                  <li>NMEA GPS</li>
-                </ul>
-                <div class="project-actions">
-                <a
-                  class="project-link roll-link"
-                  href="https://skycell.vercel.app/"
-                  ><span class="roll-label button-label"
-                    ><span class="roll-original">Live demo</span
-                    ><span class="roll-duplicate" aria-hidden="true"
-                      >Live demo</span
-                    ></span
-                  ><span class="link-arrow button-arrow" aria-hidden="true"
-                    ><svg
-                      class="arrow-original"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg
-                    ><svg
-                      class="arrow-duplicate"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg></span
-                ></a>
-                <a
-                  class="project-link roll-link"
-                  href="https://github.com/sharonbasovich/skycell"
-                  ><span class="roll-label button-label"
-                    ><span class="roll-original">Source</span
-                    ><span class="roll-duplicate" aria-hidden="true"
-                      >Source</span
-                    ></span
-                  ><span class="link-arrow button-arrow" aria-hidden="true"
-                    ><svg
-                      class="arrow-original"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg
-                    ><svg
-                      class="arrow-duplicate"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg></span
-                ></a>
-                </div>
+                <div class="project-date">Apr. 2025 – Jun. 2025</div>
+                <p class="project-summary"><em>Long-range balloon telemetry and RF analysis, awarded 1st place at Apex.</em></p>
+                <ul class="technology-list" aria-label="SkyCell skills"><li>Python</li><li>LoRa / Meshtastic</li><li>NMEA GPS</li><li>RTL-SDR</li></ul>
+                <button class="project-more" type="button" data-project-details aria-haspopup="dialog" aria-expanded="false"><span>View more</span><span class="project-more-icon" aria-hidden="true">+</span></button>
+                <div class="project-actions"><a class="project-link" href="https://skycell.vercel.app/"><span>Flight replay</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="project-link" href="https://github.com/sharonbasovich/skycell"><span>Source</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+                <template class="project-resume"><ul class="project-resume-bullets"><li>Launched a custom 915 MHz LoRa/Meshtastic telemetry link 30 km into space to establish a range of 70 km</li><li>Built Python software to parse NMEA GPS data, integrate environmental sensors, and recover radio connections</li><li>Automated RTL-SDR spectrum sweeps from 30 MHz to 1.5 GHz at 2.4 MS/s, capturing I/Q data for RF analysis</li></ul></template>
               </div>
             </article>
-            <article
-              class="project-panel"
-              data-project="2"
-              aria-labelledby="marble-title"
-            >
-              <div
-                class="project-window art-window"
-                data-world-window
-              ></div>
+            <article class="project-panel project-panel--robotics" data-project="3" data-project-key="robotics" aria-labelledby="robotics-title">
+              <div class="project-window art-window" data-world-window></div>
               <div class="project-copy">
-                <div class="project-index">
-                  <span>03 / 04</span><span>Marble Investments</span>
-                </div>
-                <h3 id="marble-title">Structure<br />from noise.</h3>
-                <p>
-                  A React graph persisting roughly 500 companies and 1,500+
-                  relationships for an investment team. A news pipeline
-                  processes roughly 1,000–2,000 articles daily, deduplicates the
-                  feed, and extracts structured fields using an LLM.
-                </p>
-                <ul class="technology-list" aria-label="Marble technologies">
-                  <li>React</li>
-                  <li>Python</li>
-                  <li>LLM extraction</li>
-                </ul>
-                <a class="project-link roll-link" href="./Basovich_Sharon_Resume.pdf"
-                  ><span class="roll-label button-label"
-                    ><span class="roll-original">Details in my resume</span
-                    ><span class="roll-duplicate" aria-hidden="true"
-                      >Details in my resume</span
-                    ></span
-                  ><span class="link-arrow button-arrow" aria-hidden="true"
-                    ><svg
-                      class="arrow-original"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg
-                    ><svg
-                      class="arrow-duplicate"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 15 15 5M5 5h10v10"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      /></svg></span
-                ></a>
-              </div>
-            </article>
-            <article
-              class="project-panel project-panel--hpc"
-              data-project="3"
-              aria-labelledby="hpc-title"
-            >
-              <div
-                class="project-window art-window"
-                data-world-window
-              ></div>
-              <div class="project-copy">
-                <div class="project-index">
-                  <span>04 / 04</span>
-                  <span>Core Developer · Waterloo, ON · Present</span>
-                </div>
-                <h3 id="hpc-title" aria-label="UWaterloo High Performance Computing">UWaterloo<br />HPC</h3>
-                <p>
-                  University of Waterloo design team sponsored by
-                  Citadel &amp; Jane Street.
-                </p>
-                <div class="hpc-subprojects">
-                  <section class="hpc-subproject" aria-labelledby="xpu-title">
-                    <h4 id="xpu-title">XPU <span class="hpc-project-status">In progress</span></h4>
-                    <p>
-                      Developing a C++23 interface for CPU and NVIDIA CUDA
-                      memory management, math, data layouts, and execution.
-                    </p>
-                  </section>
-                  <section class="hpc-subproject" aria-labelledby="vmc-title">
-                    <h4 id="vmc-title">Variational Monte Carlo <span class="hpc-project-status">In progress</span></h4>
-                    <p>
-                      Building a C++ engine for homogeneous electron-gas
-                      simulations using a Slater–Jastrow trial wavefunction
-                      and Metropolis sampling.
-                    </p>
-                  </section>
-                </div>
-                <div class="project-actions">
-                  <a class="project-link roll-link" href="https://github.com/UWHPC/xpu">
-                    <span class="roll-label button-label"><span class="roll-original">XPU source</span><span class="roll-duplicate" aria-hidden="true">XPU source</span></span>
-                    <span class="link-arrow button-arrow" aria-hidden="true"><svg class="arrow-original" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
-                  </a>
-                  <a class="project-link roll-link" href="https://github.com/UWHPC/variational-monte-carlo">
-                    <span class="roll-label button-label"><span class="roll-original">Monte Carlo source</span><span class="roll-duplicate" aria-hidden="true">Monte Carlo source</span></span>
-                    <span class="link-arrow button-arrow" aria-hidden="true"><svg class="arrow-original" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><svg class="arrow-duplicate" viewBox="0 0 20 20" fill="none"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
-                  </a>
-                </div>
+                <div class="project-index"><span>04 / 04</span><span>Vice President &amp; Lead Programmer · Richmond Hill, ON</span></div>
+                <h3 id="robotics-title">Lions Robotics</h3>
+                <div class="project-date">Jun. 2024 – Jun. 2026</div>
+                <p class="project-summary"><em>Autonomous robot control, sensor-driven mechanisms, and a 56-member robotics organization.</em></p>
+                <ul class="technology-list" aria-label="Lions Robotics skills"><li>C++</li><li>PID control</li><li>Odometry</li><li>Monte Carlo localization</li></ul>
+                <button class="project-more" type="button" data-project-details aria-haspopup="dialog" aria-expanded="false"><span>View more</span><span class="project-more-icon" aria-hidden="true">+</span></button>
+                <div class="project-actions"><a class="project-link" href="https://github.com/sharonbasovich/828555Sworlds"><span>Robot source</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+                <template class="project-resume"><ul class="project-resume-bullets"><li>Programmed autonomous robot PID, odometry, and Monte Carlo localization in C++, placing 10th in Canada</li><li>Implemented concurrent C++ tasks using sensor feedback to coordinate scoring and motion mechanisms</li><li>Led a 56-member organization to six World Championship qualifications while managing a $140k annual budget</li></ul></template>
               </div>
             </article>
           </div>
@@ -774,7 +550,7 @@
         <footer>
           <span>Sharon Basovich</span>
           <nav class="footer-navigation" aria-label="Footer navigation">
-<a href="./immersive/resources.html" class="roll-link"
+<a href="./resources.html" class="roll-link"
             ><span class="roll-label button-label"
               ><span class="roll-original">Resources &amp; credits</span
               ><span class="roll-duplicate" aria-hidden="true"

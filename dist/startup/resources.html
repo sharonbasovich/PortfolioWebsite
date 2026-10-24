@@ -2,114 +2,199 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Resources & credits — Sharon Basovich</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eef1fa" />
+    <script>
+      (() => {
+        document.documentElement.dataset.theme = "light";
+        document.documentElement.style.colorScheme = "light";
+      })();
+    </script>
+    <title>Behind the motion — Sharon Basovich</title>
     <style>
+      @font-face {
+        font-family: "DM Sans";
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url("./experience/assets/dm-sans-latin.woff2") format("woff2");
+      }
+      :root {
+        color-scheme: light;
+        --paper: #eef1fa;
+        --ink: #090b11;
+        --muted: #576075;
+        --link: #2439dd;
+        --focus: #2d43ff;
+        background: var(--paper);
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --paper: #0d111a;
+        --ink: #edf2ff;
+        --muted: #a6b1c7;
+        --link: #8fa4ff;
+        --focus: #8fa4ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          18px/1.6 "DM Sans",
+          system-ui,
+          sans-serif;
+      }
       main {
-        max-width: 850px;
-        padding: 90px 25px;
+        max-width: 900px;
+        margin: auto;
+        padding: 64px 24px;
       }
       h1 {
-        font-size: 55px;
-        letter-spacing: -3px;
+        font-size: clamp(40px, 7vw, 72px);
+        line-height: 1.05;
+        letter-spacing: -0.06em;
       }
       h2 {
-        font-size: 27px;
-        letter-spacing: -1px;
-        margin: 35px 0 12px;
-      }
-      p,
-      li {
-        color: #bec8c9;
-      }
-      li {
-        margin: 12px 0;
+        font-size: 26px;
+        margin-top: 48px;
       }
       a {
-        text-decoration: underline;
+        color: var(--link);
         text-underline-offset: 4px;
       }
+      li {
+        margin: 18px 0;
+      }
+      :focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 5px;
+      }
+      p {
+        text-wrap: pretty;
+      }
+      small {
+        color: var(--muted);
+      }
     </style>
+    <script type="module">
+      import { installTheme } from "./experience/theme.js";
+      const theme = installTheme();
+      addEventListener("pagehide", (event) => {
+        if (!event.persisted) theme.dispose();
+      });
+    </script>
   </head>
   <body>
     <main>
-      <a href="./">← Back to the interactive portfolio</a>
-      <h1>Built on good foundations.</h1>
+      <a href="./.">← Back to the site</a>
+      <h1>Behind the motion.</h1>
       <p>
-        This version uses established rendering and animation libraries, with an
-        original composition and scroll sequence.
+        The mechanical sculpture combines watch movements and robotics, with
+        project scenes built from the same cobalt, chrome, and enamel palette.
+        The models are original procedural geometry built for this site. Pointer
+        hits use raycasting and local springs; the disassembly and scroll
+        transitions share the page's animation clock.
       </p>
-      <h2>Libraries</h2>
+      <h2>References</h2>
       <ul>
         <li>
-          <a href="https://threejs.org/">Three.js 0.180.0</a> — WebGL rendering,
-          buffer geometry, points, materials, and built-in torus-knot geometry.
-          <a href="vendor/three/LICENSE">MIT license</a>.
+          <a href="https://lusion.co/">Lusion</a> — the visual reference for a
+          generous editorial layout, glossy sculptural objects, and motion that
+          drives the page.
         </li>
         <li>
-          <a href="https://gsap.com/docs/v3/Plugins/ScrollTrigger/"
-            >GSAP, ScrollTrigger & SplitText 3.13.0</a
+          <a href="https://github.com/lusionltd/WebGL-Scroll-Sync"
+            >Lusion’s WebGL Scroll Sync</a
           >
-          — scroll-linked timelines, accessible masked typography, responsive
-          section choreography, and the animation ticker.
-          <a href="https://gsap.com/standard-license/">Standard license</a>.
-          Copyright notices are retained in the distributed files.
+          — a reference for DOM-aligned WebGL windows and the adapted,
+          velocity-responsive displacement shader.
+          <a href="./experience/licenses/Lusion-WebGL-Scroll-Sync.txt">MIT notice</a>.
         </li>
         <li>
-          <a href="https://github.com/darkroomengineering/lenis"
+          <a
+            href="https://github.com/14islands/r3f-scroll-rig/blob/master/src/components/ViewportScrollScene.tsx"
+            >14islands’ viewport scroll scenes</a
+          >
+          — the pattern for rendering neighboring art windows through one shared
+          canvas, with a camera and scissored viewport for each frame.
+          <a href="./experience/licenses/14islands-scroll-rig.txt">MIT notice</a>.
+        </li>
+        <li>
+          <a
+            href="https://github.com/codrops/MagneticButtons/blob/master/src/js/demo1/buttonCtrl.js"
+            >Codrops’ Magnetic Buttons</a
+          >
+          — damped hover response, layered label movement, and rolling text.
+          <a href="./experience/licenses/Codrops-MagneticButtons.txt">MIT notice</a>.
+        </li>
+        <li>
+          <a
+            href="https://github.com/darkroomengineering/lenis/blob/v1.3.11/README.md"
             >Lenis 1.3.11</a
           >
-          — smooth scrolling, using the documented GSAP ticker and ScrollTrigger
-          integration. <a href="vendor/lenis/LICENSE">MIT license</a>.
-        </li>
-      </ul>
-      <h2>Techniques & inspiration</h2>
-      <ul>
-        <li>
-          <a
-            href="https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/"
-            >Bruno Simon: Crafting Scroll Based Animations in Three.js</a
-          >
-          — the fixed WebGL canvas behind HTML, camera-group parallax,
-          section-based composition, and capped pixel ratio.
+          — smooth wheel scrolling synchronized with the animation clock.
+          <a href="./vendor/lenis/LICENSE">MIT notice</a>.
         </li>
         <li>
-          <a href="https://bruno-simon.com/">Bruno Simon's portfolio</a> —
-          inspiration for treating an engineering portfolio as an interactive
-          experience. No vehicle, models, or site assets were copied.
-        </li>
-        <li>
-          <a href="https://gsap.com/docs/v3/Plugins/ScrollTrigger/"
-            >ScrollTrigger documentation</a
-          >
-          — scrubbed timelines mapped to document scrolling.
-        </li>
-        <li>
-          <a
-            href="https://tympanus.net/codrops/2024/03/06/on-scroll-3d-stack-motion-effect/"
-            >Codrops: On-Scroll 3D Stack Motion Effect</a
-          >
-          — the pinned frame and depth transitions between readable project
-          cards.
-        </li>
-        <li>
-          <a href="https://github.com/greensock/gsap-skills"
-            >Official GSAP skills</a
+          <a href="https://threejs.org/docs/pages/MeshPhysicalMaterial.html"
+            >Three.js physical materials</a
           >
           and
-          <a href="https://github.com/LottieFiles/motion-design-skill"
-            >LottieFiles motion-design skill</a
+          <a
+            href="https://threejs.org/examples/webgl_materials_physical_clearcoat.html"
+            >clearcoat example</a
           >
-          — choreography, reading holds, responsive cleanup, and accessible
-          motion. The local review workflow uses GSDevTools; no development
-          controls are shipped.
+          — reflective cobalt, brushed metal, and enamel materials.
+        </li>
+        <li>
+          <a
+            href="https://tympanus.net/codrops/2021/10/27/creating-the-effect-of-transparent-glass-and-plastic-in-three-js/"
+            >Codrops: glass and plastic in Three.js</a
+          >
+          — material and lighting research for the scene.
         </li>
       </ul>
+      <h2>Libraries</h2>
       <p>
-        The 3D formations are abstract visual motifs, not plots of actual
-        company relationships or financial observations. Career and project
-        information comes from my resume.
+        <a href="https://threejs.org/">Three.js 0.180.0</a>, including its
+        RoomEnvironment and RoundedBoxGeometry, provides the renderer,
+        procedural lighting environment, geometry, and raycasting.
+        <a href="./vendor/three/LICENSE">MIT notice</a>.
+        <a href="https://gsap.com/">GSAP 3.13.0</a>, ScrollTrigger, and
+        SplitText handle the coordinated entrances, heading reveals, and project
+        sequence. Lenis 1.3.11 synchronizes smooth wheel input with that clock;
+        touch navigation retains native scrolling.
+      </p>
+      <h2>Typography and assets</h2>
+      <p>
+        The robot photograph comes from the
+        <a href="https://github.com/sharonbasovich/828555Sworlds">Lions Robotics Worlds repository</a>.
+        The <a href="https://github.com/sharonbasovich/skycell">SkyCell dashboard</a>
+        replays archived APEX / SondeHub tracker data. The Marble visual is an
+        explanatory workflow diagram, rather than a screenshot of private software.
+        The HPC visual shows concepts for two works in progress, not simulation output.
+      </p>
+      <p>
+        <a href="https://fonts.google.com/specimen/DM+Sans">DM Sans</a> is
+        served locally, including its variable weights, under the
+        <a href="./experience/licenses/DM-Sans-OFL.txt">SIL Open Font License 1.1</a>.
+        Copyright belongs to the DM Sans Project Authors. No external font
+        request is required to read or use the page.
+      </p>
+      <p>
+        <small
+          >The Lusion reference informed the visual direction; the public
+          examples above informed specific implementations. This is not a claim
+          about the libraries used by Lusion’s current site. No Lusion images,
+          models, or production assets are reused. The sculptures require no
+          downloaded 3D models, HDR photographs, or paid assets. Motion can be
+          paused; reduced-motion preferences and WebGL failure retain the
+          readable page, and small screens use a natural vertical layout.</small
+        >
       </p>
     </main>
   </body>

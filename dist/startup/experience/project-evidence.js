@@ -1,26 +1,23 @@
 const asset = (name) =>
   new URL(`./assets/project-evidence/${name}`, import.meta.url).href;
 
-const photographs = [
-  {
-    key: "robot",
-    file: "drawing-robot-prototype.webp",
-    width: 1417,
-    height: 667,
-    alt: "The Undercity team prototype: a React game interface on a laptop, the physical Blot drawing plotter, and vending hardware.",
-    title: "The working prototype",
-    detail: "Undercity · interface, plotter and hardware",
+const photographs = {
+  marble: {
+    key: "marble", file: "marble-workflows.svg", mobile: "marble-workflows-mobile.svg", width: 1280, height: 840,
+    alt: "Illustrative Marble Investments workflow diagram: a React relationship graph, news extraction, and a Python stock pair screener; not a production screenshot.",
+    title: "Marble Investments", detail: "Research workflows · illustrative diagram",
   },
-  {
-    key: "skycell",
-    file: "skycell-replay.jpg",
-    width: 1280,
-    height: 1500,
-    alt: "SkyCell's archived flight replay dashboard, showing playback controls, telemetry charts and the recorded APEX / SondeHub flight trajectory.",
-    title: "Replay the flight",
-    detail: "Actual UI · archived APEX / SondeHub tracker data",
+  skycell: {
+    key: "skycell", file: "skycell-replay.jpg", width: 1280, height: 1500,
+    alt: "SkyCell's archived flight replay dashboard, showing telemetry charts and the recorded APEX / SondeHub trajectory.",
+    title: "SkyCell", detail: "Archived APEX / SondeHub tracker data",
   },
-];
+  robotics: {
+    key: "robotics", file: "lions-worlds-robot.jpg", width: 1605, height: 1906,
+    alt: "The Lions Robotics VEX V5 robot on the competition field, from Sharon's Worlds software repository.",
+    title: "Lions Robotics", detail: "Actual VEX V5 robot · Worlds repository",
+  },
+};
 
 const clamp = (value) => Math.min(1, Math.max(0, value));
 const ease = (value) => value * value * (3 - 2 * value);
@@ -50,62 +47,19 @@ function makePhoto(specification) {
   image.height = specification.height;
   image.loading = "lazy";
   image.decoding = "async";
-  media.append(image);
+  if (specification.mobile) {
+    const picture = document.createElement("picture");
+    const source = document.createElement("source");
+    source.media = "(max-width: 650px)";
+    source.srcset = asset(specification.mobile);
+    source.width = 540;
+    source.height = 670;
+    picture.append(source, image);
+    media.append(picture);
+  } else media.append(image);
   figure.append(
     media,
     makeCaption(specification.title, specification.detail),
-  );
-  return figure;
-}
-
-function makeWorkflow() {
-  const figure = document.createElement("figure");
-  figure.className = "project-evidence project-evidence--marble";
-  const content = document.createElement("div");
-  content.className = "project-evidence-workflow";
-  // The two lanes intentionally have no connecting arrow: the research graph
-  // and the news extraction pipeline are separately confirmed workflows.
-  content.innerHTML = `
-    <p class="evidence-workflow-label">Workflow diagram</p>
-    <div class="evidence-workflow-lanes">
-      <div class="evidence-workflow-lane evidence-workflow-lane--graph">
-        <p class="evidence-lane-title">Relationship research</p>
-        <ol class="evidence-workflow-steps">
-          <li>Manually identified relationships</li>
-          <li>React relationship graph</li>
-        </ol>
-        <svg class="evidence-relationship-graph" viewBox="0 0 248 178" fill="none" aria-hidden="true">
-          <g stroke="currentColor" stroke-width="1.2" opacity=".58">
-            <path d="M29 45 91 23 146 60 218 34M29 45 73 97 146 60 186 121 218 34M73 97 40 151 123 146 186 121 221 161M91 23 73 97 123 146 146 60M186 121 221 161" />
-          </g>
-          <g fill="#111b2c" stroke="currentColor" stroke-width="1.5">
-            <circle cx="29" cy="45" r="6" /><circle cx="91" cy="23" r="5" />
-            <circle cx="146" cy="60" r="8" /><circle cx="218" cy="34" r="5" />
-            <circle cx="73" cy="97" r="8" /><circle cx="40" cy="151" r="5" />
-            <circle cx="123" cy="146" r="6" /><circle cx="186" cy="121" r="7" />
-            <circle cx="221" cy="161" r="5" />
-          </g>
-          <g fill="currentColor">
-            <circle cx="146" cy="60" r="3" /><circle cx="73" cy="97" r="3" />
-          </g>
-        </svg>
-        <p class="evidence-workflow-scale">≈500 companies<br />1,500+ relationships</p>
-      </div>
-      <div class="evidence-workflow-lane evidence-workflow-lane--news">
-        <p class="evidence-lane-title">Financial news</p>
-        <ol class="evidence-workflow-steps evidence-workflow-steps--pipeline">
-          <li>News feed</li>
-          <li>Deduplication</li>
-          <li>LLM extraction</li>
-          <li>Structured event fields</li>
-        </ol>
-        <p class="evidence-workflow-fields">Relevance · sentiment<br />Affected companies · event category</p>
-      </div>
-    </div>
-  `;
-  figure.append(
-    content,
-    makeCaption("Marble research workflows", "Diagram · illustrative topology"),
   );
   return figure;
 }
@@ -163,8 +117,9 @@ export function installProjectEvidence(panels) {
     if (!host || index < 0 || index > 3 || !Number.isInteger(index)) continue;
     // A repeated installation must not stack figures or own someone else's DOM.
     if (host.querySelector(".project-evidence")) continue;
-    const figure = index === 3 ? makeHPCOverview() :
-      index === 2 ? makeWorkflow() : makePhoto(photographs[index]);
+    const key = panel.dataset.projectKey;
+    if (key !== "hpc" && !photographs[key]) continue;
+    const figure = key === "hpc" ? makeHPCOverview() : makePhoto(photographs[key]);
     const wasMarked = host.classList.contains("has-project-evidence");
     host.classList.add("has-project-evidence");
     host.append(figure);

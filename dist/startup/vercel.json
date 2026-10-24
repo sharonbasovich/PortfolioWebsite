@@ -1,7 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "node build-homepage.mjs",
+  "buildCommand": "",
   "installCommand": "",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "redirects": [
+    { "source": "/immersive", "destination": "/", "permanent": true },
+    { "source": "/immersive/", "destination": "/", "permanent": true },
+    { "source": "/immersive/index.html", "destination": "/", "permanent": true },
+    { "source": "/immersive/resources.html", "destination": "/resources.html", "permanent": true },
+    { "source": "/immersive/:path*", "destination": "/experience/:path*", "permanent": true }
+  ]
 }

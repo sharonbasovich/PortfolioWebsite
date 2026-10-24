@@ -1,43 +1,16 @@
 import Lenis from "../vendor/lenis/lenis.js";
 import { createWorld } from "./world.js?v=20261023-header";
 import { createPointerRibbon } from "./pointer-ribbon.js";
-import { installProjectEvidence } from "./project-evidence.js?v=20261023-hpc";
+import { installProjectDetails } from "./project-details.js?v=20261023-projects";
+import { installProjectEvidence } from "./project-evidence.js?v=20261023-projects";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
-import { mountProjectMotion as mountTypeMotion } from "./projects-type.js";
-import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261023-visible";
-import { mountProjectMotion as mountDepthMotion } from "./projects-depth.js";
+import { mountProjectMotion as mountPhotoMotion } from "./projects-photo.js?v=20261023-projects";
 
 const theme = installTheme();
-const requestedProjectMotion = new URLSearchParams(location.search).get("projects-motion");
-const projectMotions = new Map([
-  ["1", mountTypeMotion], ["2", mountPhotoMotion], ["3", mountDepthMotion],
-]);
-const projectMotionChoice = projectMotions.has(requestedProjectMotion) ? requestedProjectMotion : "2";
-const projectMotionMount = projectMotions.get(projectMotionChoice);
 const projectHeading = document.querySelector(".projects-heading h2");
 const projectStage = document.querySelector(".projects-heading");
 let projectMotion;
-projectStage.dataset.motionPreview = projectMotionChoice;
-if (projectMotions.has(requestedProjectMotion)) {
-  const comparison = document.createElement("nav");
-  comparison.className = "motion-comparison";
-  comparison.setAttribute("aria-label", "Project title previews");
-  const label = document.createElement("span");
-  label.textContent = "Project title previews";
-  comparison.append(label);
-  ["Scroll-built type", "Photo through type", "Depth zoom"].forEach((name, index) => {
-    const link = document.createElement("a");
-    const url = new URL(location.href);
-    url.searchParams.set("projects-motion", String(index + 1));
-    url.hash = "projects";
-    link.href = url.href;
-    link.textContent = `${index + 1}. ${name}`;
-    if (projectMotionChoice === String(index + 1)) link.setAttribute("aria-current", "page");
-    comparison.append(link);
-  });
-  projectStage.before(comparison);
-}
 
 const gsap = window.gsap,
   ScrollTrigger = window.ScrollTrigger,
@@ -186,6 +159,11 @@ let viewport = {
   compact: compactQuery.matches,
 };
 const diagnostics = { choreographyBuilds: 0, scrollCorrections: 0 };
+const projectDetails = installProjectDetails({
+  panels, gsap,
+  onOpen: () => lenis?.stop(),
+  onClose: () => { if (!paused) lenis?.start(); },
+});
 let impactInteraction = false;
 const impactInputs = ["wheel", "touchmove", "keydown"];
 function markImpactInteraction(event) {
@@ -216,6 +194,7 @@ function startScroller() {
     ScrollTrigger?.update();
     lastInput = performance.now();
   });
+  if (root.classList.contains("project-details-open")) lenis.stop();
 }
 function scrollToPosition(top, immediate = false) {
   diagnostics.scrollCorrections++;
@@ -603,7 +582,7 @@ function tick(time, deltaMs) {
 function buildChoreography(entrance = false) {
   diagnostics.choreographyBuilds++;
   const introBounds = projectStage.getBoundingClientRect();
-  const preserveProjectIntro = projectMotionMount && !entrance &&
+  const preserveProjectIntro = mountPhotoMotion && !entrance &&
     finePointer.matches && introBounds.top < innerHeight * 0.85 &&
     introBounds.bottom > innerHeight * 0.35;
   const preservePanel =
@@ -681,7 +660,7 @@ function buildChoreography(entrance = false) {
           const title = copy.querySelector("h3");
           const details = [
             ...copy.querySelectorAll(
-              ":scope > p, :scope > .hpc-subprojects, :scope > .technology-list, :scope > .project-actions, :scope > .project-link",
+              ":scope > p, :scope > .hpc-subprojects, :scope > .project-date, :scope > .project-more, :scope > .technology-list, :scope > .project-actions, :scope > .project-link",
             ),
           ];
           const sequence = gsap.timeline();
@@ -827,7 +806,7 @@ function buildChoreography(entrance = false) {
             0.2,
           );
       }
-      if (projectMotionMount) projectMotion = projectMotionMount({
+      if (mountPhotoMotion) projectMotion = mountPhotoMotion({
         heading: projectHeading, stage: projectStage, firstProject: panels[0],
         gsap, ScrollTrigger, SplitText,
         enabled: desktopQuery.matches,
@@ -840,7 +819,7 @@ function buildChoreography(entrance = false) {
       for (const heading of document.querySelectorAll(
         ".work-heading h2, .projects-heading h2, .contact h2",
       )) {
-        if (!finePointer.matches || (heading === projectHeading && projectMotionMount && desktopQuery.matches)) continue;
+        if (!finePointer.matches || (heading === projectHeading && mountPhotoMotion && desktopQuery.matches)) continue;
         SplitText?.create(heading, {
           type: "lines",
           mask: "lines",
@@ -1211,6 +1190,7 @@ window.addEventListener("pagehide", (event) => {
   disposed = true;
   clearTimeout(resizeTimer);
   for (const type of impactInputs) window.removeEventListener(type, markImpactInteraction);
+  projectDetails.dispose();
   lenis?.destroy();
   context?.revert();
   projectMotion?.dispose();

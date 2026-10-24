@@ -2,7 +2,22 @@
 
 Verified 22 October 2026. These are unmodified existing project assets, not generated imagery, mock screenshots or Lusion assets. They are being reused for Sharon's own portfolio under the user's authorization to showcase these projects. No public-reuse licence is invented: the two public project repositories currently expose no root LICENSE file. Required source credits are retained below.
 
-## drawing-robot-prototype.png
+## Current Lions Robotics photograph
+
+`lions-worlds-robot.jpg` is the actual 1605 × 1906 robot photograph from
+https://raw.githubusercontent.com/sharonbasovich/828555Sworlds/main/robot.jpg,
+linked by Sharon's public Worlds repository README. It shows the physical VEX V5
+robot on the field. It replaces the unrelated drawing-robot project image.
+The image is copied unmodified. The source repository distinguishes experimental
+MCL from the odometry/IMU competition stack; no claim of Worlds MCL deployment is
+added. Current project bullets copy the approved résumé verbatim.
+
+`marble-workflows.svg` is a code-native explanatory diagram based on the approved
+résumé, covering the research graph, news extraction, and Python pair screener.
+It is labeled illustrative and is not a screenshot or measured output. The
+project-title photo-through-type effect now follows this first project asset.
+
+## Historical drawing-robot source (not shipped)
 
 - **Kind:** actual hackathon prototype photograph.
 - **Dimensions / bytes:** 1417 × 667; 1,602,687 bytes.

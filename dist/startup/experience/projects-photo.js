@@ -1,8 +1,4 @@
 const SVG = "http://www.w3.org/2000/svg";
-const photograph = new URL(
-  "./assets/project-evidence/drawing-robot-prototype.webp",
-  import.meta.url,
-).href;
 let sequence = 0;
 
 const clamp = (value) => Math.min(1, Math.max(0, value));
@@ -27,8 +23,7 @@ function rectangle(element, bounds, radius = 0) {
     element.setAttribute("rx", radius.toFixed(2));
 }
 
-function fittedPhoto(bounds) {
-  const ratio = 1417 / 667;
+function fittedPhoto(bounds, ratio) {
   const width = Math.min(bounds.width, bounds.height * ratio);
   const height = width / ratio;
   return {
@@ -78,6 +73,9 @@ export function mountProjectMotion({
   // Handoff requires a real destination photograph, rather than inventing a
   // duplicate frame or leaving a decorative photograph over unrelated copy.
   if (!frame || !gallery || !original) return noop;
+  const photograph = original.currentSrc || original.src;
+  const ratio = (Number(original.getAttribute("width")) || original.naturalWidth || 1280) /
+    (Number(original.getAttribute("height")) || original.naturalHeight || 840);
 
   const oldOpacity = original.style.getPropertyValue("opacity");
   const oldPriority = original.style.getPropertyPriority("opacity");
@@ -152,7 +150,7 @@ export function mountProjectMotion({
       ? gallery.parentElement
       : gallery;
     const anchorBox = anchor.getBoundingClientRect();
-    const contained = fittedPhoto(photoBox);
+    const contained = fittedPhoto(photoBox, ratio);
     const destination = {
       x: galleryBox.x - box.x + panel.offsetLeft + contained.x - panelBox.x,
       // Sticky travel is already reserved in the stage height. The photo docks

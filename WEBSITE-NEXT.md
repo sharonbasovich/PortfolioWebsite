@@ -1,3 +1,34 @@
+# Single startup document and route consolidation — 23 October 2026
+
+The editable homepage is now dist/startup/index.html. There is no separate
+/immersive/ document: modules/styles/assets were moved to experience/, which
+contains no HTML. Removed build-homepage.mjs and both Vercel build commands.
+Static output directories remain unchanged. The one resources.html page now
+contains the current motion references, with corrected font/module/license links.
+Vercel redirects former immersive pages to root/resources and legacy assets to
+experience/. The local motion-lab server mirrors those redirects for verification.
+Equivalent nested /startup/immersive rules preserve bookmarks in big-tech output.
+Edit root directly; do not regenerate a duplicate or run the Next.js build.
+See docs/startup-homepage.md for source mapping and review commands.
+
+Branch codex/consolidate-resume-projects; prior production fdd4ef7. Project order
+now follows the startup résumé: Marble Investments, UWaterloo High Performance
+Computing (HPC menu), SkyCell, Lions Robotics. Exact résumé names and three active
+bullets per project; italic short summaries, skills, links, and View more controls.
+Drawing robot removed and replaced with real Lions robot imagery/source. The
+photo-through-type heading now follows the first Marble diagram. Project media
+uses stable keys after reordering. One bounded native dialog avoids pinned-layout
+resize. Three localhost-only GSAP reveal alternatives are reviewable through
+details-motion=1/2/3; default disclosure remains static pending Sharon's selection
+as required by motion-workflow-picker. Canonical resumes/PDFs remain unchanged.
+108 primary browser checks and 28 final evidence/resize checks pass. In-app
+desktop interactions and multi-size touch screenshots inspected. No unexpected
+asset/runtime/shader errors. Independent content and integration review clear.
+Sharon requested all three reveal previews and will decide afterward; keep them
+available locally and do not select a preferred animation for production.
+
+--- Earlier checkpoint ---
+
 # Startup UWaterloo HPC projects and approved resume — 23 October 2026
 
 Branch codex/startup-uwhpc-projects; prior production/rollback 637db9e.

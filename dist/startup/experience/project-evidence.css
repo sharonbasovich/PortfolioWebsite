@@ -1,0 +1,104 @@
+/* The gallery track is transformed by its existing timeline. Raise that stacking
+   context as well as its figures above the fixed WebGL surface at z-index: 2. */
+.project-panels.has-project-evidence {
+  z-index: 3;
+}
+
+.project-window.has-project-evidence {
+  overflow: hidden;
+}
+
+.project-evidence {
+  --evidence-right: 0%;
+  --evidence-shift: 0px;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #dce5ff30;
+  border-radius: inherit;
+  color: #eff3ff;
+  background: #101724;
+  box-shadow: inset 0 0 0 1px #05091480;
+  clip-path: inset(0 var(--evidence-right) 0 0 round 24px);
+}
+
+.project-evidence-media {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  place-items: center;
+  padding: 18px;
+  overflow: hidden;
+  background: #0c121e;
+}
+
+.project-evidence-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  object-position: center;
+  transform: translate3d(var(--evidence-shift), 0, 0);
+}
+
+.project-evidence--robot .project-evidence-media {
+  padding: 18px 0;
+}
+
+.project-evidence--skycell .project-evidence-media {
+  padding: 10px;
+}
+
+.project-evidence-caption {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 5px;
+  padding: 17px 20px 18px;
+  border-top: 1px solid #dce5ff20;
+  background: #101724;
+  line-height: 1.4;
+}
+
+.project-evidence-caption-title {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.project-evidence-caption-detail {
+  color: #b4bed4;
+  font-size: 11px;
+}
+
+.project-evidence-media picture { display: contents; }
+@media (max-width: 1100px) {
+  .project-evidence, .project-evidence-media img { clip-path: none; transform: none; }
+}
+@media (max-width: 650px) {
+  .project-window.has-project-evidence { min-height: 390px; height: 56svh; max-height: 560px; }
+  .project-evidence-caption { padding: 14px 16px 15px; }
+  .project-evidence-caption-title { font-size: 12px; }
+  .project-evidence-caption-detail { font-size: 10px; }
+}
+/* Static diagrams size from their content on native layouts, independent of
+   their gallery position; no old positional rules or internal clipping. */
+.project-gallery:not(.is-horizontal) .project-panel--marble .project-window.has-project-evidence {
+  height: auto; min-height: 0; max-height: none;
+}
+.project-gallery:not(.is-horizontal) .project-evidence--marble { position: relative; }
+.project-gallery:not(.is-horizontal) .project-evidence--marble .project-evidence-media { display: block; }
+.project-gallery:not(.is-horizontal) .project-evidence--marble img { height: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .project-evidence { clip-path: none; }
+  .project-evidence-media img { transform: none; }
+}

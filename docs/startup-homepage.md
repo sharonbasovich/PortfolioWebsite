@@ -1,22 +1,28 @@
 # Startup homepage and audience-specific resume downloads
 
-The accepted immersive site is the homepage at https://basovichsharon.vercel.app/.
-The original /immersive/ address remains functional and shares the root canonical
-URL. The clean big-tech website remains https://sharonbasovich.vercel.app/.
+The accepted startup site is the homepage at https://basovichsharon.vercel.app/.
+There is one document and one experience. The former /immersive/ page permanently
+redirects to the root, preserving existing bookmarks. The clean big-tech website
+remains https://sharonbasovich.vercel.app/.
 
-## Editable source and static generation
+## Single editable source and static hosting
 
-Edit dist/startup/immersive/index.html. The dependency-free Node script
-`dist/startup/build-homepage.mjs` generates dist/startup/index.html from that
-source, rebasing local HTML assets and the Three.js import map. It preserves
-fragment links and SVG mask references, so navigation stays on the root page.
-CSS and module-relative media continue to use the original immersive assets.
-Do not hand-maintain a second homepage or run the repository's Next.js build.
+Edit `dist/startup/index.html` directly. Modules, styles, project assets, fonts,
+and license notices are under `dist/startup/experience/`; vendor libraries remain
+under `dist/startup/vendor/`. The experience directory has no HTML page. Homepage
+fragments and SVG masks remain local to the root document. Do not restore a
+duplicate page or run the repository's Next.js build, which overwrites dist.
 
-Both Vercel configurations run the generator before serving their static output.
-For local static previews, run `node dist/startup/build-homepage.mjs` after source
-changes. The script resolves its directory through import.meta.url, so it also
-works as `node build-homepage.mjs` from dist/startup. Its output is deterministic.
+The old `build-homepage.mjs` generator has been removed. Both Vercel configurations
+serve static output with an empty build command. The startup project serves
+`dist/startup`; the big-tech project continues to serve `dist`. Start local review
+with `python tools/motion-lab.py` and open `http://127.0.0.1:8789/`. Its optional
+review fixtures remain local and are not shipped as page assets.
+
+The sole credits page is `/resources.html`, with valid font, module, and license
+links. Legacy `/immersive/resources.html` redirects there; former asset URLs
+redirect to `/experience/:path*`. Equivalent `/startup/immersive` rules in the
+big-tech output preserve old nested bookmarks without changing its homepage.
 
 ## Resume mapping
 
@@ -30,9 +36,33 @@ The canonical LaTeX sources and reviewed PDFs live outside this repository and
 are maintained by the resume workflow; do not edit them during website sync.
 The current win count is 11 on both sites. Historical dated notes are unchanged.
 
+## Resume-matched projects
+
+The cards and their selection menu follow the approved startup résumé order:
+Marble Investments, UWaterloo High Performance Computing, SkyCell, Lions Robotics.
+Only the HPC menu label is abbreviated. Each front has the exact project title,
+a short italic summary, skills, source/demo links, and a View more control.
+The templates contain the three active résumé bullets verbatim, with LaTeX
+formatting converted to ordinary Unicode text. The unrelated drawing robot and
+its photographs are removed. Lions Robotics uses the actual robot photograph and
+source repository at https://github.com/sharonbasovich/828555Sworlds.
+
+One native dialog displays the matching résumé bullets with keyboard focus,
+Escape/backdrop dismissal, focus restoration, bounded small-screen scrolling,
+and page-scroll locking. Opening details does not resize the gallery. Production
+disclosure is static until a motion treatment is selected. Three complete GSAP
+comparisons run only on localhost via `?details-motion=1`, `2`, or `3`: card
+expansion, side sheet, and iris reveal. All share the same content and semantics;
+reduced motion and pause use an immediate state. No new renderer or ticker.
+
+The accepted photo-through-type project heading follows the first project's
+Marble workflow SVG into its actual gallery frame, rather than retaining the
+removed drawing-robot image. Evidence selection is keyed by project, independent
+of carousel position.
+
 ## Startup HPC project group
 
-The fourth project panel groups two in-progress UWaterloo High Performance
+The second project panel groups two in-progress UWaterloo High Performance
 Computing projects. It records the Core Developer role in Waterloo, ON, and the
 University of Waterloo design team's Citadel & Jane Street sponsorship.
 
@@ -44,7 +74,7 @@ University of Waterloo design team's Citadel & Jane Street sponsorship.
 
 Both links were checked against the public team repositories. The accompanying
 diagrams are explicitly conceptual; they do not represent completed work,
-simulation output, or measured performance. Existing project content is retained.
+simulation output, or measured performance.
 The gallery derives its stops, transfer sequence, and progress width from the
 panel count. Native mobile layouts remain content-sized with no gallery pin.
 
@@ -55,6 +85,21 @@ Both startup download names contain those exact bytes. The big-tech PDF remains
 The canonical resume sources and PDFs were read and copied, not edited.
 
 ## Verification
+
+Consolidation/project verification: 108 primary browser checks plus 28 final
+evidence/resize checks pass. Coverage includes 1280x720 and 1100x650 desktops;
+320x568, 393x851, 430x932, 768x1024, and 851x393 touch layouts; exact titles,
+order and all twelve résumé bullets; all three changing animation treatments;
+interrupt/close, focus restoration/trap, background scroll lock through resize,
+source links, pause/reduced-motion states, and unclipped image/caption geometry.
+The in-app browser was used for desktop interaction review; the separate test
+browser supplied device sizes unavailable in its controls. Screenshots were
+inspected. Five legacy redirect cases and both pages' local references pass.
+Evidence: workspace `tmp/immersive-oct22-qa/project-cards-check.json`,
+`project-fit-final.json`, `project-card-*.png`, `project-details-*.png`.
+The three new treatments remain comparison previews pending Sharon's choice.
+
+Earlier verification history:
 
 Sixteen local browser checks passed across desktop and touch layouts: root URL,
 canonical metadata, font/module/CSS loading, SVG mask, navigation, resource return
