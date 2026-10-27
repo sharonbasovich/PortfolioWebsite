@@ -1,0 +1,47 @@
+/* ECHO liquid strip on the shared page-scroll clock; no nested scroll target. */
+.project-gallery.echo-gallery {height:100svh;min-height:0;overflow:clip;--project-copy-height:204px;}
+.echo-gallery .project-panels {position:relative;display:block;width:100%;height:100%;transform:none;}
+.echo-gallery .project-panel {position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;pointer-events:none;}
+.echo-gallery .project-window {visibility:hidden;}
+.echo-gallery .project-copy {position:absolute;left:var(--gutter);right:var(--gutter);bottom:26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 5vw;max-width:none;pointer-events:auto;}
+.echo-gallery .project-index {grid-column:1/-1;margin:0;}
+.echo-gallery .project-copy h3 {grid-column:1;grid-row:2/5;margin:0;font-size:clamp(28px,3.9vw,60px);line-height:1.05;}
+.echo-gallery .project-summary {grid-column:2;grid-row:2;margin:0;max-width:640px;font-size:clamp(13px,1.1vw,17px);line-height:1.5;}
+.echo-gallery .technology-list {grid-column:2;grid-row:3;margin:0;gap:8px 14px;}
+.echo-gallery .project-actions {grid-column:2;grid-row:4;margin:0;gap:20px;flex-wrap:wrap;}
+.echo-gallery .project-actions .project-more {margin:0;min-width:130px;max-width:145px;}
+.echo-gallery .project-status {position:static;grid-column:1;grid-row:3;align-self:start;margin:0;font-size:11px;}
+.echo-project-strip {position:absolute;top:150px;left:0;right:0;height:calc(100% - var(--project-copy-height) - 174px);min-height:0;z-index:3;}
+.echo-project-canvas,.echo-project-fallback {position:absolute;inset:0;width:100%;height:100%;overflow:hidden;}
+.echo-project-canvas {pointer-events:none;}
+.echo-project-canvas canvas {display:block;width:100%;height:100%;}
+.echo-webgl .echo-project-fallback {visibility:hidden;}
+.echo-fallback-card {position:absolute;left:50%;top:50%;height:88%;width:min(72vw,calc(var(--strip-height,200px)*.88*var(--image-aspect,1.5)));border-radius:18px;overflow:hidden;}
+.echo-fallback-card img {width:100%;height:100%;display:block;box-sizing:border-box;}
+.echo-gallery .project-switcher {height:60px;gap:clamp(16px,1.8vw,30px);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(6px);transition:opacity 180ms ease-out,transform 180ms ease-out,visibility 180ms;}
+.echo-gallery.gallery-engaged .project-switcher {opacity:1;visibility:visible;pointer-events:auto;transform:none;}
+.echo-gallery .project-switcher button {font-size:clamp(17.5px,1.475vw,21px);min-height:50px;gap:10px;}
+.echo-gallery .project-switcher button span {font-size:13px;}
+.echo-gallery .project-progress {height:8px;flex-basis:clamp(180px,18vw,260px);width:clamp(180px,18vw,260px);}
+@media (max-height:650px) {
+ .echo-gallery {--project-copy-height:166px;}
+ .echo-gallery .project-copy {bottom:18px;gap:6px 4vw;}
+ .echo-gallery .project-copy h3 {font-size:clamp(26px,3.7vw,42px);}
+ .echo-gallery .project-summary {font-size:13px;line-height:1.4;}
+ .echo-gallery .technology-list {font-size:11px;}
+ .echo-gallery .project-actions {gap:14px;font-size:13px;}
+ .echo-project-strip {top:128px;height:calc(100% - var(--project-copy-height) - 142px);}
+ .echo-gallery .project-switcher {top:78px;}
+}
+@media (max-width:1000px) {
+ .echo-gallery .project-switcher {display:grid;grid-template-columns:repeat(4,max-content);justify-content:space-between;gap:0 8px;top:80px;height:68px;}
+ .echo-gallery .project-switcher button {font-size:14px;gap:6px;min-height:36px;}
+ .echo-gallery .project-switcher button span {font-size:10px;}
+ .echo-gallery .project-switcher button::after {width:5px;height:5px;}
+ .echo-gallery .project-progress {grid-column:1/-1;width:100%;height:5px;margin:0;}
+ .echo-project-strip {top:150px;height:calc(100% - var(--project-copy-height) - 162px);}
+ .echo-gallery .project-copy {gap:6px 3vw;grid-template-columns:.6fr 1.4fr;}
+}
+.world-unavailable .project-window.has-project-evidence {display:block;}
+.world-unavailable .echo-gallery .project-panel {max-width:none;margin:0;}
+@media print {.echo-project-strip {display:none;}}

@@ -35,7 +35,7 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
   if (!heading || !stage || !gsap || !ScrollTrigger || !plugin || !target?.image ||
       !target?.gallery || typeof target.getBounds !== "function" ||
       stage.classList.contains("study-glyph-stage") ||
-      !matchMedia("(min-width: 1100px) and (min-height: 650px) and (hover: hover) and (pointer: fine)").matches ||
+      !matchMedia("(min-width: 760px) and (min-height: 480px) and (hover: hover) and (pointer: fine)").matches ||
       matchMedia("(prefers-reduced-motion: reduce)").matches ||
       heading.textContent.replace(/\s+/g, " ").trim() !== "My projects") return noop;
 
@@ -192,7 +192,7 @@ export function mountGlyphPhoto({ heading, stage, gsap, ScrollTrigger, target } 
   if (!measure()) { dispose(); return noop; }
   paint(0);
   timeline = gsap.timeline({ scrollTrigger: {
-    id: "study-glyph-reveal", trigger: stage, start: "top 100px", end: "bottom 20%",
+    id: "study-glyph-reveal", trigger: stage, start: "top 84px", end: "bottom 20%",
     scrub: true, invalidateOnRefresh: true,
   }});
   timeline.to(clock, { progress: 1, duration: 1, ease: "none", onUpdate: () => paint(clock.progress) });

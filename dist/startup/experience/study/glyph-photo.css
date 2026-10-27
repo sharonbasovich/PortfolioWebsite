@@ -4,7 +4,7 @@
   position: relative;
   z-index: 4;
   display: block;
-  --photo-viewport-height: min(780px, calc(100svh - 160px));
+  --photo-viewport-height: min(780px, calc(100svh - 140px));
   --photo-hold-distance: clamp(360px, 70svh, 760px);
   height: calc(var(--photo-viewport-height) + var(--photo-hold-distance));
   min-height: 0;
@@ -14,7 +14,7 @@
 .study-glyph-source { position: absolute; opacity: 0; }
 .study-glyph-visual {
   position: sticky;
-  top: 100px;
+  top: 84px;
   z-index: 1;
   display: block;
   width: 100%;
@@ -37,7 +37,7 @@
 .reduced-motion .study-glyph-source { position: static; opacity: 1 !important; }
 .motion-paused .study-glyph-stage,
 .reduced-motion .study-glyph-stage { height: auto; min-height: 0; padding-bottom: 45px; }
-@media (max-width: 1099px), (max-height: 649px), (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+@media (max-width: 759px), (max-height: 479px), (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
   .projects-heading.study-glyph-stage { height: auto; min-height: 0; padding-bottom: 45px; }
   .study-glyph-visual { display: none; }
   .study-glyph-source { position: static; opacity: 1 !important; }

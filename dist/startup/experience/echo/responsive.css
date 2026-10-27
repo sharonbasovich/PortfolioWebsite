@@ -1,0 +1,6 @@
+/* Join the trace to the actual sculpture edge, including hero footer/padding. */
+.flow-bridge {margin-top:calc(-1 * var(--route-join-gap,0px));}
+@media (min-width:760px) and (min-height:480px) and (hover:hover) and (pointer:fine) {
+ .projects-heading.study-glyph-stage {display:block;}
+ .world-unavailable .projects-heading.study-glyph-stage {display:block;}
+}

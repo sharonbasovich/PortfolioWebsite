@@ -1,0 +1,191 @@
+/* Source work records remain the native, reduced-motion and paused layout.
+   This class is mounted only when two compact faces fit without inner scroll. */
+.work.internships-active {
+  position: relative;
+  height: 100svh;
+  min-height: 480px;
+  padding: 0 var(--gutter);
+  overflow: clip;
+}
+.work.internships-active .work-layout {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.work.internships-active .work-story { position: static; }
+.work.internships-active .work-record { display: none; }
+.work.internships-active .work-heading {
+  position: absolute;
+  z-index: 5;
+  top: 96px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0;
+  background: transparent;
+}
+.work.internships-active .work-heading h2 {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1.1;
+}
+.work.internships-active .internship-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(18px, 2.3vw, 34px);
+  min-width: 0;
+  height: 52px;
+}
+.work.internships-active .internship-switcher button {
+  min-height: 44px;
+  padding: 0;
+  color: var(--muted);
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: clamp(16px, 1.5vw, 21px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 160ms ease-out;
+}
+.work.internships-active .internship-switcher button[aria-current],
+.work.internships-active .internship-switcher button:hover { color: var(--cobalt); }
+.work.internships-active .internship-switcher button:focus-visible,
+.work.internships-active .internship-more:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+.work.internships-active .internship-progress {
+  position: relative;
+  display: block;
+  width: clamp(72px, 10vw, 150px);
+  height: 6px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--line);
+}
+.work.internships-active .internship-progress i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 50%;
+  border-radius: inherit;
+  background: var(--cobalt);
+}
+.work.internships-active .internship-art-slot,
+.work.internships-active .internship-cards {
+  position: absolute;
+  top: 174px;
+  bottom: 45px;
+  width: calc((100% - clamp(32px, 6vw, 100px)) / 2);
+  min-width: 0;
+}
+.work.internships-active .internship-art-slot { left: 0; pointer-events: none; }
+.work.internships-active .internship-cards { right: 0; z-index: 3; }
+.work.internships-active .work-window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-height: none;
+  min-height: 0;
+  margin: 0;
+  transform-origin: center;
+  will-change: transform;
+}
+.work.internships-active .internship-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  will-change: transform, opacity;
+}
+.work.internships-active .internship-index {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 18px;
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.work.internships-active .internship-index span:last-child { max-width: 75%; text-align: right; }
+.work.internships-active .internship-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(42px, 5vw, 76px);
+  line-height: 1;
+  letter-spacing: -.055em;
+}
+.work.internships-active .internship-role {
+  margin: 10px 0 16px;
+  color: var(--cobalt);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.work.internships-active .internship-summary {
+  max-width: 560px;
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: clamp(14px, 1.25vw, 17px);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.work.internships-active .internship-card .work-metrics {
+  flex-shrink: 0;
+  gap: 10px;
+  margin: 0;
+  padding: 18px 0;
+}
+.work.internships-active .internship-card .work-metrics dd { font-size: clamp(25px, 2.4vw, 37px); }
+.work.internships-active .internship-card .work-metrics dt { font-size: 10px; }
+.work.internships-active .internship-card .technology-list { margin: 18px 0 0; gap: 6px 16px; }
+.work.internships-active .internship-actions { margin: 14px 0 0; }
+.work.internships-active .internship-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.work.internships-active .internship-more span { transition: transform 180ms ease-out; }
+.work.internships-active .internship-more:hover span { transform: translate(2px, -2px); }
+@media (max-height: 680px) {
+  .work.internships-active .work-heading { top: 84px; }
+  .work.internships-active .work-heading h2 { font-size: clamp(28px, 3.2vw, 38px); }
+  .work.internships-active .internship-art-slot,
+  .work.internships-active .internship-cards { top: 143px; bottom: 24px; }
+  .work.internships-active .internship-index { margin-bottom: 10px; font-size: 10px; }
+  .work.internships-active .internship-card h3 { font-size: clamp(34px, 4vw, 48px); }
+  .work.internships-active .internship-role { margin: 7px 0 10px; font-size: 12px; }
+  .work.internships-active .internship-summary { margin-bottom: 12px; font-size: 13px; line-height: 1.5; }
+  .work.internships-active .internship-card .work-metrics { padding: 12px 0; }
+  .work.internships-active .internship-card .work-metrics dd { font-size: 26px; }
+  .work.internships-active .internship-card .work-metrics dt { margin-top: 6px; font-size: 9px; line-height: 1.3; }
+  .work.internships-active .internship-card > .technology-list { display: none; }
+  .work.internships-active .internship-actions { margin-top: 8px; }
+  .work.internships-active .internship-more { min-height: 38px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .work.internships-active .internship-switcher button,
+  .work.internships-active .internship-more span { transition: none; }
+}

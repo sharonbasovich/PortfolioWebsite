@@ -1,3 +1,30 @@
+## October 27: ECHO section adaptation and responsive repair
+
+ECHO's actual liquid carousel is adapted for page-driven projects, not nested
+wheel capture or dragging. The previous fixed-frame aspect morph and sliding
+copy now present RBC and Magna internships. ECHO's expanding card/separating
+words now reveal the existing Let's talk content. Provenance is recorded in
+`dist/startup/experience/echo/SOURCE.md`, including OGL 1.0.11's Unlicense declaration.
+
+The old 1100x650 and Three.js-world prerequisites incorrectly disabled the title
+and project effects on short laptops. Fine-pointer layouts now qualify at
+760x480, independently of Three.js. Touch/reduced-motion layouts keep native
+vertical project and internship cards. The blue route starts at the measured
+hero art boundary, without its former gap. Contact and internship positions are
+preserved during responsive rebuilds.
+
+Browser checks cover 768x512, 900x600, 1024x768, 1280x578, 1366x638,
+1440x900, 1920x1080 and 2560x1080. Touch-layout fixtures cover 320x568,
+393x851 and 851x393. Geometry and screenshots were inspected; the smallest
+contact layout was corrected to retain a 16px email/link gap. Page wheel input
+advances projects forward and backward; project/internship sheets close with
+Escape. Reduced motion and unavailable WebGL retain readable content. This is
+browser/layout verification, not physical Pixel 6a GPU or frame-rate testing.
+Evidence is private in workspace `tmp/immersive-oct22-qa/echo-*`.
+
+Existing source assets, factual body content, resume PDFs and clean homepage
+are unchanged. Marble's black backdrop remains deferred.
+
 # Startup homepage and audience-specific resume downloads
 
 The accepted startup site is the homepage at https://basovichsharon.vercel.app/.

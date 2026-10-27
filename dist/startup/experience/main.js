@@ -5,15 +5,17 @@ import { installProjectDetails } from "./project-details.js?v=20261024-robotics"
 import { installProjectEvidence } from "./project-evidence.js?v=20261024-skycrop";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
-import { mountMorphGallery } from "./study/morph-gallery.js?v=20261024-skycrop";
-import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261024-dock-flash";
+import { mountEchoProjects } from "./echo/projects.js?v=20261027-echo";
+import { mountContactExpansion } from "./echo/contact.js?v=20261027-echo";
+import { mountInternships } from "./internships.js?v=20261027-echo";
+import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261027-echo";
 
 const initialProjectsHash = location.hash === "#projects";
 
 const theme = installTheme();
 const projectHeading = document.querySelector(".projects-heading h2");
 const projectStage = document.querySelector(".projects-heading");
-let projectMotion, studyGallery;
+let projectMotion, studyGallery, internshipMotion, contactMotion;
 let galleryEngaged = null;
 
 const gsap = window.gsap,
@@ -26,9 +28,9 @@ let stickyBrandShown = null;
 const canvas = document.querySelector("#world"),
   frame = document.querySelector(".world-frame");
 const motionButton = document.querySelector(".motion");
-const gallery = document.querySelector(".project-gallery"),
-  track = document.querySelector(".project-panels");
-const panels = [...document.querySelectorAll(".project-panel")];
+const gallery = document.querySelector("#projects .project-gallery"),
+  track = document.querySelector("#projects .project-panels");
+const panels = [...document.querySelectorAll("#projects .project-panel")];
 const projectEvidence = installProjectEvidence(panels);
 {
   root.classList.add("motion-study");
@@ -86,7 +88,7 @@ const compactQuery = matchMedia(
   "(max-width: 800px), (hover: none), (pointer: coarse)",
 );
 const desktopQuery = matchMedia(
-  "(min-width: 1100px) and (min-height: 650px) and (hover: hover) and (pointer: fine)",
+  "(min-width: 760px) and (min-height: 480px) and (hover: hover) and (pointer: fine)",
 );
 const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -222,7 +224,13 @@ function scrollToPosition(top, immediate = false) {
       behavior: immediate || paused ? "instant" : "smooth",
     });
 }
+function refreshRouteJoin() {
+  const box = heroWindow.getBoundingClientRect();
+  const gap = box.height > 0 ? Math.max(0, document.querySelector('.hero').getBoundingClientRect().bottom - box.bottom) : 0;
+  bridge.style.setProperty('--route-join-gap', `${gap}px`);
+}
 function refreshMeasurements() {
+  refreshRouteJoin();
   bridge.style.setProperty("--route-height", `${Math.max(180, proof.offsetTop - 34)}px`);
   nativeRouteTextInset = routeWords.getBoundingClientRect().top - routeSvg.getBoundingClientRect().top;
   for (const item of windows)
@@ -369,6 +377,8 @@ function updateScrollRail() {
 }
 function paint(time = 0, delta = 1 / 60) {
   if (disposed || document.hidden) return;
+  internshipMotion?.update();
+  contactMotion?.update();
   // Read all DOM geometry first; render every visible window in its own view.
   const heroBounds = document.querySelector(".hero").getBoundingClientRect();
   const workBounds = document.querySelector(".work").getBoundingClientRect();
@@ -555,7 +565,7 @@ function paint(time = 0, delta = 1 / 60) {
   updateTrace(delta);
   updateProjectNavigation();
   projectEvidence.update(deckClock.index, { native: !deckTrigger, paused });
-  studyGallery?.update(deckClock.index);
+  studyGallery?.update(deckClock.index, time);
   if (route) {
     const progress = routeDrawProgress();
     routeReveal.style.strokeDashoffset = String(1 - progress);
@@ -600,17 +610,21 @@ function tick(time, deltaMs) {
 
 function buildChoreography(entrance = false) {
   diagnostics.choreographyBuilds++;
+  const preserveContact = !entrance && activeChapter === 3 && contactMotion?.getState?.().enabled
+    ? contactMotion.getState().progress : null;
+  const preserveInternship = !entrance && activeChapter === 1 && internshipMotion?.getState?.().enabled
+    ? internshipMotion.trigger?.progress : null;
   const introBounds = projectStage.getBoundingClientRect();
   const preserveProjectIntro = projectMotion?.getState?.().enabled && !entrance &&
     finePointer.matches && introBounds.top < innerHeight * 0.85 &&
     introBounds.bottom > innerHeight * 0.35;
   const preservePanel =
-    finePointer.matches && !entrance && !preserveProjectIntro && activeWindow?.chapter === 2
+    finePointer.matches && !entrance && !preserveProjectIntro && activeChapter === 2 && activeWindow?.chapter === 2
       ? panels[studyGallery ? clamp(Math.round(deckClock.index), 0, panels.length - 1) : activeWindow.project]
       : null;
   const anchor =
     finePointer.matches && !entrance && !preservePanel
-      ? preserveProjectIntro ? projectStage : activeWindow?.element
+      ? preserveProjectIntro ? projectStage : activeChapter === 3 ? document.querySelector('#contact') : activeWindow?.element
       : null;
   const anchorTop = anchor?.getBoundingClientRect().top,
     panelTop = preservePanel?.getBoundingClientRect().top;
@@ -621,6 +635,8 @@ function buildChoreography(entrance = false) {
   projectMotion = undefined;
   studyGallery?.dispose();
   studyGallery = undefined;
+  internshipMotion?.dispose(); internshipMotion = undefined;
+  contactMotion?.dispose(); contactMotion = undefined;
   context = undefined;
   deckTrigger = undefined;
   deckTimeline = undefined;
@@ -638,12 +654,16 @@ function buildChoreography(entrance = false) {
   }
   motionButton.textContent = paused ? "Enable motion" : "Pause motion";
   motionButton.setAttribute("aria-pressed", String(paused));
+  refreshRouteJoin();
   if (!paused && gsap && ScrollTrigger) {
     context = gsap.context(() => {
-      if (desktopQuery.matches && world && !lostContext) {
+      internshipMotion = mountInternships({section:document.querySelector('.work'),gsap,ScrollTrigger,enabled:desktopQuery.matches && Boolean(world) && !lostContext,
+        onOpen:()=>lenis?.stop(),onClose:()=>{lenis?.resize();lenis?.start();},onNavigate:top=>scrollToPosition(top)});
+      contactMotion = mountContactExpansion({section:document.querySelector('.contact'),gsap,ScrollTrigger,enabled:true,contained:worldContained});
+      if (desktopQuery.matches) {
         gallery.classList.add("is-horizontal");
         projectSwitcher.hidden = false;
-        studyGallery = mountMorphGallery({
+        studyGallery = mountEchoProjects({
           gallery, track, panels, clock: deckClock, gsap, ScrollTrigger,
           holdDuration: projectHoldDuration, transferDuration: projectTransferDuration,
         });
@@ -742,7 +762,7 @@ function buildChoreography(entrance = false) {
       for (const heading of document.querySelectorAll(
         ".work-heading h2, .projects-heading h2, .contact h2",
       )) {
-        if (!finePointer.matches || (heading === projectHeading && projectMotion?.getState?.().enabled)) continue;
+        if (!finePointer.matches || (heading === projectHeading && projectMotion?.getState?.().enabled) || (heading.closest('.contact') && contactMotion?.getState?.().enabled)) continue;
         SplitText?.create(heading, {
           type: "lines",
           mask: "lines",
@@ -769,7 +789,13 @@ function buildChoreography(entrance = false) {
     entry.rotation = 0;
   }
   ScrollTrigger?.refresh();
-  if (preservePanel && deckTrigger) {
+  const contactTrigger = preserveContact !== null && ScrollTrigger?.getById('contact-expand');
+  if (contactTrigger) {
+    scrollToPosition(contactTrigger.start + preserveContact * (contactTrigger.end - contactTrigger.start), true);
+  } else if (preserveInternship !== null && internshipMotion?.trigger) {
+    const trigger = internshipMotion.trigger;
+    scrollToPosition(trigger.start + preserveInternship * (trigger.end - trigger.start), true);
+  } else if (preservePanel && deckTrigger) {
     const progress = projectStops[Number(preservePanel.dataset.project)];
     scrollToPosition(
       deckTrigger.start + progress * (deckTrigger.end - deckTrigger.start),
@@ -905,8 +931,11 @@ document.addEventListener("click", (event) => {
   const studyProjectStart = studyGallery && id === "#projects"
     ? ScrollTrigger?.getById("study-glyph-reveal")?.start
     : undefined;
+  const contactTrigger = id === '#contact' && ScrollTrigger?.getById('contact-expand');
+  const contactDestination = contactTrigger
+    ? contactTrigger.start + .85 * (contactTrigger.end - contactTrigger.start) : undefined;
   scrollToPosition(
-    studyProjectStart ?? scrollY + target.getBoundingClientRect().top - offset,
+    studyProjectStart ?? contactDestination ?? scrollY + target.getBoundingClientRect().top - offset,
     paused,
   );
   if (event.detail === 0) {
@@ -961,6 +990,9 @@ async function initialize() {
         deckIndex: deckClock.index,
         motionStudy: Boolean(studyGallery),
         studyIntro: projectMotion?.getState?.(),
+        projects: studyGallery?.getState?.(),
+        internships: internshipMotion?.getState?.(),
+        contact: contactMotion?.getState?.(),
         routeProgress: routeClock.progress,
         routeDrawProgress: routeDrawProgress(),
         viewport: { ...viewport, layoutHeight },
@@ -980,6 +1012,18 @@ async function initialize() {
         scrollToPosition(trigger.start + clamp(progress) * (trigger.end - trigger.start), true);
         ScrollTrigger.update();
         paint(sceneTime, 0);
+      },
+      seekSection: (id, progress = 0) => {
+        const trigger = ScrollTrigger?.getById(id);
+        if (!trigger) return;
+        scrollToPosition(trigger.start + clamp(progress) * (trigger.end - trigger.start), true);
+        ScrollTrigger.update();
+        paint(sceneTime, 0);
+      },
+      refreshLayout: () => buildChoreography(),
+      seekRouteJoin: () => {
+        scrollToPosition(scrollY + heroWindow.getBoundingClientRect().bottom - innerHeight*.24, true);
+        ScrollTrigger.update();paint(sceneTime,0);
       },
       freezeEntrance: () => {
         entranceTimeline?.progress(1);
@@ -1139,6 +1183,7 @@ window.addEventListener("pagehide", (event) => {
   context?.revert();
   projectMotion?.dispose();
   studyGallery?.dispose();
+  internshipMotion?.dispose(); contactMotion?.dispose();
   gsap?.ticker.remove(tick);
   ribbon.dispose();
   projectEvidence.dispose();

@@ -40,6 +40,23 @@ REDUCED_MOTION = """
 })();
 """
 
+TOUCH_LAYOUT = """
+(() => {
+  const original = window.matchMedia.bind(window);
+  window.matchMedia = function (query) {
+    const result = original(query);
+    const touch = /\\(pointer:\\s*coarse\\)|\\(hover:\\s*none\\)/.test(query);
+    const fine = /\\(pointer:\\s*fine\\)|\\(hover:\\s*hover\\)/.test(query);
+    if (!touch && !fine) return result;
+    return new Proxy(result, { get(target, key) {
+      if (key === 'matches') return touch && !fine;
+      const value = Reflect.get(target, key, target);
+      return typeof value === 'function' ? value.bind(target) : value;
+    }});
+  };
+})();
+"""
+
 
 class MotionHandler(SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
@@ -77,6 +94,8 @@ class MotionHandler(SimpleHTTPRequestHandler):
             return None
         query = parse_qs(request.query)
         scripts = []
+        if query.get('input') == ['touch']:
+            scripts.append(TOUCH_LAYOUT)
         if query.get('webgl') == ['off']:
             scripts.append(WEBGL_OFF)
         if query.get('motion') == ['reduce']:
