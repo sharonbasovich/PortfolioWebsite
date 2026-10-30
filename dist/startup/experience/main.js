@@ -1,12 +1,12 @@
 import Lenis from "../vendor/lenis/lenis.js";
-import { createWorld } from "./world.js?v=20261023-header";
+import { createWorld } from "./world.js?v=20261030-visible-end";
 import { createPointerRibbon } from "./pointer-ribbon.js";
 import { installProjectDetails } from "./project-details.js?v=20261024-robotics";
 import { installProjectEvidence } from "./project-evidence.js?v=20261024-skycrop";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
 import { mountEchoProjects } from "./echo/projects.js?v=20261027-echo";
-import { mountContactExpansion } from "./echo/contact.js?v=20261027-echo";
+import { mountContactExpansion } from "./echo/contact.js?v=20261030-visible-end";
 import { mountInternships } from "./internships.js?v=20261027-echo";
 import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261027-echo";
 
@@ -76,7 +76,7 @@ const routePoints = Array.from({ length: 49 }, (_, index) => {
   return { x: point.x / 1440, y: point.y / 650 };
 });
 const routeClock = { progress: 0 };
-let nativeRouteDraw = 0, nativeRouteTextInset = 0;
+let nativeRouteDraw = 0, routeTextInset = 0, routeSafeTop = 112;
 const heroWindow = document.querySelector(".hero-window");
 const trace = document.querySelector(".pointer-trace");
 const ribbon = createPointerRibbon(trace);
@@ -94,15 +94,6 @@ const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const ease = (value) => value * value * (3 - 2 * value);
 const dockingEnd = 0.18;
-const carrierRoutePoints = routePoints.map((_, index) => {
-  const fraction = clamp((index / (routePoints.length - 1) - dockingEnd) / (1 - dockingEnd));
-  const at = fraction * (routePoints.length - 1);
-  const lower = Math.floor(at), upper = Math.min(routePoints.length - 1, lower + 1);
-  return {
-    x: routePoints[lower].x + (routePoints[upper].x - routePoints[lower].x) * (at - lower),
-    y: routePoints[lower].y + (routePoints[upper].y - routePoints[lower].y) * (at - lower),
-  };
-});
 const routeDrawProgress = () =>
   paused ? 1 : !finePointer.matches ? nativeRouteDraw :
     clamp((routeClock.progress - dockingEnd) / (1 - dockingEnd));
@@ -232,7 +223,8 @@ function refreshRouteJoin() {
 function refreshMeasurements() {
   refreshRouteJoin();
   bridge.style.setProperty("--route-height", `${Math.max(180, proof.offsetTop - 34)}px`);
-  nativeRouteTextInset = routeWords.getBoundingClientRect().top - routeSvg.getBoundingClientRect().top;
+  routeTextInset = routeWords.getBoundingClientRect().top - routeSvg.getBoundingClientRect().top;
+  routeSafeTop = Math.max(112, Math.max(document.querySelector(".site-header").offsetHeight, innerWidth <= 650 ? 114 : 0) + 16);
   for (const item of windows)
     item.radius =
       parseFloat(getComputedStyle(item.element).borderTopLeftRadius) || 28;
@@ -390,21 +382,21 @@ function paint(time = 0, delta = 1 / 60) {
     brand.tabIndex = brandShown ? 0 : -1;
     brand.setAttribute("aria-hidden", String(!brandShown));
   }
-  if (!finePointer.matches && !paused) {
-    // Native scrolling has no flying carrier or docking delay. Draw against
-    // the visible line area rather than the much taller metrics-containing
-    // bridge. Finish with its bottom at 40% viewport, or earlier if necessary
-    // to keep the whole heading below the header on a short landscape phone.
-    // layoutHeight stays stable when a phone's browser toolbar opens/closes.
+  if (!paused) {
+    // Complete the route while its heading is still below the fixed header.
+    // The metrics beneath it must never lengthen the flight. Read the actual
+    // visible SVG on every paint, so fast scrolls and toolbar resizing cannot
+    // leave a lagging ScrollTrigger playhead behind the departing section.
     const finishTop = Math.max(
       layoutHeight * 0.4 - routeBounds.height,
-      112 - nativeRouteTextInset,
+      routeSafeTop - routeTextInset,
     );
-    nativeRouteDraw = clamp(
+    const visibleProgress = clamp(
       (layoutHeight * 0.85 - routeBounds.top) /
         Math.max(1, layoutHeight * 0.85 - finishTop),
     );
-    routeClock.progress = nativeRouteDraw;
+    nativeRouteDraw = visibleProgress;
+    routeClock.progress = visibleProgress;
   }
   const openingProgress = clamp(-heroBounds.top / Math.min(170, layoutHeight * 0.18));
   const heroOpening = 1 - (1 - openingProgress) ** 2;
@@ -493,15 +485,23 @@ function paint(time = 0, delta = 1 / 60) {
     world.state.reveal = entry.reveal;
     world.state.rotation = entry.rotation;
     if (!paused) world.state.burst = heroOpening;
+    const routeTarget = allFrames.find((item) => item.chapter === 1);
+    // Finish tracing About while it is visible, then hold its endpoint until
+    // the internship window arrives. Docking retains its visible impact cue.
+    const dockProgress = clamp(
+      (layoutHeight * .85 - (routeTarget?.rect.top ?? Infinity)) /
+        Math.max(1, layoutHeight * .4),
+    );
     const handoff = {
       enabled: Boolean(
         desktopQuery.matches && !paused && gsap && ScrollTrigger && !lostContext,
       ),
-      progress: routeClock.progress,
+      progress: routeClock.progress * .8 + (routeClock.progress >= 1 ? dockProgress * .2 : 0),
+      pathProgress: routeDrawProgress(),
       impactEnabled: impactInteraction,
       startFrame: allFrames.find((item) => item.chapter === 0),
-      endFrame: allFrames.find((item) => item.chapter === 1),
-      path: (desktopQuery.matches || paused) ? carrierRoutePoints.map((point) => ({
+      endFrame: routeTarget,
+      path: (desktopQuery.matches || paused) ? routePoints.map((point) => ({
         x: routeBounds.left + point.x * routeBounds.width,
         y: routeBounds.top + point.y * routeBounds.height,
       })) : [],
@@ -695,20 +695,6 @@ function buildChoreography(entrance = false) {
               trigger: bridge,
               start: "top bottom",
               end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
-        gsap.fromTo(
-          routeClock,
-          { progress: 0 },
-          {
-            progress: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: bridge,
-              start: "top 80%",
-              end: "bottom 25%",
               scrub: true,
             },
           },
@@ -933,7 +919,7 @@ document.addEventListener("click", (event) => {
     : undefined;
   const contactTrigger = id === '#contact' && ScrollTrigger?.getById('contact-expand');
   const contactDestination = contactTrigger
-    ? contactTrigger.start + .85 * (contactTrigger.end - contactTrigger.start) : undefined;
+    ? contactTrigger.end : undefined;
   scrollToPosition(
     studyProjectStart ?? contactDestination ?? scrollY + target.getBoundingClientRect().top - offset,
     paused,
@@ -978,7 +964,7 @@ async function initialize() {
     ["127.0.0.1", "localhost"].includes(location.hostname) &&
     new URLSearchParams(location.search).get("review") === "1"
   ) {
-    const { installReview } = await import("/__motion_lab__/review-api.js");
+    const { installReview } = await import("/__motion_lab__/review-api.js?v=20261030-visible-end");
     installReview({
       getState: () => ({
         paused,
@@ -1021,6 +1007,10 @@ async function initialize() {
         paint(sceneTime, 0);
       },
       refreshLayout: () => buildChoreography(),
+      seekAboutComplete: () => {
+        scrollToPosition(scrollY + routeWords.getBoundingClientRect().top - routeSafeTop, true);
+        ScrollTrigger?.update(); paint(sceneTime, 0);
+      },
       seekRouteJoin: () => {
         scrollToPosition(scrollY + heroWindow.getBoundingClientRect().bottom - innerHeight*.24, true);
         ScrollTrigger.update();paint(sceneTime,0);

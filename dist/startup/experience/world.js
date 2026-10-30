@@ -1665,7 +1665,7 @@ export function createWorld(
     }
     carrierCamera.projectionMatrixInverse.copy(carrierCamera.projectionMatrix).invert();
 
-    const pathIndex = p * (path.length - 1);
+    const pathIndex = clamp(input.pathProgress ?? p) * (path.length - 1);
     const lower = Math.floor(pathIndex);
     const upper = Math.min(path.length - 1, lower + 1);
     carrierPose.point.set(

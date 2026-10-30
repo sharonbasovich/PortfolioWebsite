@@ -1,3 +1,28 @@
+## October 30: visible About path and finite contact ending
+
+The About route now follows its actual viewport position. It finishes before
+its heading clears the fixed header, independently of the metrics below it.
+The block follows that same line progress, holds at its endpoint, then docks
+when the internship window becomes visible. Its existing sparks still trigger
+at the visible dock. The geometry updates directly on the existing render clock;
+there is no additional RAF or delayed scrub playhead.
+
+The final contact stage now owns its credits instead of leaving a separate
+footer after the sticky runway. Expansion and content reveal finish together
+at the page end. Phone layouts reserve the expanded brand/header row and a
+small credits band above the existing motion controls. Original footer placement
+and attributes are restored when motion is paused or disabled. Direct Let's talk
+navigation targets the finished reveal; reverse scrolling remains reversible.
+
+IAB checks cover 1440x900, 1280x578, 320x568, 393x851, 768x1024 and
+851x393 (browser rounding can report a dimension one pixel larger). Full path
+progress was observed with About still visible. Readable contact/email/link and
+footer geometry fits with no horizontal overflow and at most two pixels of
+fractional scroll rounding at the end. Pause/resume restores one controller and
+original source order. The visible docking recorded one actual spark trigger.
+No runtime warnings/errors. Evidence is private in workspace
+`tmp/immersive-oct22-qa/scroll-end-*`. Source assets, facts and PDFs are unchanged.
+
 # ECHO sections and laptop repair — 27 October 2026
 
 Branch `codex/echo-scroll-sections`, base `1701784`.
