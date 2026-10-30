@@ -69,7 +69,7 @@ const awards = [
   ["VEX Robotics World Championship Judges Award", "1 of 10 recipients among 9,565 teams"],
   ["Carnegie Mellon picoCTF", "113 / 10,460 · Top 1%"],
   ["Canadian Computing Competition", "Senior Honour Roll · Top 3%"],
-  ["Hackathons", "7-time award winner across international events"],
+  ["Hackathons", "12-time award winner across international events"],
 ];
 
 const skills = [
@@ -116,7 +116,7 @@ export default function Home() {
             <div><strong>1,200</strong><span>repos impacted at RBC</span></div>
             <div><strong>70 km</strong><span>high-altitude radio link</span></div>
             <div><strong>$140k</strong><span>robotics budget managed</span></div>
-            <div><strong>7×</strong><span>hackathon award winner</span></div>
+            <div><strong>12×</strong><span>hackathon award winner</span></div>
           </div>
         </section>
 
