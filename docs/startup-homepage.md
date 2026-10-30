@@ -1,3 +1,22 @@
+## October 30: uninterrupted About-to-internship motion
+
+The endpoint hold is superseded. Docking now begins during the last part of the
+line and spans the full remaining scroll interval into the visible internship
+window. The path tail uses a cubic Hermite profile matching incoming velocity
+and reaching zero path-relative velocity only after the docking blend is moving.
+The target blend uses quintic easing for continuous position/velocity at its
+boundaries. Drawing and carrier path progress share the same timing. Existing
+pause/reduced-motion behavior and impact gating are retained; no new RAF.
+
+Actual IAB rendered-world diagnostics were sampled at14 scroll positions across
+the transition, including every20px around the former stop. Both the carrier
+clock and document-space position advance at every sample; no endpoint plateau.
+The main/world/review modules loaded and executed in that browser. A later
+browser control session and redundant Node syntax check stalled under local
+resource pressure, so no additional device/FPS verification is claimed. Evidence:
+workspace tmp/immersive-oct22-qa/continuous-handoff-samples.json. Factual page
+body, contact ending, project assets and all resume PDFs are unchanged.
+
 ## October 30: visible About path and finite contact ending
 
 The About route now follows its actual viewport position. It finishes before

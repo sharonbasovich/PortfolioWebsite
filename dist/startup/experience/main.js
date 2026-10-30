@@ -1,5 +1,5 @@
 import Lenis from "../vendor/lenis/lenis.js";
-import { createWorld } from "./world.js?v=20261030-visible-end";
+import { createWorld } from "./world.js?v=20261030-continuous-handoff";
 import { createPointerRibbon } from "./pointer-ribbon.js";
 import { installProjectDetails } from "./project-details.js?v=20261024-robotics";
 import { installProjectEvidence } from "./project-evidence.js?v=20261024-skycrop";
@@ -94,9 +94,17 @@ const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const ease = (value) => value * value * (3 - 2 * value);
 const dockingEnd = 0.18;
-const routeDrawProgress = () =>
-  paused ? 1 : !finePointer.matches ? nativeRouteDraw :
+const routeDrawProgress = () => {
+  if (paused) return 1;
+  const progress = !finePointer.matches ? nativeRouteDraw :
     clamp((routeClock.progress - dockingEnd) / (1 - dockingEnd));
+  // Match the line and carrier through a C1-continuous tail: full incoming
+  // speed at .84, zero path-relative speed at the endpoint. The overlapping
+  // docking curve carries the motion onward before that endpoint is reached.
+  if (progress <= .84) return progress;
+  const tail = (progress - .84) / .16;
+  return .84 + .16 * (tail + tail * tail - tail * tail * tail);
+};
 const windows = [...document.querySelectorAll("[data-world-window]")].map(
   (element) => {
     const panel = element.closest(".project-panel");
@@ -486,17 +494,22 @@ function paint(time = 0, delta = 1 / 60) {
     world.state.rotation = entry.rotation;
     if (!paused) world.state.burst = heroOpening;
     const routeTarget = allFrames.find((item) => item.chapter === 1);
-    // Finish tracing About while it is visible, then hold its endpoint until
-    // the internship window arrives. Docking retains its visible impact cue.
-    const dockProgress = clamp(
-      (layoutHeight * .85 - (routeTarget?.rect.top ?? Infinity)) /
-        Math.max(1, layoutHeight * .4),
+    // Overlap the last path segment with the flight into the internship.
+    // One uninterrupted scroll interval replaces the former endpoint hold.
+    const routeFinishTop = Math.max(
+      layoutHeight * .4 - routeBounds.height, routeSafeTop - routeTextInset,
     );
+    const routeSpan = Math.max(1, layoutHeight * .85 - routeFinishTop);
+    const routeStart = scrollY + routeBounds.top - layoutHeight * .85;
+    const transferStart = routeStart + routeSpan * (dockingEnd + (1 - dockingEnd) * .84);
+    const transferEnd = scrollY + (routeTarget?.rect.top ?? Infinity) - layoutHeight * .45;
+    const dockProgress = clamp((scrollY - transferStart) / Math.max(1, transferEnd - transferStart));
     const handoff = {
       enabled: Boolean(
         desktopQuery.matches && !paused && gsap && ScrollTrigger && !lostContext,
       ),
-      progress: routeClock.progress * .8 + (routeClock.progress >= 1 ? dockProgress * .2 : 0),
+      progress: routeClock.progress * .8 + dockProgress * .2,
+      dockingProgress: dockProgress,
       pathProgress: routeDrawProgress(),
       impactEnabled: impactInteraction,
       startFrame: allFrames.find((item) => item.chapter === 0),
@@ -964,7 +977,7 @@ async function initialize() {
     ["127.0.0.1", "localhost"].includes(location.hostname) &&
     new URLSearchParams(location.search).get("review") === "1"
   ) {
-    const { installReview } = await import("/__motion_lab__/review-api.js?v=20261030-visible-end");
+    const { installReview } = await import("/__motion_lab__/review-api.js?v=20261030-continuous-handoff");
     installReview({
       getState: () => ({
         paused,
@@ -1007,8 +1020,8 @@ async function initialize() {
         paint(sceneTime, 0);
       },
       refreshLayout: () => buildChoreography(),
-      seekAboutComplete: () => {
-        scrollToPosition(scrollY + routeWords.getBoundingClientRect().top - routeSafeTop, true);
+      seekAboutComplete: (offset = 0) => {
+        scrollToPosition(scrollY + routeWords.getBoundingClientRect().top - routeSafeTop + offset, true);
         ScrollTrigger?.update(); paint(sceneTime, 0);
       },
       seekRouteJoin: () => {

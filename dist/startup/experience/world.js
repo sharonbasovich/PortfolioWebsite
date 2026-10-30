@@ -1656,7 +1656,8 @@ export function createWorld(
     carrierCamera.updateProjectionMatrix();
     carrierProjection.copy(carrierCamera.projectionMatrix);
     const sourceWeight = 1 - smooth(0, 0.2, p);
-    const targetWeight = smooth(0.8, 1, p);
+    const transfer = clamp(input.dockingProgress ?? (p - .8) / .2);
+    const targetWeight = transfer * transfer * transfer * (10 + transfer * (-15 + 6 * transfer));
     for (let index = 0; index < 16; index++) {
       carrierCamera.projectionMatrix.elements[index] =
         carrierProjection.elements[index] * (1 - sourceWeight - targetWeight) +
@@ -1674,8 +1675,8 @@ export function createWorld(
     );
     if (p < 0.15)
       carrierPose.point.lerp(carrierStart.center, 1 - smooth(0, 0.15, p));
-    else if (p > 0.8)
-      carrierPose.point.lerp(carrierEnd.center, smooth(0.8, 1, p));
+    else if (targetWeight > 0)
+      carrierPose.point.lerp(carrierEnd.center, targetWeight);
 
     const depth = Math.max(0.2,
       -carrierStart.position.z +

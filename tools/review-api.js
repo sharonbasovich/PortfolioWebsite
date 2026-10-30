@@ -9,6 +9,7 @@ export function installReview(api) {
   button('Refresh layout',()=>api.refreshLayout());
   button('About join',()=>api.seekRouteJoin());
   button('About complete',()=>api.seekAboutComplete());
+  for(const offset of [-80,-40,-20,0,20,40,80,120,180,240,320,400,480,560])button(`Handoff ${offset}`,()=>api.seekAboutComplete(offset));
   for(const p of [0,.3,.65,1])button(`Title ${p}`,()=>api.seekStudyIntro(p));
   for(const i of [0,1,2,3])button(`Project ${i}`,()=>api.jumpProject(i));
   for(const p of [0,.5,1])button(`Internship ${p}`,()=>api.seekSection('internship-gallery',p));
