@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from '/dist/startup/vendor/three/addons/environments/RoomEnvironment.js';
-import { makeModel } from './models.js';
+import { makeModel } from './models.js?v=20261105-final';
 
 const concepts={
   watch:{subject:'01 / HOROLOGY',title:'A closer look at time.',copy:'A machined case, open-work movement, blued hands, and a rotating gear train. Scroll to separate its construction.',description:'A mechanical watch with articulated bracelet ends, open movement, moving hands and a scroll-separated dial.'},

@@ -10,7 +10,18 @@ import runpy
 ROOT = Path(__file__).resolve().parents[1]
 MotionHandler = runpy.run_path(str(ROOT / 'tools/motion-lab.py'))['MotionHandler']
 
+class ReviewHandler(MotionHandler):
+    def send_head(self):
+        for name in ('If-Modified-Since', 'If-None-Match'):
+            if name in self.headers:
+                del self.headers[name]
+        return super().send_head()
+
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-store')
+        super().end_headers()
+
 if __name__ == '__main__':
-    server = ThreadingHTTPServer(('127.0.0.1', 8790), partial(MotionHandler, directory=str(ROOT)))
+    server = ThreadingHTTPServer(('127.0.0.1', 8790), partial(ReviewHandler, directory=str(ROOT)))
     print('Portfolio review: http://127.0.0.1:8790/tools/model-studies/', flush=True)
     server.serve_forever()
