@@ -20,7 +20,9 @@ stage.append(slider);
 const style=document.createElement('style');style.textContent='.assembly-control{position:absolute;left:26px;right:26px;bottom:45px;display:flex;align-items:center;gap:18px;font-size:11px;color:#c7d4e8}.assembly-control input{accent-color:#86adff;min-width:40px;flex:1;height:36px;margin:0}.assembly-control button{background:none;border:0;border-bottom:1px solid #a9b2c666;font-size:11px;color:inherit;padding:8px 0;min-height:36px}.assembly-control button:disabled{opacity:.45;cursor:default}@media(max-width:600px){.assembly-control{left:18px;right:18px;gap:12px}.assembly-control>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.assembly-control input,.assembly-control button{min-height:44px}}';document.head.append(style);
 const range=slider.querySelector('input'),follow=slider.querySelector('button');follow.disabled=true;
 function showFallback(){document.querySelector('.fallback').hidden=false;canvas.hidden=true;slider.hidden=true;stage.querySelector('.stage-bottom').hidden=true;document.querySelector('#pause').hidden=true;}
-range.addEventListener('input',()=>{manual=range.valueAsNumber/100;follow.disabled=false;requestFrame();});
+const inspect=value=>{manual=value;range.value=String(value*100);follow.disabled=false;requestFrame();};
+range.addEventListener('input',()=>inspect(range.valueAsNumber/100));
+range.addEventListener('keydown',event=>{if(event.key==='Home'||event.key==='End'){event.preventDefault();inspect(event.key==='Home'?0:1);}});
 follow.addEventListener('click',()=>{manual=null;follow.disabled=true;requestFrame();});
 function select(kind){
   const choice=concepts[kind]?kind:'watch';model?.dispose();model=makeModel(choice);scene.add(model.root);
