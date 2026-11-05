@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sharon Basovich — Personal model studies</title>
+  <link rel="stylesheet" href="study.css">
+  <script type="importmap">{"imports":{"three":"/dist/startup/vendor/three/three.module.js"}}</script>
+  <script type="module" src="study.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header><a class="brand" href="/dist/startup/">Sharon Basovich.</a><span>Model studies</span><a href="/dist/">Clean portfolio ↗</a></header>
+  <main id="main">
+    <section class="study" aria-labelledby="name">
+      <div class="sticky">
+        <div class="introduction"><h1 id="name">Sharon<br>Basovich.</h1><p>Hi! I'm studying Computer Science at the University of Waterloo, previously interned at Magna and RBC, and I'm into horology, science fiction, and mechanical keyboards.</p></div>
+        <div class="stage" aria-label="Interactive personal model preview">
+          <canvas id="scene" aria-label="A mechanical watch, with an animated exploded assembly" role="img"></canvas>
+          <p class="fallback" hidden>The interactive model is unavailable. The descriptions and other portfolio content remain available.</p>
+          <div class="stage-top"><span id="subject">01 / HOROLOGY</span><button id="pause" type="button" aria-pressed="false">Pause motion</button></div>
+          <div class="stage-bottom"><span id="part-label">Assembled</span><span class="progress" aria-hidden="true"><i></i></span><span id="percent">0%</span></div>
+        </div>
+        <div class="comparison">
+          <nav aria-label="Model concept"><a href="?model=watch" data-model="watch">01 <span>Watch movement</span></a><a href="?model=keyboard" data-model="keyboard">02 <span>Mechanical keyboard</span></a><a href="?model=payload" data-model="payload">03 <span>Radio payload</span></a></nav>
+          <div><h2 id="concept-title">A closer look at time.</h2><p id="concept-copy">A machined case, open-work movement, blued hands, and a rotating gear train. Scroll to separate its construction.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="end"><p>Three subjects. The same portfolio.</p><h2>Something<br>more personal.</h2><p>These are original illustrative models, built for this comparison. The payload is inspired by SkyCell; it is not a CAD reproduction of the flight hardware.</p><a href="/dist/startup/">Back to the creative portfolio ↗</a></section>
+  </main>
+</body>
+</html>

@@ -194,8 +194,11 @@ export function installProjectDetails({ panels, gsap, onOpen, onClose } = {}) {
     pauseObserver.disconnect();
     reduced.removeEventListener("change", settleReduced);
     dialog.remove();
-    window.removeEventListener("pagehide", dispose);
+    window.removeEventListener("pagehide", onPageHide);
   };
-  window.addEventListener("pagehide", dispose);
+  // A page kept in the back/forward cache keeps its DOM and listeners. Removing
+  // the dialog here would leave every View more button dead on browser Back.
+  const onPageHide = (event) => { if (!event.persisted) dispose(); };
+  window.addEventListener("pagehide", onPageHide);
   return { dispose };
 }

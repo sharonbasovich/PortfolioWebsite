@@ -4,12 +4,16 @@
 .echo-contact .contact-layout {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:block;max-width:none;min-height:0;overflow:hidden;border-radius:24px;background:transparent;color:#f4f6ff;}
 .echo-contact .contact-window {position:absolute;inset:0;width:100%;height:100%;min-height:0;max-height:none;border-radius:24px;margin:0;z-index:0;background:transparent;}
 .echo-contact .contact-copy {position:absolute;inset:0;width:100%;max-width:none;padding:clamp(24px,3vw,48px);z-index:2;pointer-events:none;background:linear-gradient(#101827df 0%,#10182700 35%,#10182700 53%,#101827f2 100%);}
+.echo-contact .contact-copy::before {content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#0d1525b8,#0d15254d 45%,transparent 74%);}
 .echo-contact .contact-copy h2 {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
 .echo-contact-content {position:absolute;inset:clamp(24px,3vw,48px);pointer-events:none;}
 .echo-contact .contact-lead {max-width:510px;font-size:clamp(15px,1.5vw,22px);line-height:1.5;margin:0;color:#f3f5ff;}
 .echo-contact .email {position:absolute;left:0;bottom:68px;display:inline-flex;margin:0;color:white;border-color:#ffffff66;font-size:clamp(23px,3.5vw,54px);pointer-events:auto;}
 .echo-contact .contact-links {position:absolute;bottom:0;left:0;right:0;display:flex;flex-wrap:wrap;gap:20px 36px;margin:0;}
 .echo-contact .contact-links a {color:#fff;border-color:#ffffff66;pointer-events:auto;font-size:clamp(15px,1.3vw,20px);}
+.echo-contact .email .link-arrow,.echo-contact .contact-links a > .link-arrow {color:#a9baff;}
+.echo-contact .email:focus-visible,.echo-contact .contact-links a:focus-visible {outline-color:#b6c9ff;}
+.echo-contact .email:hover,.echo-contact .contact-links a:hover {color:#d5dfff;}
 .echo-contact-title {position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none;font-size:clamp(76px,11vw,160px);line-height:.95;letter-spacing:-.075em;font-weight:500;color:white;}
 .echo-contact-ambient {position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#3048ff24,transparent 65%),repeating-radial-gradient(ellipse at 50% 50%,transparent 0,transparent 68px,#3048ff12 69px,transparent 70px);pointer-events:none;}
 /* Keep the credits in the final sticky screen instead of extending the page. */

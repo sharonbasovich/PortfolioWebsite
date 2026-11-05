@@ -1,4 +1,4 @@
-import { installProjectDetails } from "./project-details.js?v=20261024-robotics";
+import { installProjectDetails } from "./project-details.js?v=20261105-polish";
 
 const clamp = (value, low = 0, high = 1) => Math.min(high, Math.max(low, value));
 const mix = (from, to, amount) => from + (to - from) * amount;

@@ -1,3 +1,32 @@
+## November 5: personal model studies and both-portfolio refinement
+
+See docs/personal-model-studies.md. Three original recognizable model studies
+(watch, mechanical keyboard, SkyCell-inspired radio payload) are implemented in
+tools/model-studies, outside public output. No model has been selected for the
+production scene. Keep all three for Sharon's comparison. Start the shared local
+server with python tools/portfolio-review.py on 8790; ECHO still owns port 8070.
+
+Clean-page refinements add the already approved project images/logo, card/link
+detail, a mobile contact shortcut, phone name framing and natural-flow system
+cards for phones/coarse pointers. Creative refinements fix cached-page dialog
+lifecycle, contact contrast and phone date/skill type. Both pages now correct
+their initial bookmarks after font/pin/native load positioning, yielding to user
+input. Startup #contact reaches its completed expansion with no trailing scroll.
+
+Actual browser review covers 320x568, 393x851, 768x1024, 851x393, 1280x578 and
+1440x900 layouts. Details open with pointer and keyboard; browser Back retains
+working disclosure. Phone dark/light and short-laptop project title/gallery
+were inspected. Explicit reduced-motion and unavailable-WebGL fixtures retain
+readable content. Three model studies were inspected assembled/separated, with
+actual geometry-driven camera framing, phone controls, reduced-motion manual
+inspection and WebGL fallback. These are browser checks, not physical-device FPS.
+Private evidence: workspace tmp/portfolio-nov05-qa. Initial layout matrix rows
+are superseded by subsequent settled bookmark rechecks; natural-flow clean
+contact can span more than one short phone screen.
+
+Both resume PDFs retain their reviewed October 30 hashes. No new professional
+facts, canonical resume changes, assets replaced or model chosen for integration.
+
 ## October 30: uninterrupted About-to-internship motion
 
 The endpoint hold is superseded. Docking now begins during the last part of the

@@ -1,9 +1,18 @@
 (() => {
   if (!window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
+  const initialHash = location.hash;
+  let anchorCancelled = false;
+  const cancelAnchor = event => { if (event.isTrusted) anchorCancelled = true; };
+  const anchorInputs = ['pointerdown', 'wheel', 'touchmove', 'keydown'];
+  if (initialHash) anchorInputs.forEach(type => window.addEventListener(type, cancelAnchor, {passive: true}));
 
   const media = gsap.matchMedia();
-  media.add('(min-height: 600px) and (prefers-reduced-motion: no-preference)', () => {
+  media.add({
+    animate: '(prefers-reduced-motion: no-preference)',
+    chapter: '(min-width: 760px) and (min-height: 560px) and (hover: hover) and (pointer: fine)'
+  }, context => {
+    if (!context.conditions.animate) return;
     const scene = document.querySelector('.motion-story');
     const words = gsap.utils.toArray('.motion-word');
     const panels = gsap.utils.toArray('.motion-panel');
@@ -11,8 +20,11 @@
     const mobile = matchMedia('(max-width: 700px)').matches;
     if (!scene || words.length !== 3 || panels.length !== 3) return;
 
+    // Phones read the three system cards in natural flow. Desktop retains the
+    // accepted pinned chapter; short laptops still receive the entry reveals.
+    if (context.conditions.chapter) {
     scene.classList.add('has-motion');
-    gsap.set(words, {autoAlpha: 0, xPercent: 25, scale: 0.76, filter: 'blur(16px)'});
+    gsap.set(words, {autoAlpha: 0, xPercent: 25, scale: 0.76, filter: 'blur(8px)'});
     gsap.set(panels, {autoAlpha: 0, yPercent: 42, rotation: 8, scale: 0.8});
     gsap.set([words[0], panels[0]], {autoAlpha: 1, xPercent: 0, yPercent: 0, rotation: 0, scale: 1, filter: 'blur(0px)'});
 
@@ -34,15 +46,16 @@
       }
     });
     sequence.to('.motion-progress span', {scaleX: 1, duration: 3.4}, 0);
-    sequence.to(words[0], {xPercent: -24, scale: 1.15, autoAlpha: 0, filter: 'blur(12px)', duration: 0.34}, 0.67)
+    sequence.to(words[0], {xPercent: -24, scale: 1.15, autoAlpha: 0, filter: 'blur(6px)', duration: 0.34}, 0.67)
       .to(panels[0], {yPercent: -40, rotation: -7, scale: 1.08, autoAlpha: 0, duration: 0.34}, 0.67)
       .to(words[1], {xPercent: 0, scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.38}, 0.87)
       .to(panels[1], {yPercent: 0, rotation: 0, scale: 1, autoAlpha: 1, duration: 0.38}, 0.87)
-      .to(words[1], {xPercent: -24, scale: 1.15, autoAlpha: 0, filter: 'blur(12px)', duration: 0.34}, 1.75)
+      .to(words[1], {xPercent: -24, scale: 1.15, autoAlpha: 0, filter: 'blur(6px)', duration: 0.34}, 1.75)
       .to(panels[1], {yPercent: -40, rotation: -7, scale: 1.08, autoAlpha: 0, duration: 0.34}, 1.75)
       .to(words[2], {xPercent: 0, scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.38}, 1.95)
       .to(panels[2], {yPercent: 0, rotation: 0, scale: 1, autoAlpha: 1, duration: 0.38}, 1.95)
       .to({}, {duration: 0.75}, 2.35);
+    }
 
     // Codrops' on-scroll typography demos informed the mask/transform treatment.
     // The choreography and site content here are original.
@@ -72,7 +85,7 @@
     });
     const focusReveal = event => {
       const block = event.target.closest('.job, .project, .contact');
-      if (block) gsap.to(block, {opacity: 1, duration: 0.1, overwrite: 'auto'});
+      if (block) gsap.to(block, {opacity: 1, x: 0, y: 0, scale: 1, rotation: 0, duration: 0.1, overwrite: 'auto'});
     };
     document.addEventListener('focusin', focusReveal);
     return () => {
@@ -80,4 +93,17 @@
       document.removeEventListener('focusin', focusReveal);
     };
   });
+  document.fonts?.ready.then(() => {
+    ScrollTrigger.refresh();
+    const align = () => {
+      const target = !anchorCancelled && location.hash === initialHash && document.getElementById(initialHash.slice(1));
+      if (target) window.scrollTo({top: scrollY + target.getBoundingClientRect().top - 32, behavior: 'instant'});
+      anchorInputs.forEach(type => window.removeEventListener(type, cancelAnchor));
+    };
+    // The chapter changes document length; native hash positioning happens
+    // before its pin spacers and final font measurements are established.
+    if (document.readyState === 'complete') requestAnimationFrame(align);
+    else window.addEventListener('load', () => requestAnimationFrame(align), {once: true});
+  });
+  window.addEventListener('pageshow', event => { if (event.persisted) ScrollTrigger.refresh(); });
 })();

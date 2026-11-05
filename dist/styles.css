@@ -52,3 +52,58 @@ html,body{overflow-x:clip}
 .contact-links a:hover{color:var(--accent);background:var(--soft)}
 @media(max-width:700px){.contact-links{grid-template-columns:1fr;margin-top:38px}.contact-links a,.contact-links a+a{padding:16px 2px;border-left:0}.contact-links a+a{border-top:1px solid var(--line)}footer{display:flex;align-items:center;justify-content:space-between;gap:16px}footer>a{white-space:nowrap}}
 
+/* November refinement: preserve the clean editorial layout and real work. */
+html{scrollbar-width:thin;scrollbar-color:#aeb7c8 transparent;scroll-padding-top:32px}
+::selection{background:#2443d824;color:var(--ink)}
+h2,h3,.about-lead{text-wrap:balance}
+.job p,.project p,.contact p{text-wrap:pretty}
+.proof strong,.project-number,.motion-panel strong{font-variant-numeric:tabular-nums}
+.topbar nav a{min-height:44px;display:inline-flex;align-items:center;justify-content:center;position:relative}
+.topbar .nav-contact{padding-bottom:0;border:0;gap:12px}
+.nav-contact>span:last-child{margin-left:0;color:var(--accent);transition:transform 200ms ease}
+.nav-contact:hover>span:last-child{transform:translate(2px,-2px)}
+.topbar nav a:not(.nav-contact)::after{content:'';position:absolute;bottom:5px;left:0;right:0;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform 200ms ease}
+.topbar nav a:hover::after,.topbar nav a:focus-visible::after{transform:scaleX(1)}
+.button{border-radius:6px;transition:background 180ms ease,transform 180ms ease,box-shadow 180ms ease}
+.button:hover{box-shadow:0 5px 16px -8px #2443d880;transform:translateY(-2px)}
+.button:active{transform:translateY(0)}
+.project{display:flex;flex-direction:column;padding:22px;border-radius:10px;transition:border-color 220ms ease,box-shadow 220ms ease}
+.project:hover,.project:focus-within{border-color:#aebae8;box-shadow:0 8px 28px -20px #203d7b60}
+.project-top{margin-bottom:18px;min-height:34px}
+.project-media{margin:0 0 24px;aspect-ratio:3/2;overflow:hidden;border-radius:5px;background:#f5f6f9;border:1px solid #17202b0a;flex-shrink:0}
+.project-media img{display:block;width:100%;height:100%;object-fit:cover}
+.project-media-skycell img{object-position:50% 34%}
+.project-media-marble img{object-fit:contain;padding:24px}
+.project .tags{min-height:0;margin-bottom:4px}
+.project>p{min-height:0}
+.project-link{min-height:44px;align-items:center;margin-top:10px;line-height:1.5}
+.project-link span,.text-link span{transition:transform 200ms ease;display:inline-block}
+.project-link:hover span,.text-link:hover span{transform:translate(2px,-2px)}
+summary{min-height:48px;gap:20px}
+summary span{transition:transform 220ms ease}
+.contact-email{display:inline-flex;align-items:center;gap:16px;max-width:100%;overflow-wrap:anywhere}
+.contact>a span{padding-left:0;flex-shrink:0}
+.contact-links a{min-height:64px}
+.contact-links a span{transition:transform 200ms ease}
+.contact-links a:hover span{transform:translate(2px,-2px)}
+footer a{min-height:44px;display:inline-flex;align-items:center}
+.motion-story:not(.has-motion) .motion-floor{display:none}
+.motion-story:not(.has-motion) .motion-count{display:none}
+.motion-story:not(.has-motion) .motion-panels{margin-bottom:0}
+@media(min-width:1001px){.projects{align-items:stretch}.project details{margin-top:auto}.project .tags{margin-bottom:20px}}
+@media(max-width:700px){
+  .topbar nav{gap:8px}.topbar nav a{min-width:44px;font-size:12px}
+  .topbar nav .nav-contact{display:inline-flex;min-width:44px;width:44px;border:1px solid var(--line);border-radius:50%;padding:0}
+  .nav-contact-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .topbar .wordmark{font-size:31px}
+  .hero h1{font-size:clamp(58px,17.8vw,70px);letter-spacing:-.055em}
+  .project{padding:22px}.project-media{margin-bottom:22px}.project h3{font-size:29px}
+  .project-top{margin-bottom:16px}.project .tags{margin-bottom:18px}
+  .motion-static-title{margin:32px 0;font-size:clamp(36px,9vw,60px)}
+  .motion-panel{box-shadow:none;min-height:220px;gap:20px;padding:24px}
+  .contact-email{font-size:clamp(17px,5.2vw,24px)!important;gap:10px}
+  .proof{gap:12px}.proof>div+div{padding-left:12px}.proof strong{font-size:clamp(25px,7vw,32px)}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}.button:hover{transform:none}}
+@media(max-height:500px){.contact{padding-block:36px}.contact h2{font-size:42px;margin-block:14px}.contact p{margin-bottom:16px}.contact-links{margin-top:24px}.contact-links a{min-height:52px;padding-block:14px}footer{padding-block:12px}}
+

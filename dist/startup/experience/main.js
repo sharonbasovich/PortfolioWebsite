@@ -1,16 +1,20 @@
 import Lenis from "../vendor/lenis/lenis.js";
 import { createWorld } from "./world.js?v=20261030-continuous-handoff";
 import { createPointerRibbon } from "./pointer-ribbon.js";
-import { installProjectDetails } from "./project-details.js?v=20261024-robotics";
+import { installProjectDetails } from "./project-details.js?v=20261105-polish";
 import { installProjectEvidence } from "./project-evidence.js?v=20261024-skycrop";
 import { installTheme } from "./theme.js?v=20261023-header";
 import { createNativePresentation } from "./native-presentation.js?v=20261023-polish";
 import { mountEchoProjects } from "./echo/projects.js?v=20261027-echo";
 import { mountContactExpansion } from "./echo/contact.js?v=20261030-visible-end";
-import { mountInternships } from "./internships.js?v=20261027-echo";
+import { mountInternships } from "./internships.js?v=20261105-polish";
 import { mountGlyphPhoto } from "./study/glyph-photo.js?v=20261027-echo";
 
-const initialProjectsHash = location.hash === "#projects";
+const initialHash = location.hash;
+let initialAnchorCancelled = false;
+const initialAnchorInputs = ["pointerdown", "wheel", "touchmove", "keydown"];
+const cancelInitialAnchor = event => { if (event.isTrusted) initialAnchorCancelled = true; };
+if (initialHash) initialAnchorInputs.forEach(type => window.addEventListener(type, cancelInitialAnchor, { passive: true }));
 
 const theme = installTheme();
 const projectHeading = document.querySelector(".projects-heading h2");
@@ -570,7 +574,7 @@ function paint(time = 0, delta = 1 / 60) {
       "CONNECT",
       "ENGINEER",
       "BUILD",
-      "SAY HELLO",
+      "CONNECT",
     ][activeChapter];
   }
   updateScrollRail();
@@ -908,6 +912,14 @@ document.addEventListener("keydown", (event) => {
   lastInput = performance.now();
 });
 
+function anchorPosition(id, target) {
+  const offset = document.querySelector(".site-header").getBoundingClientRect().height + 12;
+  const projectStart = studyGallery && id === "#projects"
+    ? ScrollTrigger?.getById("study-glyph-reveal")?.start : undefined;
+  const contactEnd = id === "#contact"
+    ? ScrollTrigger?.getById("contact-expand")?.end : undefined;
+  return projectStart ?? contactEnd ?? scrollY + target.getBoundingClientRect().top - offset;
+}
 document.addEventListener("click", (event) => {
   const link = event.target.closest('a[href^="#"]');
   if (
@@ -925,18 +937,7 @@ document.addEventListener("click", (event) => {
   if (!target) return;
   markImpactInteraction(event);
   event.preventDefault();
-  const offset =
-    document.querySelector(".site-header").getBoundingClientRect().height + 12;
-  const studyProjectStart = studyGallery && id === "#projects"
-    ? ScrollTrigger?.getById("study-glyph-reveal")?.start
-    : undefined;
-  const contactTrigger = id === '#contact' && ScrollTrigger?.getById('contact-expand');
-  const contactDestination = contactTrigger
-    ? contactTrigger.end : undefined;
-  scrollToPosition(
-    studyProjectStart ?? contactDestination ?? scrollY + target.getBoundingClientRect().top - offset,
-    paused,
-  );
+  scrollToPosition(anchorPosition(id, target), paused);
   if (event.detail === 0) {
     if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
     target.focus({ preventScroll: true });
@@ -1060,14 +1061,22 @@ document.fonts.ready.then(() => {
   if (disposed) return;
   ScrollTrigger?.refresh();
   refreshMeasurements();
-  // Native fragment positioning precedes the project stage's layout. Align
-  // its initial bookmark once; ordinary scroll/resize never resets the reader.
-  const intro = initialProjectsHash && location.hash === "#projects" && ScrollTrigger?.getById("study-glyph-reveal");
-  if (intro) {
-    scrollToPosition(intro.start, true);
-    ScrollTrigger.update();
+  // All initial section bookmarks precede pinned-layout construction. Use the
+  // same measured destination as navigation, without overriding user input.
+  const alignInitialAnchor = () => {
+    if (disposed) return;
+    const target = initialHash && location.hash === initialHash && !initialAnchorCancelled &&
+      document.getElementById(initialHash.slice(1));
+    initialAnchorInputs.forEach(type => window.removeEventListener(type, cancelInitialAnchor));
+    if (!target) return;
+    scrollToPosition(anchorPosition(initialHash, target), true);
+    ScrollTrigger?.update();
     paint(gsap?.ticker.time || 0, 0);
-  }
+  };
+  // Browser-native fragment alignment happens at document load. Correct after
+  // that pass rather than letting it overwrite the measured contact endpoint.
+  if (document.readyState === "complete") requestAnimationFrame(alignInitialAnchor);
+  else window.addEventListener("load", () => requestAnimationFrame(alignInitialAnchor), { once: true });
 });
 window.addEventListener(
   "scroll",
@@ -1181,6 +1190,7 @@ window.addEventListener("pagehide", (event) => {
   disposed = true;
   clearTimeout(resizeTimer);
   for (const type of impactInputs) window.removeEventListener(type, markImpactInteraction);
+  initialAnchorInputs.forEach(type => window.removeEventListener(type, cancelInitialAnchor));
   projectDetails.dispose();
   lenis?.destroy();
   context?.revert();

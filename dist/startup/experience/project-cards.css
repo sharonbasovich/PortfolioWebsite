@@ -33,7 +33,8 @@
 }
 @media (max-width: 650px) {
   .project-panel .project-copy h3 { font-size: 44px; }
-  .project-panel .project-index { gap: 12px; }
+  .project-panel .project-index { gap: 12px; font-size: 12px; }
   .project-panel .project-index span:last-child { max-width: 76%; }
+  .project-panel .project-copy .technology-list { font-size: 13px; line-height: 1.5; }
   .project-panel .project-actions { gap: 8px 22px; }
 }
