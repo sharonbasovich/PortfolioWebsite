@@ -1,109 +1,74 @@
 (() => {
-  if (!window.gsap || !window.ScrollTrigger) return;
-  gsap.registerPlugin(ScrollTrigger);
-  const initialHash = location.hash;
-  let anchorCancelled = false;
-  const cancelAnchor = event => { if (event.isTrusted) anchorCancelled = true; };
-  const anchorInputs = ['pointerdown', 'wheel', 'touchmove', 'keydown'];
-  if (initialHash) anchorInputs.forEach(type => window.addEventListener(type, cancelAnchor, {passive: true}));
+  const header = document.querySelector(".site-header");
+  const links = [...header.querySelectorAll('nav a[href^="#"]')];
+  const sections = links.map(link => document.querySelector(link.getAttribute("href")));
+  let scrollFrame = 0;
+  let activeIndex = -1;
 
-  const media = gsap.matchMedia();
-  media.add({
-    animate: '(prefers-reduced-motion: no-preference)',
-    chapter: '(min-width: 760px) and (min-height: 560px) and (hover: hover) and (pointer: fine)'
-  }, context => {
-    if (!context.conditions.animate) return;
-    const scene = document.querySelector('.motion-story');
-    const words = gsap.utils.toArray('.motion-word');
-    const panels = gsap.utils.toArray('.motion-panel');
-    const counter = document.querySelector('.motion-count');
-    const mobile = matchMedia('(max-width: 700px)').matches;
-    if (!scene || words.length !== 3 || panels.length !== 3) return;
+  function updateNavigation() {
+    scrollFrame = 0;
+    const y = header.offsetHeight + 37;
+    let index = sections.length - 1;
+    while (index >= 0 && sections[index].getBoundingClientRect().top > y) index--;
+    if (index === activeIndex) return;
 
-    // Phones read the three system cards in natural flow. Desktop retains the
-    // accepted pinned chapter; short laptops still receive the entry reveals.
-    if (context.conditions.chapter) {
-    scene.classList.add('has-motion');
-    gsap.set(words, {autoAlpha: 0, xPercent: 25, scale: 0.76, filter: 'blur(8px)'});
-    gsap.set(panels, {autoAlpha: 0, yPercent: 42, rotation: 8, scale: 0.8});
-    gsap.set([words[0], panels[0]], {autoAlpha: 1, xPercent: 0, yPercent: 0, rotation: 0, scale: 1, filter: 'blur(0px)'});
+    links[activeIndex]?.removeAttribute("aria-current");
+    links[index]?.setAttribute("aria-current", "location");
+    activeIndex = index;
+  }
 
-    const sequence = gsap.timeline({
-      defaults: {ease: 'none'},
-      scrollTrigger: {
-        trigger: scene,
-        start: 'top top',
-        end: () => '+=' + Math.round(innerHeight * (mobile ? 2.1 : 2.4)),
-        pin: true,
-        scrub: 0.55,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: self => {
-          const position = self.progress * 3.4;
-          const index = position < 0.87 ? 1 : position < 1.95 ? 2 : 3;
-          counter.textContent = String(index).padStart(2, '0') + ' / 03';
-        }
-      }
-    });
-    sequence.to('.motion-progress span', {scaleX: 1, duration: 3.4}, 0);
-    sequence.to(words[0], {xPercent: -24, scale: 1.15, autoAlpha: 0, filter: 'blur(6px)', duration: 0.34}, 0.67)
-      .to(panels[0], {yPercent: -40, rotation: -7, scale: 1.08, autoAlpha: 0, duration: 0.34}, 0.67)
-      .to(words[1], {xPercent: 0, scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.38}, 0.87)
-      .to(panels[1], {yPercent: 0, rotation: 0, scale: 1, autoAlpha: 1, duration: 0.38}, 0.87)
-      .to(words[1], {xPercent: -24, scale: 1.15, autoAlpha: 0, filter: 'blur(6px)', duration: 0.34}, 1.75)
-      .to(panels[1], {yPercent: -40, rotation: -7, scale: 1.08, autoAlpha: 0, duration: 0.34}, 1.75)
-      .to(words[2], {xPercent: 0, scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.38}, 1.95)
-      .to(panels[2], {yPercent: 0, rotation: 0, scale: 1, autoAlpha: 1, duration: 0.38}, 1.95)
-      .to({}, {duration: 0.75}, 2.35);
+  function scheduleNavigation() {
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(updateNavigation);
+  }
+
+  window.addEventListener("scroll", scheduleNavigation, { passive: true });
+  window.addEventListener("resize", scheduleNavigation, { passive: true });
+  updateNavigation();
+
+  if (!Element.prototype.animate || !window.IntersectionObserver) return;
+
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const running = new Set();
+  const easeOut = "cubic-bezier(.2,.65,.3,1)";
+
+  function animate(element, keyframes, options) {
+    if (reducedMotion.matches || document.hidden) return;
+    const animation = element.animate(keyframes, { easing: easeOut, ...options });
+    running.add(animation);
+    function release() { running.delete(animation); }
+    animation.finished.then(release, release);
+  }
+
+  // Let an intentional jump or an early keyboard action settle the entrance immediately.
+  function cancelEntrance() {
+    running.forEach(animation => animation.cancel());
+  }
+
+  reducedMotion.addEventListener("change", cancelEntrance);
+  window.addEventListener("hashchange", cancelEntrance);
+  document.addEventListener("focusin", cancelEntrance);
+
+  if (!location.hash && scrollY < 8) {
+    animate(document.querySelector(".hero h1"), [
+      { opacity: .86, translate: "0 13px" },
+      { opacity: 1, translate: "0 0" }
+    ], { duration: 490 });
+    animate(document.querySelector(".hero-intro"), [
+      { opacity: .84, transform: "translateY(10px)" },
+      { opacity: 1, transform: "translateY(0)" }
+    ], { duration: 420, delay: 65 });
+  }
+
+  const imageObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (entry.intersectionRatio < .32) continue;
+      imageObserver.unobserve(entry.target);
+      animate(entry.target, [
+        { clipPath: "inset(0 0 16% 0 round 9px)", translate: "0 12px" },
+        { clipPath: "inset(0 0 0 0 round 9px)", translate: "0 0" }
+      ], { duration: 520 });
     }
+  }, { threshold: .32 });
 
-    // Codrops' on-scroll typography demos informed the mask/transform treatment.
-    // The choreography and site content here are original.
-    gsap.from('.hero h1', {y: 70, clipPath: 'inset(100% 0 0 0)', duration: 1.15, ease: 'power3.out'});
-    gsap.to('.hero h1', {
-      yPercent: mobile ? 8 : 16, scale: mobile ? 0.96 : 0.89, transformOrigin: 'left top', ease: 'none',
-      scrollTrigger: {trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.65}
-    });
-    document.querySelectorAll('.section-heading h2, .contact h2').forEach(el => {
-      gsap.from(el, {
-        yPercent: 90, clipPath: 'inset(100% 0 0 0)', duration: 0.95, ease: 'power3.out',
-        scrollTrigger: {trigger: el, start: 'top 92%', once: true}
-      });
-    });
-    document.querySelectorAll('.job').forEach(el => {
-      gsap.from(el, {
-        x: mobile ? 32 : 88, opacity: 0.18, duration: 0.95, ease: 'power3.out',
-        scrollTrigger: {trigger: el, start: 'top 90%', once: true}
-      });
-    });
-    document.querySelectorAll('.project').forEach((el, index) => {
-      gsap.from(el, {
-        y: mobile ? 70 : 105, rotation: mobile ? 0 : (index - 1) * 3,
-        scale: 0.86, opacity: 0.25, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: {trigger: el, start: 'top 94%', once: true}
-      });
-    });
-    const focusReveal = event => {
-      const block = event.target.closest('.job, .project, .contact');
-      if (block) gsap.to(block, {opacity: 1, x: 0, y: 0, scale: 1, rotation: 0, duration: 0.1, overwrite: 'auto'});
-    };
-    document.addEventListener('focusin', focusReveal);
-    return () => {
-      scene.classList.remove('has-motion');
-      document.removeEventListener('focusin', focusReveal);
-    };
-  });
-  document.fonts?.ready.then(() => {
-    ScrollTrigger.refresh();
-    const align = () => {
-      const target = !anchorCancelled && location.hash === initialHash && document.getElementById(initialHash.slice(1));
-      if (target) window.scrollTo({top: scrollY + target.getBoundingClientRect().top - 32, behavior: 'instant'});
-      anchorInputs.forEach(type => window.removeEventListener(type, cancelAnchor));
-    };
-    // The chapter changes document length; native hash positioning happens
-    // before its pin spacers and final font measurements are established.
-    if (document.readyState === 'complete') requestAnimationFrame(align);
-    else window.addEventListener('load', () => requestAnimationFrame(align), {once: true});
-  });
-  window.addEventListener('pageshow', event => { if (event.persisted) ScrollTrigger.refresh(); });
+  document.querySelectorAll(".project-photo, .marble-media").forEach(media => imageObserver.observe(media));
 })();
