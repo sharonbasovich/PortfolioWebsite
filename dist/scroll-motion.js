@@ -1,5 +1,6 @@
 (() => {
   const header = document.querySelector(".site-header");
+  const hero = document.querySelector(".hero");
   const links = [...header.querySelectorAll('nav a[href^="#"]')];
   const sections = links.map(link => document.querySelector(link.getAttribute("href")));
   let scrollFrame = 0;
@@ -7,7 +8,12 @@
 
   function updateNavigation() {
     scrollFrame = 0;
-    const y = header.offsetHeight + 37;
+    const headerHeight = header.offsetHeight;
+    const showHeader = hero.getBoundingClientRect().bottom <= headerHeight + 1;
+    header.classList.toggle("is-visible", showHeader);
+    header.inert = !showHeader;
+
+    const y = headerHeight + 37;
     let index = sections.length - 1;
     while (index >= 0 && sections[index].getBoundingClientRect().top > y) index--;
     if (index === activeIndex) return;
@@ -59,16 +65,34 @@
     ], { duration: 420, delay: 65 });
   }
 
-  const imageObserver = new IntersectionObserver(entries => {
+  const revealAt = .23;
+  const entryObserver = new IntersectionObserver(entries => {
     for (const entry of entries) {
-      if (entry.intersectionRatio < .32) continue;
-      imageObserver.unobserve(entry.target);
-      animate(entry.target, [
-        { clipPath: "inset(0 0 16% 0 round 9px)", translate: "0 12px" },
-        { clipPath: "inset(0 0 0 0 round 9px)", translate: "0 0" }
-      ], { duration: 520 });
-    }
-  }, { threshold: .32 });
+      if (entry.intersectionRatio < revealAt) continue;
+      const element = entry.target;
+      entryObserver.unobserve(element);
+      if (element.contains(document.activeElement)) continue;
 
-  document.querySelectorAll(".project-photo, .marble-media").forEach(media => imageObserver.observe(media));
+      if (element.matches(".project")) {
+        animate(element.querySelector(".project-photo"), [
+          { clipPath: "inset(0 0 16% 0 round 9px)", translate: "0 12px" },
+          { clipPath: "inset(0 0 0 0 round 9px)", translate: "0 0" }
+        ], { duration: 520 });
+        reveal(element.querySelector(".project-info"), 50);
+      } else {
+        reveal(element.querySelector(".job-heading"));
+        reveal(element.querySelector(".job-story"), 45);
+        reveal(element.querySelector(".job-result"), 70);
+      }
+    }
+  }, { threshold: revealAt });
+
+  function reveal(element, delay = 0) {
+    animate(element, [
+      { opacity: .58, translate: "0 16px" },
+      { opacity: 1, translate: "0 0" }
+    ], { duration: 465, delay, fill: "backwards" });
+  }
+
+  document.querySelectorAll(".job, .project").forEach(element => entryObserver.observe(element));
 })();

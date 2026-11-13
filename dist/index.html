@@ -13,8 +13,9 @@
   <meta property="og:url" content="https://sharonbasovich.vercel.app/">
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="12" fill="%233044cc"/%3E%3Ctext x="32" y="42" font-family="Arial" font-weight="700" font-size="29" text-anchor="middle" fill="white"%3ESB%3C/text%3E%3C/svg%3E'>
   <link rel="preload" href="startup/experience/assets/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=folio-4">
-  <script src="scroll-motion.js?v=folio-4" defer></script>
+  <script>document.documentElement.classList.add("has-scroll-header");</script>
+  <link rel="stylesheet" href="styles.css?v=folio-5">
+  <script src="scroll-motion.js?v=folio-5" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -28,20 +29,23 @@
         <a href="#projects">Projects</a>
         <a href="#about">About</a>
       </nav>
-      <a class="header-resume" href="Sharon_Basovich_Resume.pdf">Résumé <span class="arrow" aria-hidden="true">↗</span></a>
+      <a class="button header-resume" href="Sharon_Basovich_Resume.pdf">Résumé <span class="arrow" aria-hidden="true">↗</span></a>
     </div>
   </header>
 
   <main id="main" tabindex="-1">
     <section class="hero" id="top" aria-labelledby="name">
       <div class="shell hero-inner">
-        <h1 id="name"><span>Sharon</span> <span>Basovich</span></h1>
+        <h1 id="name"><span>Hi, I’m</span> <span>Sharon.</span></h1>
         <div class="hero-intro">
-          <p class="hero-lead">Computer Science at the University of Waterloo.</p>
-          <p>I build software for engineering teams, investment research, and robots.</p>
+          <div class="hero-education">
+            <p class="hero-lead">I study Computer Science at the University of Waterloo.</p>
+            <img class="waterloo-mark" src="assets/waterloo-logo.png" width="400" height="160" decoding="async" alt="">
+          </div>
           <div class="hero-links">
             <a class="button" href="Sharon_Basovich_Resume.pdf">View résumé <span class="arrow" aria-hidden="true">↗</span></a>
             <a class="quiet-link" href="https://github.com/sharonbasovich">GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="quiet-link" href="https://www.linkedin.com/in/sharon-basovich">LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
           </div>
         </div>
       </div>
@@ -111,9 +115,10 @@
 
         <div class="project-grid">
           <article class="project">
-            <div class="project-photo robotics-photo">
+            <a class="project-photo robotics-photo" href="https://github.com/sharonbasovich/828555Sworlds" aria-label="Lions Robotics source code">
               <img src="startup/experience/assets/project-evidence/lions-robots-trophies.jpg" width="1200" height="800" loading="lazy" decoding="async" alt="Lions Robotics robots displayed with their competition trophies">
-            </div>
+              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
+            </a>
             <div class="project-info">
               <h3>Lions Robotics</h3>
               <p class="project-role">Vice President &amp; Lead Programmer</p>
@@ -123,9 +128,10 @@
           </article>
 
           <article class="project">
-            <div class="project-photo skycell-photo">
+            <a class="project-photo skycell-photo" href="https://skycell.vercel.app/" aria-label="SkyCell flight replay">
               <img src="startup/experience/assets/project-evidence/skycell-balloon-launch.jpg" width="659" height="880" loading="lazy" decoding="async" alt="Two high-altitude balloons and the payloads suspended beneath them">
-            </div>
+              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
+            </a>
             <div class="project-info">
               <h3>SkyCell</h3>
               <p class="project-role">1st place, Apex International Hackathon</p>
@@ -137,15 +143,32 @@
             </div>
           </article>
 
-          <article class="project marble-project">
+          <article class="project">
+            <a class="project-photo project-logo marble-media" href="https://www.marbleinvestments.ca/" aria-label="Marble Investments fund website">
+              <img src="startup/experience/assets/project-evidence/marble-logo.svg" width="467" height="157" loading="lazy" decoding="async" alt="">
+              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
+            </a>
             <div class="project-info">
               <h3>Marble Investments</h3>
               <p class="project-role">Research tooling for a $3M investment fund</p>
               <p>Developed a React research graph to store 1,500+ relationships across 500+ companies. Built a news pipeline that uses an LLM to identify portfolio impact across 2,000 articles daily, plus a Python screener that narrows 1 million stock pairs to 50–100 candidates for analyst review.</p>
               <a class="quiet-link" href="https://www.marbleinvestments.ca/">Fund website <span class="arrow" aria-hidden="true">↗</span></a>
             </div>
-            <div class="marble-media">
-              <img src="startup/experience/assets/project-evidence/marble-logo.svg" width="467" height="157" loading="lazy" decoding="async" alt="Marble Investments">
+          </article>
+
+          <article class="project">
+            <a class="project-photo project-logo hpc-media" href="https://www.uwhpc.com/" aria-label="UW HPC team website">
+              <img src="startup/experience/assets/project-evidence/uwhpc-logo.svg" width="387" height="234" loading="lazy" decoding="async" alt="">
+              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
+            </a>
+            <div class="project-info">
+              <h3>UW HPC</h3>
+              <p class="project-role">Core Developer, Waterloo’s High Performance Computing team</p>
+              <p>Help develop XPU, a C++23 library for shared CPU and CUDA code, and a CUDA C++ engine that uses variational Monte Carlo to simulate an electron gas.</p>
+              <div class="project-links">
+                <a class="quiet-link" href="https://github.com/UWHPC/xpu">XPU source <span class="arrow" aria-hidden="true">↗</span></a>
+                <a class="quiet-link" href="https://github.com/UWHPC/variational-monte-carlo">Monte Carlo source <span class="arrow" aria-hidden="true">↗</span></a>
+              </div>
             </div>
           </article>
         </div>
@@ -154,15 +177,14 @@
 
     <section class="shell section about" id="about" aria-labelledby="about-title">
       <div class="about-bio">
-        <h2 id="about-title">About</h2>
-        <p class="about-lead">I’m in the Honours Computer Science co-op program at the University of Waterloo.</p>
-        <p>Outside of code, I’m into watches and how they work, mechanical keyboards, cubing, science fiction, and cooking.</p>
+        <h2 id="about-title">I build software and ask hard questions.</h2>
+        <p>Outside of code, I’m into horology, mechanical keyboards, cubing, science fiction, and cooking.</p>
       </div>
       <div class="recognition">
-        <h3>Recognition</h3>
+        <h3>Awards</h3>
         <dl>
           <div>
-            <dt>13 hackathon wins</dt>
+            <dt>13 Hackathon Wins</dt>
             <dd>Including Hack the North, General Catalyst, and Ramp</dd>
           </div>
           <div>
