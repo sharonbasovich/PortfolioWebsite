@@ -175,12 +175,6 @@ main:focus { outline: none; }
   border-top: 1px solid #cdd1e8;
 }
 
-.hero-education {
-  display: flex;
-  align-items: center;
-  gap: 8px clamp(10px, 1.7vw, 24px);
-}
-
 .hero-lead {
   color: var(--ink);
   font-size: clamp(25px, 2.75vw, 37px);
@@ -190,11 +184,14 @@ main:focus { outline: none; }
   max-width: 21ch;
 }
 
+.waterloo-name { white-space: nowrap; }
+
 .waterloo-mark {
-  flex: none;
-  width: 160px;
-  height: auto;
-  margin-inline: -16px;
+  display: inline-block;
+  width: .76em;
+  height: .76em;
+  margin-inline: .23em .06em;
+  vertical-align: -.07em;
 }
 
 .hero-links {
@@ -360,29 +357,7 @@ strong { color: var(--ink); font-weight: 700; }
 .robotics-photo img { object-position: center 58%; }
 .skycell-photo img { object-position: center 32%; }
 
-.project-photo-icon {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border-radius: 50%;
-  background: rgb(247 247 244 / .97);
-  color: var(--ink);
-  font-size: 19px;
-  line-height: 1;
-  box-shadow: 0 2px 10px rgb(0 0 0 / .15);
-  transition: background .2s var(--ease), color .2s var(--ease), transform .24s var(--ease);
-}
-
 .project-photo:focus-visible img { transform: scale(1.045); }
-.project-photo:focus-visible .project-photo-icon {
-  background: var(--accent);
-  color: white;
-  transform: translate(2px, -2px);
-}
 
 .project-info { margin-top: 22px; }
 .project-info > p:not(.project-role) { margin-top: 12px; }
@@ -402,8 +377,8 @@ strong { color: var(--ink); font-weight: 700; }
   place-items: center;
 }
 
-.marble-media { background: #0e1014; }
-.marble-media img { width: min(62%, 290px); height: auto; }
+.marble-media { background: #fff; }
+.marble-media img { width: min(67%, 330px); height: auto; }
 .hpc-media { background: #f7f7f4; }
 .hpc-media img { width: min(49%, 245px); height: auto; }
 
@@ -471,7 +446,6 @@ strong { color: var(--ink); font-weight: 700; }
   .site-header nav a:hover { color: var(--accent-dark); }
   a:hover .arrow, a:focus-visible .arrow { transform: translate(2px, -2px); }
   .project-photo:hover img { transform: scale(1.045); }
-  .project-photo:hover .project-photo-icon { background: var(--accent); color: white; }
 }
 
 @media (max-width: 1050px) {
@@ -538,8 +512,6 @@ strong { color: var(--ink); font-weight: 700; }
   .site-header nav { gap: 6px; }
   .header-resume { padding-inline: 7px; }
   .header-resume .arrow { display: none; }
-  .hero-education { align-items: flex-start; flex-direction: column; gap: 0; }
-  .waterloo-mark { margin-inline: -21px 0; }
   .hero-links { column-gap: 9px; }
   .hero-links .button { padding-inline: 10px; }
   .hero-links .arrow { display: none; }
@@ -555,6 +527,5 @@ strong { color: var(--ink); font-weight: 700; }
   *, *::before, *::after { transition-duration: 0s !important; }
   .has-scroll-header .site-header { transition-delay: 0s; }
   a:hover .arrow, a:focus-visible .arrow,
-  .project-photo:hover img, .project-photo:focus-visible img,
-  .project-photo:focus-visible .project-photo-icon { transform: none; }
+  .project-photo:hover img, .project-photo:focus-visible img { transform: none; }
 }

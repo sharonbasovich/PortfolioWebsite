@@ -14,7 +14,7 @@
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="12" fill="%233044cc"/%3E%3Ctext x="32" y="42" font-family="Arial" font-weight="700" font-size="29" text-anchor="middle" fill="white"%3ESB%3C/text%3E%3C/svg%3E'>
   <link rel="preload" href="startup/experience/assets/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script>document.documentElement.classList.add("has-scroll-header");</script>
-  <link rel="stylesheet" href="styles.css?v=folio-5">
+  <link rel="stylesheet" href="styles.css?v=folio-6">
   <script src="scroll-motion.js?v=folio-5" defer></script>
 </head>
 <body>
@@ -38,10 +38,7 @@
       <div class="shell hero-inner">
         <h1 id="name"><span>Hi, I’m</span> <span>Sharon.</span></h1>
         <div class="hero-intro">
-          <div class="hero-education">
-            <p class="hero-lead">I study Computer Science at the University of Waterloo.</p>
-            <img class="waterloo-mark" src="assets/waterloo-logo.png" width="400" height="160" decoding="async" alt="">
-          </div>
+          <p class="hero-lead">I study Computer Science at the University of <span class="waterloo-name">Waterloo.<img class="waterloo-mark" src="assets/waterloo-crest.png" width="32" height="32" decoding="async" alt=""></span></p>
           <div class="hero-links">
             <a class="button" href="Sharon_Basovich_Resume.pdf">View résumé <span class="arrow" aria-hidden="true">↗</span></a>
             <a class="quiet-link" href="https://github.com/sharonbasovich">GitHub <span class="arrow" aria-hidden="true">↗</span></a>
@@ -117,7 +114,6 @@
           <article class="project">
             <a class="project-photo robotics-photo" href="https://github.com/sharonbasovich/828555Sworlds" aria-label="Lions Robotics source code">
               <img src="startup/experience/assets/project-evidence/lions-robots-trophies.jpg" width="1200" height="800" loading="lazy" decoding="async" alt="Lions Robotics robots displayed with their competition trophies">
-              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
             </a>
             <div class="project-info">
               <h3>Lions Robotics</h3>
@@ -128,25 +124,8 @@
           </article>
 
           <article class="project">
-            <a class="project-photo skycell-photo" href="https://skycell.vercel.app/" aria-label="SkyCell flight replay">
-              <img src="startup/experience/assets/project-evidence/skycell-balloon-launch.jpg" width="659" height="880" loading="lazy" decoding="async" alt="Two high-altitude balloons and the payloads suspended beneath them">
-              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
-            </a>
-            <div class="project-info">
-              <h3>SkyCell</h3>
-              <p class="project-role">1st place, Apex International Hackathon</p>
-              <p>Launched a balloon payload to 30 km altitude with a 70 km LoRa/Meshtastic radio link. Built Python software to parse GPS data, read environmental sensors, and recover dropped radio connections.</p>
-              <div class="project-links">
-                <a class="quiet-link" href="https://skycell.vercel.app/">Flight replay <span class="arrow" aria-hidden="true">↗</span></a>
-                <a class="quiet-link" href="https://github.com/sharonbasovich/skycell">Dashboard source <span class="arrow" aria-hidden="true">↗</span></a>
-              </div>
-            </div>
-          </article>
-
-          <article class="project">
             <a class="project-photo project-logo marble-media" href="https://www.marbleinvestments.ca/" aria-label="Marble Investments fund website">
-              <img src="startup/experience/assets/project-evidence/marble-logo.svg" width="467" height="157" loading="lazy" decoding="async" alt="">
-              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
+              <img src="assets/marble-wordmark.webp" width="720" height="250" loading="lazy" decoding="async" alt="">
             </a>
             <div class="project-info">
               <h3>Marble Investments</h3>
@@ -158,8 +137,7 @@
 
           <article class="project">
             <a class="project-photo project-logo hpc-media" href="https://www.uwhpc.com/" aria-label="UW HPC team website">
-              <img src="startup/experience/assets/project-evidence/uwhpc-logo.svg" width="387" height="234" loading="lazy" decoding="async" alt="">
-              <span class="project-photo-icon arrow" aria-hidden="true">↗</span>
+              <img src="assets/uwhpc-mark.svg" width="387" height="234" loading="lazy" decoding="async" alt="">
             </a>
             <div class="project-info">
               <h3>UW HPC</h3>
@@ -168,6 +146,21 @@
               <div class="project-links">
                 <a class="quiet-link" href="https://github.com/UWHPC/xpu">XPU source <span class="arrow" aria-hidden="true">↗</span></a>
                 <a class="quiet-link" href="https://github.com/UWHPC/variational-monte-carlo">Monte Carlo source <span class="arrow" aria-hidden="true">↗</span></a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project">
+            <a class="project-photo skycell-photo" href="https://skycell.vercel.app/" aria-label="SkyCell flight replay">
+              <img src="startup/experience/assets/project-evidence/skycell-balloon-launch.jpg" width="659" height="880" loading="lazy" decoding="async" alt="Two high-altitude balloons and the payloads suspended beneath them">
+            </a>
+            <div class="project-info">
+              <h3>SkyCell</h3>
+              <p class="project-role">1st place, Apex International Hackathon</p>
+              <p>Launched a balloon payload to 30 km altitude with a 70 km LoRa/Meshtastic radio link. Built Python software to parse GPS data, read environmental sensors, and recover dropped radio connections.</p>
+              <div class="project-links">
+                <a class="quiet-link" href="https://skycell.vercel.app/">Flight replay <span class="arrow" aria-hidden="true">↗</span></a>
+                <a class="quiet-link" href="https://github.com/sharonbasovich/skycell">Dashboard source <span class="arrow" aria-hidden="true">↗</span></a>
               </div>
             </div>
           </article>
