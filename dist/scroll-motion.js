@@ -43,6 +43,7 @@
     running.add(animation);
     function release() { running.delete(animation); }
     animation.finished.then(release, release);
+    return animation;
   }
 
   // Let an intentional jump or an early keyboard action settle the entrance immediately.
@@ -54,6 +55,29 @@
   window.addEventListener("hashchange", cancelEntrance);
   document.addEventListener("focusin", cancelEntrance);
 
+  const wave = document.querySelector(".hero-wave");
+  const hand = wave.querySelector(".wave-hand");
+  let waveAnimation;
+  let waveTimer;
+
+  function waveHello() {
+    if (waveAnimation?.playState === "running") return;
+    waveAnimation = animate(hand, [
+      { rotate: "0deg", offset: 0 },
+      { rotate: "-7deg", offset: .16 },
+      { rotate: "14deg", offset: .35 },
+      { rotate: "-8deg", offset: .54 },
+      { rotate: "7deg", offset: .71 },
+      { rotate: "0deg", offset: 1 }
+    ], { duration: 540, easing: "ease-in-out" });
+  }
+
+  wave.addEventListener("pointerenter", event => {
+    if (event.pointerType === "touch") return;
+    clearTimeout(waveTimer);
+    waveHello();
+  });
+
   if (!location.hash && scrollY < 8) {
     animate(document.querySelector(".hero h1"), [
       { opacity: .86, translate: "0 13px" },
@@ -63,6 +87,10 @@
       { opacity: .84, transform: "translateY(10px)" },
       { opacity: 1, transform: "translateY(0)" }
     ], { duration: 420, delay: 65 });
+    waveTimer = setTimeout(() => {
+      const bounds = wave.getBoundingClientRect();
+      if (bounds.bottom > 0 && bounds.top < innerHeight) waveHello();
+    }, 620);
   }
 
   const revealAt = .23;
