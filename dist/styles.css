@@ -373,6 +373,59 @@ main:focus { outline: none; }
   line-height: .98;
 }
 
+.reveal-title {
+  overflow: clip;
+  padding: .06em .05em .15em;
+  margin: -.06em -.05em -.15em;
+}
+
+.reveal-title > span { display: block; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-title.is-awaiting-reveal > span { transform: translateY(110%); }
+  .reveal-title.is-revealing > span { transition: transform .66s var(--ease); }
+
+  .project-photo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--project-paper);
+    transform: scaleY(0);
+    transform-origin: top;
+    pointer-events: none;
+  }
+
+  .project-photo.is-awaiting-reveal::before { transform: scaleY(1); }
+  .project-photo.is-revealing::before { transition: transform .72s var(--ease); }
+
+  .is-awaiting-reveal.reveal-copy {
+    opacity: .18;
+    transform: translateY(22px);
+  }
+
+  .is-revealing.reveal-copy {
+    transition: opacity .56s var(--ease), transform .56s var(--ease);
+  }
+
+  @media (min-width: 801px) {
+    .job-story.is-revealing { transition-delay: 45ms; }
+    .job-result.is-revealing { transition-delay: 90ms; }
+  }
+
+  .is-awaiting-reveal.reveal-copy:focus-within,
+  .is-revealing.reveal-copy:focus-within {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .project-photo:focus-visible::before {
+    transform: scaleY(0);
+    transition: none;
+  }
+}
+
 .experience-list {
   border-block: 1px solid var(--line);
 }

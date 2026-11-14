@@ -95,33 +95,43 @@
     }, 620);
   }
 
-  // Start each piece just below the viewport. Keep content still if it was
-  // already visible on load or arrived well into view in a fast scroll.
-  let firstRevealBatch = true;
+  // Prepare offscreen content before it can be painted in its resting state.
+  // Content already in view, including a linked section, starts fully shown.
+  const revealCopy = ".job-heading, .job-story, .job-result, .project-info, .about-bio p, .recognition, .email-link, .footer-links";
+  const revealTargets = document.querySelectorAll(".reveal-title, .project-photo, " + revealCopy);
   const entryObserver = new IntersectionObserver(entries => {
     for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
       const element = entry.target;
-      entryObserver.unobserve(element);
-      const { top } = entry.boundingClientRect;
-      if (top < innerHeight - (firstRevealBatch ? 0 : 48)) continue;
-      if (element.contains(document.activeElement)) continue;
-
-      if (element.matches(".project-photo")) {
-        animate(element.querySelector("img"), [
-          { opacity: .76, scale: 1.025 },
-          { opacity: 1, scale: 1 }
-        ], { duration: 440 });
-      } else {
-        animate(element, [
-          { opacity: .78, translate: "0 8px" },
-          { opacity: 1, translate: "0 0" }
-        ], { duration: 390 });
-      }
+      if (!element.classList.contains("is-awaiting-reveal")) continue;
+      if (!entry.isIntersecting && entry.boundingClientRect.bottom > 0) continue;
+      finishReveal(element, entry.isIntersecting && !element.contains(document.activeElement));
     }
-    firstRevealBatch = false;
-  }, { rootMargin: "0px 0px 36px" });
+  }, { rootMargin: "0px 0px -36px" });
 
-  document.querySelectorAll(".job-heading, .job-story, .job-result, .project-photo, .project-info")
-    .forEach(element => entryObserver.observe(element));
+  function finishReveal(element, play = false) {
+    entryObserver.unobserve(element);
+    element.classList.toggle("is-revealing", play);
+    element.classList.remove("is-awaiting-reveal");
+  }
+
+  const initialAnchor = document.getElementById(location.hash.slice(1));
+  const firstScreenBottom = innerHeight + Math.max(0, (initialAnchor?.getBoundingClientRect().top ?? 0) - header.offsetHeight);
+
+  if (!reducedMotion.matches) {
+    for (const element of revealTargets) {
+      if (element.getBoundingClientRect().top < firstScreenBottom) continue;
+      if (element.matches(revealCopy)) element.classList.add("reveal-copy");
+      element.classList.add("is-awaiting-reveal");
+      entryObserver.observe(element);
+    }
+  }
+
+  document.addEventListener("focusin", event => {
+    const element = event.target.closest(".is-awaiting-reveal, .is-revealing");
+    if (element) finishReveal(element);
+  });
+
+  reducedMotion.addEventListener("change", () => {
+    if (reducedMotion.matches) revealTargets.forEach(element => finishReveal(element));
+  });
 })();
