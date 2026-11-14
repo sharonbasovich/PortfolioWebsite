@@ -106,7 +106,7 @@
       if (!entry.isIntersecting && entry.boundingClientRect.bottom > 0) continue;
       finishReveal(element, entry.isIntersecting && !element.contains(document.activeElement));
     }
-  }, { rootMargin: "0px 0px -36px" });
+  });
 
   function finishReveal(element, play = false) {
     entryObserver.unobserve(element);
