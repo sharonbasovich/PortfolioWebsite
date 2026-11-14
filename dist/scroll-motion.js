@@ -46,14 +46,16 @@
     return animation;
   }
 
-  // Let an intentional jump or an early keyboard action settle the entrance immediately.
+  // Let an intentional jump settle the entrance immediately.
   function cancelEntrance() {
     running.forEach(animation => animation.cancel());
   }
 
   reducedMotion.addEventListener("change", cancelEntrance);
   window.addEventListener("hashchange", cancelEntrance);
-  document.addEventListener("focusin", cancelEntrance);
+  document.addEventListener("focusin", event => {
+    if (event.target.matches(":focus-visible")) cancelEntrance();
+  });
 
   const wave = document.querySelector(".hero-wave");
   const hand = wave.querySelector(".wave-hand");
@@ -62,14 +64,14 @@
 
   function waveHello() {
     if (waveAnimation?.playState === "running") return;
+    // Ease into and out of each wrist turn.
     waveAnimation = animate(hand, [
-      { rotate: "0deg", offset: 0 },
-      { rotate: "-7deg", offset: .16 },
-      { rotate: "14deg", offset: .35 },
-      { rotate: "-8deg", offset: .54 },
-      { rotate: "7deg", offset: .71 },
+      { rotate: "0deg", offset: 0, easing: "ease-in-out" },
+      { rotate: "12deg", offset: .25, easing: "ease-in-out" },
+      { rotate: "-8deg", offset: .52, easing: "ease-in-out" },
+      { rotate: "4deg", offset: .77, easing: "ease-in-out" },
       { rotate: "0deg", offset: 1 }
-    ], { duration: 540, easing: "ease-in-out" });
+    ], { duration: 960, easing: "linear" });
   }
 
   wave.addEventListener("pointerenter", event => {
@@ -93,34 +95,33 @@
     }, 620);
   }
 
-  const revealAt = .23;
+  // Start each piece just below the viewport. Keep content still if it was
+  // already visible on load or arrived well into view in a fast scroll.
+  let firstRevealBatch = true;
   const entryObserver = new IntersectionObserver(entries => {
     for (const entry of entries) {
-      if (entry.intersectionRatio < revealAt) continue;
+      if (!entry.isIntersecting) continue;
       const element = entry.target;
       entryObserver.unobserve(element);
+      const { top } = entry.boundingClientRect;
+      if (top < innerHeight - (firstRevealBatch ? 0 : 48)) continue;
       if (element.contains(document.activeElement)) continue;
 
-      if (element.matches(".project")) {
-        animate(element.querySelector(".project-photo"), [
-          { clipPath: "inset(0 0 16% 0 round 9px)", translate: "0 12px" },
-          { clipPath: "inset(0 0 0 0 round 9px)", translate: "0 0" }
-        ], { duration: 520 });
-        reveal(element.querySelector(".project-info"), 50);
+      if (element.matches(".project-photo")) {
+        animate(element.querySelector("img"), [
+          { opacity: .76, scale: 1.025 },
+          { opacity: 1, scale: 1 }
+        ], { duration: 440 });
       } else {
-        reveal(element.querySelector(".job-heading"));
-        reveal(element.querySelector(".job-story"), 45);
-        reveal(element.querySelector(".job-result"), 70);
+        animate(element, [
+          { opacity: .78, translate: "0 8px" },
+          { opacity: 1, translate: "0 0" }
+        ], { duration: 390 });
       }
     }
-  }, { threshold: revealAt });
+    firstRevealBatch = false;
+  }, { rootMargin: "0px 0px 36px" });
 
-  function reveal(element, delay = 0) {
-    animate(element, [
-      { opacity: .58, translate: "0 16px" },
-      { opacity: 1, translate: "0 0" }
-    ], { duration: 465, delay, fill: "backwards" });
-  }
-
-  document.querySelectorAll(".job, .project").forEach(element => entryObserver.observe(element));
+  document.querySelectorAll(".job-heading, .job-story, .job-result, .project-photo, .project-info")
+    .forEach(element => entryObserver.observe(element));
 })();
