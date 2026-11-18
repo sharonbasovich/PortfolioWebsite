@@ -1,6 +1,6 @@
 # Sharon Basovich's portfolio
 
-This repository deploys three Vercel projects from `main`. The two clean sites share one HTML template, styles, scripts, and assets. Both include Abstract. Their approved differences are the resume downloads and the Eigenvale experience entry: `sharonb` retains Eigenvale, while `sharonbasovich` omits it.
+This repository deploys three Vercel projects from `main`. The two clean sites share one HTML template, styles, scripts, and assets. Their resume downloads and dates are specific to each version. Both include Abstract, and `sharonb` also lists Eigenvale.
 
 | Version | Live URL | Vercel project | Root Directory | Output Directory | Resume variant |
 | --- | --- | --- | --- | --- | --- |
@@ -11,6 +11,8 @@ This repository deploys three Vercel projects from `main`. The two clean sites s
 Each project uses the `vercel.json` in its own root. The clean projects run the dependency-free `node tools/select-resume.mjs` build step, which generates `dist/index.html`, `dist/Sharon_Basovich_Resume.pdf`, and its `dist/resume.pdf` compatibility alias. All remaining static files come from the same `dist/` source and are unchanged by the selector.
 
 Edit common clean-site markup in `templates/clean-index.html`, rather than the generated `dist/index.html`. Enclose the Eigenvale entry in exactly one ordered `<!-- eigenvale:start -->` / `<!-- eigenvale:end -->` comment pair. The selector validates the pair before writing output, removes that block for `sharonbasovich`, retains it for `sharonb`, and strips the marker comments from both generated versions. All other template markup is preserved exactly; the template itself is never modified during selection.
+
+For dates that differ between the clean portfolios, wrap the relevant lines in `<!-- variant:sharonbasovich -->` and `<!-- /variant:sharonbasovich -->` or the equivalent `sharonb` pair. Put each comment on its own line. The selector keeps the matching block and strips the comments.
 
 Set `PORTFOLIO_RESUME_VARIANT=sharonb` on the `sharonb` Vercel project for Production and Preview environments. Development may use the same value. The existing `portfolio-website` project defaults to `sharonbasovich`; it may also set that value explicitly. Unknown or empty values fail the build instead of silently choosing a resume. Selection is project-based, so generated deployment and branch-preview URLs serve the same variant as their project without hostname matching.
 

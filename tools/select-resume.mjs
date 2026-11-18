@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // Both clean Vercel projects share one template and static design. Select the
-// resume and Eigenvale entry by project so branch-preview URLs agree as well.
+// resume and variant-specific content by project so branch previews match.
 const variants = {
   sharonbasovich: 'Sharon_Basovich_Resume.pdf',
   sharonb: 'Sharon_Basovich_Resume_Current.pdf',
@@ -33,9 +33,15 @@ if (
 ) {
   throw new Error('The clean template must contain exactly one balanced eigenvale:start/eigenvale:end marker pair.');
 }
-const html = template.slice(0, start) +
+const withExperience = template.slice(0, start) +
   (variant === 'sharonb' ? template.slice(start + startMarker.length, end) : '') +
   template.slice(end + endMarker.length);
+
+const variantBlock = /^<!-- variant:(sharonbasovich|sharonb) -->\r?\n([\s\S]*?)^<!-- \/variant:\1 -->\r?\n/gm;
+const html = withExperience.replace(variantBlock, (_, name, content) => name === variant ? content : '');
+if (/<!-- \/?variant:/.test(html)) {
+  throw new Error('The clean template contains an invalid or unclosed variant block.');
+}
 
 const source = join(projectRoot, 'resumes', variants[variant]);
 const pdf = readFileSync(source);
