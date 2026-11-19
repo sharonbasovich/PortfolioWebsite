@@ -500,7 +500,7 @@ strong { color: var(--ink); font-weight: 700; }
 .robotics-photo img { object-position: center 58%; }
 .skycell-photo img { object-position: center 32%; }
 
-.project-photo:focus-visible img { transform: scale(1.045); }
+.project-photo:focus-visible img { transform: scale(1.02); }
 
 .project-info { margin-top: 22px; }
 .project-info > p:not(.project-role) { margin-top: 12px; }
@@ -601,7 +601,7 @@ strong { color: var(--ink); font-weight: 700; }
   .theme-button:hover { background: var(--control-hover); }
   .site-header nav a:hover { color: var(--accent-dark); }
   a:hover .arrow, a:focus-visible .arrow { transform: translate(2px, -2px); }
-  .project-photo:hover img { transform: scale(1.045); }
+  .project-photo:hover img { transform: scale(1.02); }
 }
 
 @media (max-width: 1050px) {

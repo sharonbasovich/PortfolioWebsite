@@ -1,7 +1,6 @@
 (() => {
   const root = document.documentElement;
   const themeColor = document.querySelector('meta[name="theme-color"]');
-  const system = matchMedia("(prefers-color-scheme: dark)");
   const key = "sharon-portfolio-theme";
   let button;
 
@@ -18,7 +17,7 @@
   let choice = restoreChoice();
 
   function applyTheme() {
-    const theme = choice ?? (system.matches ? "dark" : "light");
+    const theme = choice ?? "light";
     root.dataset.theme = theme;
     themeColor.content = theme === "dark" ? "#14151e" : "#f7f7f4";
     if (button) {
@@ -28,7 +27,6 @@
   }
 
   applyTheme();
-  system.addEventListener("change", applyTheme);
   window.addEventListener("storage", event => {
     if (event.key !== key && event.key !== null) return;
     choice = restoreChoice();

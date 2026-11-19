@@ -1,66 +1,33 @@
-/*!
- * Ported from Motion Primitives BorderTrail by Julien Thibeaut.
- * https://github.com/ibelick/motion-primitives/blob/120f64f6ca60348e251f929e9c81f11ccbe45eda/components/core/border-trail.tsx
- *
- * MIT License
- * Copyright (c) 2024 ibelick
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 .project-outline {
   position: absolute;
   inset: 0;
   z-index: 2;
-  border: 2px solid transparent;
-  border-radius: inherit;
-  opacity: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+  fill: none;
 }
 
-@supports (offset-path: rect(0 auto auto 0 round 8px)) and (mask-composite: exclude) {
-  @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
-    .project-outline {
-      mask-clip: padding-box, border-box;
-      mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);
-      mask-composite: exclude;
-      transition: opacity .22s var(--ease, ease);
-    }
+.project-outline__line {
+  stroke: #c6d0f5;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: 100;
+  filter: drop-shadow(0 0 1px rgb(14 19 41 / .75));
+}
 
-    .project-outline__trail {
-      position: absolute;
-      width: clamp(86px, 25%, 142px);
-      aspect-ratio: 1;
-      background: linear-gradient(90deg, transparent 4%, var(--accent) 60%, #fff 90%, transparent);
-      offset-path: rect(0 auto auto 0 round 8px);
-      animation: project-outline-travel 3s linear infinite paused;
-    }
-
-    .project-photo:focus-visible .project-outline { opacity: 1; }
-    .project-photo:focus-visible .project-outline__trail { animation-play-state: running; }
-
-    @media (hover: hover) and (pointer: fine) {
-      .project-photo:hover .project-outline { opacity: 1; }
-      .project-photo:hover .project-outline__trail { animation-play-state: running; }
-    }
+@media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+  .project-outline[data-visible] { opacity: 1; }
+  .project-outline[data-tracing] .project-outline__line {
+    animation: project-edge-draw 610ms cubic-bezier(.29, .66, .34, 1) both;
   }
 }
 
-@keyframes project-outline-travel {
-  from { offset-distance: 0%; }
-  to { offset-distance: 100%; }
+@keyframes project-edge-draw {
+  0%   { stroke-dashoffset: 100; stroke-opacity: .9; }
+  77%  { stroke-dashoffset: 0; stroke-opacity: .86; }
+  100% { stroke-dashoffset: 0; stroke-opacity: .48; }
 }
