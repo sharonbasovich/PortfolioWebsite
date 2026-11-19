@@ -1,0 +1,41 @@
+Clean contact grain lettering
+
+Adapted from Sharon Basovich's Giats preview component:
+src/components/dom/contact/SandTitle.jsx
+
+The Giats portfolio is by Evangelos Giatsidis:
+https://github.com/Giats2498/giats-portfolio
+Copyright (c) 2025 Evangelos Giatsidis.
+
+Seeded text particles and radial pointer repulsion follow the MIT-licensed
+particle-field approach credited by that adaptation:
+https://github.com/imfemambocus/portfolio/blob/main/src/particles/shaders.ts
+Copyright (c) 2026 Isfaaq M. F. Emambocus.
+
+This clean-site version retains a real, selectable HTML heading and uses a
+bounded Canvas2D overlay. Its particle positions are sampled from the rendered
+heading, with restrained spring displacement and static mobile/reduced-motion
+fallbacks. It does not use the original site's WebGL renderer or visual assets.
+
+MIT License
+
+Copyright (c) 2025 Evangelos Giatsidis
+Copyright (c) 2026 Isfaaq M. F. Emambocus
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
