@@ -1,0 +1,65 @@
+/* Giats's clipped 300%-wide track, 700ms easing and travel.
+   Adapted from the Giats preview footer (4361df3), based on the MIT-licensed
+   Giats footer by Evangelos Giatsidis and Iocaste by Codrops.
+   See CONTACT-GRAIN-NOTICE.txt and giats-underline.js for the MIT notices. */
+.giats-underline-label {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+.giats-underline-track {
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  bottom: .04em;
+  width: 300%;
+  height: 114%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  opacity: 0;
+  transition: transform 700ms cubic-bezier(0, .25, .5, 1), opacity 180ms ease;
+}
+
+.email-link .giats-underline-track,
+.site-header nav a[aria-current="location"] .giats-underline-track {
+  opacity: 1;
+}
+
+.site-header nav a.giats-link-ready[aria-current="location"]::after {
+  content: none;
+}
+
+.giats-link-ready:focus-visible .giats-underline-track {
+  opacity: 1;
+  transform: translate3d(-66.6%, 0, 0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .giats-link-ready:hover .giats-underline-track {
+    opacity: 1;
+    transform: translate3d(-66.6%, 0, 0);
+  }
+}
+
+:is(.quiet-link, .email-link, .site-header nav a):not(.giats-link-ready):is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .giats-link-ready .giats-underline-track {
+    transform: none !important;
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .giats-underline-track { display: none; }
+
+  .email-link,
+  .site-header nav a[aria-current="location"],
+  .giats-link-ready:is(:hover, :focus-visible) {
+    text-decoration: underline;
+  }
+}

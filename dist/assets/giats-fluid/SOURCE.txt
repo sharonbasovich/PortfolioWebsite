@@ -1,0 +1,11 @@
+Original portfolio design and development by Evangelos Giatsidis — https://giats.me
+
+Source:
+https://github.com/Giats2498/giats-portfolio/tree/1e0b7b0bfc0dce086a91c8d742c3c13cff6cf270/src/components/canvas/fluid
+
+shaders.js contains the original Giats shader texts. cursor.js retains the
+original splat, curl, vorticity, divergence, pressure, gradient, advection, and
+display passes, using a small native WebGL2 host in place of React Three Fiber.
+The port caps the render size and ends work when the pointer goes idle. It uses
+the original difference blend at reduced opacity, with neutral black at rest.
+The original MIT notice is in LICENSE.txt.
