@@ -4,7 +4,19 @@
   "buildCommand": "",
   "installCommand": "",
   "outputDirectory": ".",
+  "trailingSlash": true,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+      ]
+    }
+  ],
   "redirects": [
+    { "source": "/home", "destination": "/", "permanent": true },
+    { "source": "/home/", "destination": "/", "permanent": true },
     { "source": "/immersive", "destination": "/", "permanent": true },
     { "source": "/immersive/", "destination": "/", "permanent": true },
     { "source": "/immersive/index.html", "destination": "/", "permanent": true },

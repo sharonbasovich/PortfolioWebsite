@@ -1,0 +1,72 @@
+.root {
+  height: 100svh;
+  min-height: 355px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: max(88px, 6.8vw) var(--layout-margin) clamp(16px, 2vw, 30px);
+  box-shadow: inset 0 max(88px, 6.8vw) var(--white),
+    inset calc(var(--layout-margin) * -1.015) 0 var(--white),
+    inset 0 calc(-1 * clamp(16px, 2vw, 30px)) var(--white),
+    inset calc(var(--layout-margin) * 1.015) 0 var(--white);
+}
+.topContainer {
+  padding: max(6px, 0.6vw) 0 max(14px, 1.9vw);
+  flex: none;
+  background: var(--white);
+  box-shadow: 0 0 0 1px var(--white);
+  align-items: center;
+}
+.leftContainer { grid-column: 1 / 11; }
+.intro { grid-column: 12 / 17; max-width: 36ch; }
+.crest { display: inline-block; width: 20px; height: auto; vertical-align: -.34em; }
+.bottomContainer {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  touch-action: pan-y;
+  cursor: grab;
+  box-shadow: 0 0 0 6px var(--white);
+  border-radius: var(--layout-columns-gap);
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+}
+.spherePoster {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: #24262d url('/sharon/sphere-field.webp') center / cover no-repeat;
+  transition: opacity 380ms ease;
+  &[data-ready='true'] { opacity: 0; }
+}
+.shutters {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  overflow: clip;
+  pointer-events: none;
+  i {
+    background: var(--white);
+    transform-origin: top;
+    transition: transform 650ms cubic-bezier(.76, 0, .24, 1) var(--delay);
+  }
+  i:nth-child(2n) { transform-origin: bottom; }
+  &[data-open='true'] i { transform: scaleY(0); }
+}
+@media (max-width: 812px) {
+  .root {
+    padding-top: 109px;
+    box-shadow: inset 0 109px var(--white),
+      inset calc(var(--layout-margin) * -1.02) 0 var(--white),
+      inset 0 calc(-1 * clamp(16px, 2vw, 30px)) var(--white),
+      inset calc(var(--layout-margin) * 1.02) 0 var(--white);
+  }
+  .topContainer { gap: 6px; padding: 2px 0 16px; }
+  .leftContainer, .intro { grid-column: 1 / -1; }
+  .intro { font-size: clamp(14px, 3vw, 21px); max-width: 41ch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shutters { display: none; }
+}

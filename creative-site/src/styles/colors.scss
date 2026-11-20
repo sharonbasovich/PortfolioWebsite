@@ -1,0 +1,48 @@
+@use 'sass:color';
+
+$colors: (
+  'white': #f0f4f1,
+  'black': #28282b,
+  'menuColor': #28282b,
+  'accentColor': #f9f9f9,
+  'fillColor': #f2ffbd,
+  'menuFontColor': #f0f4f1,
+);
+
+html {
+  @each $name, $color in $colors {
+    --#{$name}: #{$color};
+    // for safari use case: https://ambientimpact.com/web/snippets/safari-bug-with-gradients-that-fade-to-transparent
+    // --#{$name}-transparent: #{color.change($color, $alpha: 0)};
+  }
+}
+
+html {
+  color-scheme: light;
+  --muted: #555e70;
+  --header-paper: rgb(240 244 241 / 94%);
+  --header-border: rgb(24 30 40 / 13%);
+  --control: #fafcfc;
+  --control-hover: #e7eaf2;
+  --action: #090b11;
+  --action-ink: #fff;
+  --accent: #4355e9;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --white: #10141d;
+  --black: #edf1fa;
+  --accentColor: #222a3a;
+  --fillColor: #91a1ff;
+  --menuColor: #151b28;
+  --menuFontColor: #f0f4f9;
+  --muted: #a8b2c7;
+  --header-paper: rgb(16 20 29 / 95%);
+  --header-border: rgb(207 220 255 / 16%);
+  --control: #1a2232;
+  --control-hover: #263248;
+  --action: #4355e9;
+  --action-ink: #fff;
+  --accent: #96a7ff;
+}

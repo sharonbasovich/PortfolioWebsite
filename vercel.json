@@ -5,6 +5,8 @@
   "installCommand": "",
   "outputDirectory": "dist",
   "redirects": [
+    { "source": "/startup", "destination": "https://basovichsharon.vercel.app/", "permanent": true },
+    { "source": "/startup/", "destination": "https://basovichsharon.vercel.app/", "permanent": true },
     { "source": "/startup/immersive", "destination": "/startup/", "permanent": true },
     { "source": "/startup/immersive/", "destination": "/startup/", "permanent": true },
     { "source": "/startup/immersive/index.html", "destination": "/startup/", "permanent": true },

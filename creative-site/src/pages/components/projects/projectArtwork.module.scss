@@ -1,0 +1,44 @@
+.artwork {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 70% 38%, var(--project-glow), var(--project-canvas) 74%);
+
+  > img {
+    object-fit: cover;
+    object-position: var(--project-position);
+  }
+}
+
+.logo:not(.ambient) {
+  background: var(--project-logo-background);
+
+  > img {
+    object-fit: contain;
+    padding: 10% 18%;
+  }
+}
+
+.ambient {
+  &::after {
+    position: absolute;
+    content: '';
+    inset: 0;
+    background: linear-gradient(90deg, rgba(7, 10, 16, 0.78), rgba(7, 10, 16, 0.15) 75%);
+  }
+
+  > img {
+    opacity: 0.5;
+  }
+}
+
+.detail {
+  box-shadow: 0 0 0 1px rgb(15 25 45 / 10%);
+}
+
+@media (max-width: 800px) {
+  .ambient::after {
+    background: linear-gradient(0deg, rgba(7, 10, 16, 0.80), rgba(7, 10, 16, 0.1) 85%);
+  }
+}

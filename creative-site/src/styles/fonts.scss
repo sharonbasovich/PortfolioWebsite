@@ -1,0 +1,8 @@
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dm-sans-latin.woff2') format('woff2');
+  font-weight: 100 1000;
+  font-display: swap;
+}
+:root { --font-primary: 'DM Sans'; }
+body { font-family: var(--font-primary), sans-serif; }

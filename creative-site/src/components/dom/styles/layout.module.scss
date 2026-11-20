@@ -1,0 +1,16 @@
+@import '@src/styles/functions';
+
+.footer {
+  position: relative;
+  z-index: 3;
+  height: auto;
+  width: 100vw;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 64% 7%, #272833 0%, #17181e 48%, #111216 100%);
+}
+
+.footer:focus { outline: none; }
+
+:global(html[data-theme='dark']) .footer {
+  background: radial-gradient(ellipse at 64% 7%, #1f2638 0%, #10141d 58%, #0a0d13 100%);
+}

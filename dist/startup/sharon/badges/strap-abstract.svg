@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="128" viewBox="0 0 460 128">
+  <!-- Logo from https://abstract.inc/ -->
+  <rect width="460" height="128" fill="#17191c"/>
+  <path d="M0 6h460M0 122h460" stroke="#afb2b4" stroke-width="3" stroke-dasharray="4 5"/>
+  <svg x="77" y="28" width="72" height="72" viewBox="0 0 780 780" fill="#f9f9f7">
+    <path d="M0 0h351v351h-351ZM429 0h351v351h-351ZM0 429h351v351h-351ZM429 429h151.32v151.32h-151.32ZM628.68 429h151.32v151.32h-151.32ZM429 628.68h151.32v151.32h-151.32ZM628.68 628.68h60.67v60.67h-60.67ZM719.33 628.68h60.67v60.67h-60.67ZM628.68 719.33h60.67v60.67h-60.67ZM719.33 719.33h60.67v60.67h-60.67Z"/>
+  </svg>
+  <text x="166" y="81" fill="#f9f9f7" font-family="Arial,sans-serif" font-size="49" font-weight="600">Abstract</text>
+</svg>
