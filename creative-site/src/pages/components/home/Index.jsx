@@ -16,8 +16,10 @@ function Home() {
           <SandTitle name />
         </div>
         <p className={clsx('h6', styles.intro)}>
-          Building Matrix C Inference at Abstract (HF0S26) and studying computer science at the University of Waterloo.{' '}
-          <Image src="/sharon/waterloo-crest.png" width={21} height={24} alt="" className={styles.crest} />
+          Building Inference at Abstract (HF0 S26) and studying computer science at the University of{' '}
+          <span className={styles.crestLabel}>
+            Waterloo.<Image src="/sharon/waterloo-crest.png" width={21} height={24} alt="" className={styles.crest} />
+          </span>
         </p>
       </div>
       {/* The physics controller binds arrow and space-key input to this focusable scene. */}

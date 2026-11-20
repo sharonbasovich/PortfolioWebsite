@@ -37,7 +37,7 @@ function makeGrain(random, tx, ty, grainWidth, radius) {
 
 function makeField(width, height) {
   const random = seededRandom(203471);
-  const attempts = clamp(Math.round(width * height / 35), 2300, 11000);
+  const attempts = clamp(Math.round(width * height / 12), 6700, 32000);
   const grains = [];
   for (let i = 0; i < attempts; i += 1) {
     const x = random();

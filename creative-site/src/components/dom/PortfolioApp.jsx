@@ -96,10 +96,10 @@ export default function PortfolioApp({ Component, pageProps, router }) {
   useEffect(() => {
     if (!lenis || isLoading || router.pathname !== '/') return undefined;
     const id = window.location.hash.slice(1);
-    const target = ['top', 'internships', 'projects', 'about', 'contact'].includes(id) && document.getElementById(id);
+    const target = ['top', 'internships', 'projects', 'contact'].includes(id) && document.getElementById(id);
     if (!target) return undefined;
     const frame = requestAnimationFrame(() => {
-      const needsOffset = id === 'projects' || id === 'about';
+      const needsOffset = id === 'projects';
       const headerHeight = document.querySelector('[role="banner"]')?.getBoundingClientRect().height ?? 0;
       lenis.scrollTo(target, { offset: needsOffset ? -headerHeight - 12 : 0, immediate: true, force: true });
     });

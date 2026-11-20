@@ -14,7 +14,6 @@ const GoTop = dynamic(() => import('./GoTop'), { ssr: false });
 
 const sections = [
   { title: 'Home', href: '/#top' },
-  { title: 'About me', href: '/#about' },
   { title: 'Projects', href: '/#projects' },
 ];
 

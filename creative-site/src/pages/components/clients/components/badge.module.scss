@@ -47,11 +47,17 @@
   inset: 0;
   pointer-events: none;
 }
-.poster {
-  transition: opacity 150ms;
+.viewport {
+  visibility: hidden;
+}
+.scene[data-drop='true'] .poster {
+  transform: translateY(calc((var(--badge-drop, 0) - 1) * 88%));
+}
+.scene[data-ready='true'] .viewport {
+  visibility: visible;
 }
 .scene[data-ready='true'] .poster {
-  opacity: 0;
+  visibility: hidden;
 }
 .poster img {
   position: absolute;
@@ -67,7 +73,7 @@
 }
 .posterBand {
   position: absolute;
-  width: 33cqh;
+  width: 36cqh;
   height: 4.8cqh;
   top: -2.4cqh;
   left: 48%;
@@ -87,9 +93,6 @@
   background: transparent;
 }
 @media (prefers-reduced-motion: reduce) {
-  .poster {
-    transition: none;
-  }
   .scene {
     cursor: default;
   }

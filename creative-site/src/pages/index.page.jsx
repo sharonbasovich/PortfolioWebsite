@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import Home from '@src/pages/components/home/Index';
-import About from '@src/pages/components/about/Index';
 import Quote from '@src/pages/components/quote/Index';
 import Projects from '@src/pages/components/projects/Index';
 import Clients from '@src/pages/components/clients/Index';
@@ -14,7 +13,6 @@ function Page() {
       <Clients />
       <Quote />
       <Projects />
-      <About />
     </>
   );
 }

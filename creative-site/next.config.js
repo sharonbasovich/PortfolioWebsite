@@ -2,7 +2,9 @@ const isStaticExport = process.env.PORTFOLIO_STATIC_EXPORT === '1';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  ...(isStaticExport ? { output: 'export', trailingSlash: true } : { distDir: process.env.GIATS_BUILD_DIR || '.next' }),
+  ...(isStaticExport
+    ? { output: 'export', outputFileTracing: false, trailingSlash: true }
+    : { distDir: process.env.GIATS_BUILD_DIR || '.next' }),
   pageExtensions: ['page.jsx'],
   experimental: {
     ...(isStaticExport ? { cpus: 2 } : {}),

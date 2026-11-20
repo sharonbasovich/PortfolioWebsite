@@ -11,6 +11,7 @@ const DEFAULT_HEIGHT = 5.05;
 const CARD_Y = -0.45;
 const EYE_Y = 1.365;
 const SEGMENTS = 30;
+const DROP_DISTANCE = 0.88;
 const COMPANIES = ['abstract', 'rbc', 'magna'];
 const COMPANY_NAMES = { abstract: 'Abstract', rbc: 'RBC', magna: 'Magna' };
 const BADGE_ART = ['', 'strap-'].flatMap((prefix) => COMPANIES.map((company) => `/sharon/badges/${prefix}${company}.svg`));
@@ -37,7 +38,7 @@ function BadgePoster({ name }) {
     <div className={styles.poster} aria-hidden="true">
       <span className={styles.posterBand} style={{ backgroundImage: `url("/sharon/badges/strap-${name}.svg")` }} />
       <span className={styles.posterClip} />
-      <Image unoptimized alt="" width={810} height={1100} src={`/sharon/badges/${name}.svg`} />
+      <Image unoptimized alt="" width={810} height={1100} src={`/sharon/badges/${name}.svg`} loading={name === 'abstract' ? 'eager' : 'lazy'} />
     </div>
   );
 }
@@ -70,7 +71,8 @@ function BadgeScene({ input, name, progressRef, onReady }) {
   const cardEdge = useRef(null);
   const cardFront = useRef(null);
   const cardBack = useRef(null);
-  const didRender = useRef(false);
+  const firstFrame = useRef(true);
+  const announced = useRef(false);
   const track = useRef({
     x: -0.08,
     y: CARD_Y,
@@ -109,12 +111,15 @@ function BadgeScene({ input, name, progressRef, onReady }) {
 
   useFrame((state, rawDelta) => {
     if (!pivot.current || !flip.current || !fabric.current || !cardFront.current || !cardBack.current) return;
+    if (!state.size.width || !state.size.height) return;
     const dt = Math.min(rawDelta, 0.045);
     const p = track.current;
     const c = input.current;
     p.time += dt;
     const aspect = state.size.width / Math.max(1, state.size.height);
     const viewHeight = Math.max(DEFAULT_HEIGHT, 3.55 / aspect);
+    const drop = progressRef?.current.drop ?? (name === 'abstract' ? c.entrance : 1);
+    const dropOffset = (1 - drop) * DROP_DISTANCE * viewHeight;
     const halfW = viewHeight * aspect * 0.5;
     const moveX = Math.min(1.32, Math.max(0.28, halfW - 1.03));
     if (state.camera.isPerspectiveCamera) {
@@ -125,6 +130,7 @@ function BadgeScene({ input, name, progressRef, onReady }) {
       }
     }
     c.scroll *= Math.exp(-4.3 * dt);
+    const scrollMotion = c.scroll * drop;
     let goalX = c.inside ? c.x * moveX * 0.88 : Math.sin(p.time * 0.72) * 0.095;
     let goalY = CARD_Y + (c.inside ? c.y * 0.25 : 0);
     if (c.dragging) {
@@ -137,8 +143,8 @@ function BadgeScene({ input, name, progressRef, onReady }) {
       goalY = clamp(c.y * viewHeight * 0.5 + p.grabY, -viewHeight * 0.5 + 1.35, 0.8);
     } else {
       p.pointerId = null;
-      goalX = clamp(goalX + c.scroll * 0.92, -moveX, moveX);
-      goalY += Math.abs(c.scroll) * 0.15;
+      goalX = clamp(goalX + scrollMotion * 0.92, -moveX, moveX);
+      goalY += Math.abs(scrollMotion) * 0.15;
     }
     if (c.kickX || c.kickY || c.kickTurn) {
       p.vx += c.kickX;
@@ -164,11 +170,11 @@ function BadgeScene({ input, name, progressRef, onReady }) {
     p.kick *= Math.exp(-3.1 * dt);
     const settle = 1 - Math.exp(-9 * dt);
     p.roll += (clamp(p.x * 0.25 + p.vx * 0.065, -0.48, 0.48) - p.roll) * settle;
-    p.twist += (clamp(-0.12 + p.vx * 0.15 + c.scroll * 0.47 + (c.inside ? c.x * 0.38 : 0) + p.kick, -0.95, 0.95) - p.twist) * settle;
+    p.twist += (clamp(-0.12 + p.vx * 0.15 + scrollMotion * 0.47 + (c.inside ? c.x * 0.38 : 0) + p.kick, -0.95, 0.95) - p.twist) * settle;
     p.pitch += (clamp(-0.08 + p.vy * 0.075 + (c.inside ? -c.y * 0.24 : 0), -0.4, 0.35) - p.pitch) * settle;
-    pivot.current.position.set(p.x, p.y, c.dragging ? 0.15 : 0);
+    pivot.current.position.set(p.x, p.y + dropOffset, c.dragging ? 0.15 : 0);
     pivot.current.rotation.set(p.pitch, p.twist, p.roll);
-    const turns = progressRef?.current ?? c.entrance;
+    const turns = progressRef?.current.turns ?? (name === 'abstract' ? 0 : c.entrance);
     flip.current.rotation.y = -Math.PI * turns;
     let front = initialBrand;
     let back = initialBrand;
@@ -177,21 +183,21 @@ function BadgeScene({ input, name, progressRef, onReady }) {
     let phase = 0;
     if (progressRef) {
       // Change artwork on the face pointing away, between the half turns.
-      front = turns >= 1 ? 1 : 0;
-      back = turns >= 2 ? 2 : 0;
-      nextBrand = Math.min(Math.floor(turns), COMPANIES.length - 1);
-      previousBrand = Math.max(0, nextBrand - 1);
-      phase = turns - nextBrand;
+      front = turns >= 1 ? 2 : 0;
+      back = 1;
+      previousBrand = Math.min(Math.floor(turns), COMPANIES.length - 1);
+      nextBrand = Math.min(previousBrand + 1, COMPANIES.length - 1);
+      phase = turns - previousBrand;
     }
     cardFront.current.map = cards[front];
     cardBack.current.map = cards[back];
     cardEdge.current.color.lerpColors(brandColors[previousBrand], brandColors[nextBrand], phase);
     fabric.current.map = straps[phase < 0.5 ? previousBrand : nextBrand];
 
-    curve.v0.set(-0.09, viewHeight * 0.5 + 0.14, -0.16);
+    curve.v0.set(-0.09, viewHeight * 0.5 + 0.14 + dropOffset, -0.16);
     curve.v3.set(0, EYE_Y, 0).applyQuaternion(pivot.current.quaternion).add(pivot.current.position);
     p.bandX += (p.x - p.bandX) * (1 - Math.exp(-5 * dt));
-    curve.v1.set(-0.09 + p.bandX * 0.12, viewHeight * 0.5 - 0.52, -0.08);
+    curve.v1.set(-0.09 + p.bandX * 0.12, viewHeight * 0.5 - 0.52 + dropOffset, -0.08);
     curve.v2.set(curve.v3.x - 0.16 * p.vx - 0.12 * p.roll, curve.v3.y + 0.58, curve.v3.z + 0.06);
     const positions = ribbon.attributes.position;
     for (let i = 0; i <= SEGMENTS; i += 1) {
@@ -208,8 +214,12 @@ function BadgeScene({ input, name, progressRef, onReady }) {
       positions.setXYZ(2 * i + 1, point.x + dx, point.y + dy, point.z + dz);
     }
     positions.needsUpdate = true;
-    if (!didRender.current) {
-      didRender.current = true;
+    // R3F draws after useFrame. Keep the poster up through that first
+    // complete render so it never overlaps the live model.
+    if (firstFrame.current) {
+      firstFrame.current = false;
+    } else if (!announced.current) {
+      announced.current = true;
       onReady();
     }
   });
@@ -261,12 +271,17 @@ export default function Badge({ name = 'rbc', progressRef }) {
   const [ready, setReady] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
   const markReady = useCallback(() => setReady(true), []);
+  const dropsIn = Boolean(progressRef) || name === 'abstract';
 
   useEffect(() => {
     const container = host.current;
     const scroller = container.closest('main');
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const updateMotion = () => setReduced(mq.matches);
+    const updateMotion = () => {
+      if (mq.matches) setReady(false);
+      else useTexture.preload(BADGE_ART);
+      setReduced(mq.matches);
+    };
     updateMotion();
     mq.addEventListener('change', updateMotion);
     const watch = new IntersectionObserver(
@@ -277,7 +292,7 @@ export default function Badge({ name = 'rbc', progressRef }) {
           input.current.inside = false;
         }
       },
-      { root: scroller, rootMargin: '140px 0px' },
+      { root: scroller, rootMargin: '240px 0px' },
     );
     watch.observe(container);
     return () => {
@@ -301,6 +316,7 @@ export default function Badge({ name = 'rbc', progressRef }) {
         const height = scroller.clientHeight;
         const progress = clamp((height * 0.92 - face) / Math.max(1, height * 0.37), 0, 1);
         input.current.entrance = progress * progress * (3 - 2 * progress);
+        if (dropsIn) host.current.style.setProperty('--badge-drop', input.current.entrance);
       }
       previous = scroller.scrollTop;
       at = now;
@@ -308,7 +324,7 @@ export default function Badge({ name = 'rbc', progressRef }) {
     sample();
     scroller.addEventListener('scroll', sample, { passive: true });
     return () => scroller.removeEventListener('scroll', sample);
-  }, [visible, reduced, progressRef]);
+  }, [visible, reduced, progressRef, dropsIn]);
 
   const pointer = (event) => {
     if (!event.isPrimary) return;
@@ -329,7 +345,7 @@ export default function Badge({ name = 'rbc', progressRef }) {
   }, []);
   const live = visible && !reduced;
   return (
-    <div ref={host} className={styles.scene} data-brand={name} data-ready={live && ready} data-held={grabbing} role="group" aria-label={`${COMPANY_NAMES[name]} internship badge`}>
+    <div ref={host} className={styles.scene} data-brand={name} data-drop={!reduced && dropsIn} data-ready={live && ready} data-held={grabbing} role="group" aria-label={`${COMPANY_NAMES[name]} internship badge`}>
       <SandTitle field />
       {!reduced && (
         <button

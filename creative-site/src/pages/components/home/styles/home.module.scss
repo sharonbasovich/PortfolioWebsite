@@ -19,7 +19,8 @@
 }
 .leftContainer { grid-column: 1 / 11; }
 .intro { grid-column: 12 / 17; max-width: 36ch; }
-.crest { display: inline-block; width: 20px; height: auto; vertical-align: -.34em; }
+.crestLabel { white-space: nowrap; }
+.crest { display: inline-block; width: 20px; height: auto; margin-inline-start: .28em; vertical-align: -.34em; }
 .bottomContainer {
   flex: 1 1 auto;
   min-height: 0;

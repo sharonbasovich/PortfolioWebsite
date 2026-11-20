@@ -74,8 +74,9 @@ function JobCopy({ job, copyRef }) {
 
 export default function Clients() {
   const rootRef = useRef(null);
+  const badgeWindowRef = useRef(null);
   const copyRefs = useRef([]);
-  const progressRef = useRef(0);
+  const progressRef = useRef({ drop: 0, turns: 0 });
   const [narrow, setNarrow] = useState(true);
   const [activeJob, setActiveJob] = useState(0);
 
@@ -95,19 +96,25 @@ export default function Clients() {
       frame = 0;
       const height = scroller.clientHeight;
       const scrollerTop = scroller.getBoundingClientRect().top;
+      let drop = 0;
       let turns = 0;
       let active = 0;
       copyRefs.current.forEach((copy, index) => {
         if (!copy) return;
         const top = copy.getBoundingClientRect().top - scrollerTop;
-        // The first badge enters below the heading. Give its face time to
-        // appear before turning; later cards rotate in the pinned window.
-        const start = height * (index === 0 ? 0.60 : 0.68);
+        const start = height * (index === 0 ? 0.75 : 0.68);
         const progress = Math.min(1, Math.max(0, (start - top) / Math.max(1, height * 0.34)));
-        turns += progress * progress * (3 - 2 * progress);
-        if (progress >= 0.5) active = index;
+        const eased = progress * progress * (3 - 2 * progress);
+        if (index === 0) {
+          drop = eased;
+        } else {
+          turns += eased;
+          if (progress >= 0.5) active = index;
+        }
       });
-      progressRef.current = turns;
+      progressRef.current.drop = drop;
+      progressRef.current.turns = turns;
+      badgeWindowRef.current.style.setProperty('--badge-drop', drop);
       setActiveJob(active);
     };
     const schedule = () => {
@@ -148,7 +155,7 @@ export default function Clients() {
           <div className={styles.presentation}>
             <div className={styles.stickyBadge}>
               {heading}
-              <div className={styles.badgeWindow}>
+              <div ref={badgeWindowRef} className={styles.badgeWindow}>
                 <Badge name={internships[activeJob].id} progressRef={progressRef} />
               </div>
             </div>
