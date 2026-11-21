@@ -3,6 +3,7 @@
 .root {
   position: relative;
   background-color: var(--white);
+  padding-top: clamp(112px, 10vw, 170px);
 
   .title {
     grid-column: 5 / 16;

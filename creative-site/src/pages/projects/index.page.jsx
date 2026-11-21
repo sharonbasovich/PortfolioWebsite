@@ -70,7 +70,7 @@ function Page() {
       <section ref={rootRef} className={clsx(styles.root, 'layout-block-inner')}>
         <div className={styles.innerContainer}>
           {projects.map((project, index) => (
-            <ProjectLink project={project} aria-label={`View ${project.title}`} id={project.id} key={project.id} className={styles.card}>
+            <ProjectLink project={project} aria-label={`View ${project.title}`} id={project.id} key={project.id} className={styles.card} data-project-art-track>
               <div
                 style={
                   !isMobile

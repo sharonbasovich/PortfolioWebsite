@@ -1,0 +1,28 @@
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 52%, #60718e 0, #3c4d69 46%, #24334d 100%);
+}
+
+.canvas,
+.poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.poster {
+  object-fit: contain;
+}
+
+.canvas {
+  visibility: hidden;
+}
+
+.stage[data-lions-ready='true'] {
+  .poster { visibility: hidden; }
+  .canvas { visibility: visible; }
+}

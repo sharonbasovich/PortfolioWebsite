@@ -12,13 +12,14 @@ export function useProjectWindowOpen() {
 }
 
 // Keep a real destination for open-in-new-tab, copy link, and navigation without JS.
-export function ProjectLink({ project, children, className, id, 'aria-label': label }) {
+export function ProjectLink({ project, children, className, id, 'aria-label': label, 'data-project-art-track': artworkTrack }) {
   const open = useContext(OpenProject);
   return (
     <a
       className={className}
       id={id}
       aria-label={label}
+      data-project-art-track={artworkTrack ? '' : undefined}
       href={project.website}
       onClick={(event) => {
         if (!open || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;

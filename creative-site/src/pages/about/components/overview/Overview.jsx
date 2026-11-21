@@ -7,7 +7,7 @@ export default function Overview() {
     <section className={clsx(styles.root, 'layout-grid-inner')}>
       <div className={styles.title}>
         <AppearTitle>
-          <h2 className="h3">I study computer science at the University of Waterloo.</h2>
+          <h1 className="h3">I study computer science at the University of Waterloo.</h1>
         </AppearTitle>
       </div>
       <div className={clsx(styles.text, 'p-l', styles.myStory)}>

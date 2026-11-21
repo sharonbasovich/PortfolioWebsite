@@ -14,7 +14,7 @@ function NextProject({ nextProject }) {
       </section>
       <section className={clsx(styles.nextRoot, 'layout-block-inner')}>
         <div className={styles.innerContainer}>
-          <ProjectLink project={nextProject} aria-label={`View ${nextProject.title}`} id={nextProject.id} className={styles.card}>
+          <ProjectLink project={nextProject} aria-label={`View ${nextProject.title}`} id={nextProject.id} className={styles.card} data-project-art-track>
             <div className={styles.projectsWrap}>
               <div className={clsx(styles.container, 'layout-grid-inner')}>
                 <div className={styles.projectsDetails}>

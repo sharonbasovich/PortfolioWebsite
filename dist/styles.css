@@ -562,13 +562,19 @@ strong { color: var(--ink); font-weight: 700; }
 
 .site-footer h2 { color: white; }
 
+#contact-title {
+  --contact-grain-ink: #f8f9ff;
+  --contact-grain-shadow: #d0d8f7;
+  --contact-grain-glint: #adbcff;
+}
+
 #contact-title > span {
   position: relative;
   display: inline-block;
 }
 
 @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
-  #contact-title.contact-grain-ready > span { color: rgb(255 255 255 / .68); }
+  #contact-title.contact-grain-ready > span { color: rgb(241 244 255 / .42); }
 }
 
 .footer-inner {

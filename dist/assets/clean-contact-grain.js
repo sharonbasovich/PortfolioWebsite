@@ -21,8 +21,8 @@
     text.classList.add("contact-grain-text");
     heading.classList.add("contact-grain-host");
 
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    const fine = matchMedia("(hover: hover) and (pointer: fine) and (forced-colors: none)");
+    const staticText = matchMedia("(prefers-reduced-motion: reduce), (forced-colors: active)");
+    const fine = matchMedia("(hover: hover) and (pointer: fine)");
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
     const pointer = { x: 0, y: 0, active: false };
     let grains = [], palette = [];
@@ -33,7 +33,7 @@
     let sizeKey = "";
 
     function allowed() {
-      return !disposed && fontsReady && fine.matches && !reduced.matches && !selected;
+      return !disposed && fontsReady && !staticText.matches && !selected;
     }
     function solid() {
       heading.classList.remove("contact-grain-ready");
@@ -48,9 +48,9 @@
     function colors() {
       const style = getComputedStyle(heading);
       palette = [
-        style.color,
-        style.getPropertyValue("--contact-grain-shadow").trim() || style.color,
-        style.getPropertyValue("--contact-grain-glint").trim() || "#c5ceff",
+        style.getPropertyValue("--contact-grain-ink").trim(),
+        style.getPropertyValue("--contact-grain-shadow").trim(),
+        style.getPropertyValue("--contact-grain-glint").trim(),
       ];
     }
     function randomGenerator() {
@@ -64,18 +64,19 @@
     }
 
     function rebuild() {
-      if (!allowed()) return;
+      if (!allowed() || !visible) return;
       const box = text.getBoundingClientRect();
       const style = getComputedStyle(text);
       const fontSize = parseFloat(style.fontSize);
       const nextKey = [text.clientWidth, text.clientHeight, style.font, style.fontWeight,
-        style.fontFamily, style.letterSpacing].join("|");
+        style.fontFamily, style.letterSpacing, fine.matches].join("|");
       if (nextKey === sizeKey && grains.length) { wake(); return; }
       if (!box.width || !box.height || !fontSize) return;
       sizeKey = nextKey;
       stop();
       solid();
-      pad = Math.ceil(clamp(fontSize * 0.24, 12, 21));
+      radius = clamp(fontSize * 0.85, 32, 72);
+      pad = fine.matches ? Math.ceil(6 + radius * 0.74) : 4;
       width = text.clientWidth + pad * 2;
       height = text.clientHeight + pad * 2;
       const dpr = Math.min(devicePixelRatio || 1, 1.5);
@@ -109,21 +110,26 @@
         }
       }
       const pixels = mask.getImageData(0, 0, width, height).data;
+      const ink = [];
+      for (let pixel = 0; pixel < pixels.length / 4; pixel++) {
+        if (pixels[pixel * 4 + 3] >= 150) ink.push(pixel);
+      }
       const random = randomGenerator();
-      const grainWidth = clamp(fontSize / 110, 0.55, 0.95);
-      const attempts = Math.min(24000, Math.ceil(width * height / (grainWidth ** 2 * 1.3)));
-      radius = clamp(fontSize * 0.45, 18, 38);
+      const grainWidth = clamp(fontSize / 94, 0.65, 1.05);
+      // Sample only the ink so every glyph gets the same density as the title resizes.
+      const count = Math.min(14000, Math.ceil(ink.length / (grainWidth ** 2 * .86)));
       grains = [];
-      for (let index = 0; index < attempts && grains.length < 4200; index++) {
-        const tx = random() * width, ty = random() * height;
-        if (pixels[(Math.floor(ty) * width + Math.floor(tx)) * 4 + 3] < 160) continue;
+      for (let index = 0; index < count; index++) {
+        const pixel = ink[Math.floor(random() * ink.length)];
+        const tx = pixel % width + random();
+        const ty = Math.floor(pixel / width) + random();
         const angle = random() * Math.PI * 2;
         const spread = 3 + random() * 7;
         const tone = random();
         grains.push({ tx, ty, x: tx, y: ty, vx: 0, vy: 0,
           dx: Math.cos(angle) * spread, dy: Math.sin(angle) * spread,
-          size: grainWidth * (0.65 + random() * 0.65),
-          tone: Number(tone > 0.82) + Number(tone > 0.96) });
+          size: grainWidth * (0.72 + random() * 0.66),
+          tone: Number(tone > 0.74) + Number(tone > 0.92) });
       }
       grains.sort((a, b) => a.tone - b.tone);
       seededFormation = false;
@@ -140,7 +146,7 @@
       }
       const dt = clamp((now - (lastPaint || now - 33.33)) / 1000, 0.005, 0.05);
       lastPaint = now;
-      if (!formed && !seededFormation) {
+      if (fine.matches && !formed && !seededFormation) {
         for (const grain of grains) {
           grain.x += grain.dx;
           grain.y += grain.dy;
@@ -157,10 +163,12 @@
           const dx = tx - pointer.x, dy = ty - pointer.y;
           const distanceSquared = dx * dx + dy * dy;
           if (distanceSquared < reachSquared) {
-            const distance = Math.sqrt(distanceSquared) || 0.1;
-            const force = (1 - distance / radius) ** 2 * radius * 0.4;
-            tx += dx / distance * force;
-            ty += dy / distance * force;
+            const distance = Math.sqrt(distanceSquared);
+            const falloff = (1 - distance / radius) ** 2;
+            const push = 1.35 * falloff;
+            const scatter = 2.7 * falloff;
+            tx += dx * push + grain.dx * scatter;
+            ty += dy * push + grain.dy * scatter;
           }
         }
         // Closed-form critical damping stays calm through slower frame cadences.
@@ -177,7 +185,7 @@
       canvas.style.display = "block";
       heading.classList.add("contact-grain-ready");
       heading.setAttribute("data-contact-grain-ready", "true");
-      if (now < awakeUntil) frame = requestAnimationFrame(draw);
+      if (fine.matches && now < awakeUntil) frame = requestAnimationFrame(draw);
       else formed = true;
     }
     function wake() {
@@ -186,7 +194,7 @@
       if (!frame) { lastPaint = 0; frame = requestAnimationFrame(draw); }
     }
     function move(event) {
-      if (!allowed() || event.pointerType === "touch" || event.buttons) return;
+      if (!allowed() || !fine.matches || event.pointerType === "touch" || event.buttons) return;
       const box = text.getBoundingClientRect();
       pointer.x = event.clientX - box.left + pad;
       pointer.y = event.clientY - box.top + pad;
@@ -217,8 +225,11 @@
     }
     const intersection = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (visible) wake();
-      else stop();
+      if (visible) rebuild();
+      else {
+        pointer.active = false;
+        stop();
+      }
     }, { threshold: 0.15 });
     intersection.observe(heading);
     const size = window.ResizeObserver ? new ResizeObserver(() => {
@@ -231,7 +242,7 @@
     text.addEventListener("pointermove", move, { passive: true });
     text.addEventListener("pointerleave", leave);
     text.addEventListener("pointercancel", leave);
-    reduced.addEventListener("change", availability);
+    staticText.addEventListener("change", availability);
     fine.addEventListener("change", availability);
     document.addEventListener("selectionchange", selection);
     document.addEventListener("visibilitychange", visibility);
@@ -247,7 +258,7 @@
       text.removeEventListener("pointermove", move);
       text.removeEventListener("pointerleave", leave);
       text.removeEventListener("pointercancel", leave);
-      reduced.removeEventListener("change", availability);
+      staticText.removeEventListener("change", availability);
       fine.removeEventListener("change", availability);
       document.removeEventListener("selectionchange", selection);
       document.removeEventListener("visibilitychange", visibility);
