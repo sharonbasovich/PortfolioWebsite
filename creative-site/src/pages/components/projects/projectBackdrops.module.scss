@@ -1,0 +1,203 @@
+.market,
+.compute {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.market {
+  background: radial-gradient(ellipse at 79% 42%, #284965, #142641 74%);
+}
+
+.chart {
+  position: absolute;
+  inset: 9% 4.5% 8% 23%;
+  display: grid;
+  grid-template-rows: min-content 1fr 17% min-content;
+  gap: clamp(6px, 1vw, 14px);
+  color: #b0c6da;
+  font-size: clamp(10px, 1vw, 14px);
+  mask-image: linear-gradient(90deg, transparent, #000 26%);
+}
+
+.chartCaption,
+.time {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.chartCaption {
+  padding-bottom: .55em;
+  border-bottom: 1px solid #b0c6da4d;
+}
+
+.price,
+.volume {
+  position: relative;
+  display: flex;
+  padding-right: 3em;
+}
+
+.price {
+  border-block-end: 1px solid #b0c6da4d;
+  background-image:
+    linear-gradient(#b0c6da22 1px, transparent 1px),
+    linear-gradient(90deg, #b0c6da1c 1px, transparent 1px);
+  background-size: 100% 20%, 12.5% 100%;
+}
+
+.up,
+.down {
+  position: relative;
+  flex: 1;
+}
+
+.up   { --candle: #72dbd0; }
+.down { --candle: #e7a286; }
+
+.wick,
+.body,
+.volume i {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--candle);
+}
+
+.wick {
+  width: 1px;
+  opacity: .7;
+}
+
+.body {
+  width: 64%;
+  min-height: 2px;
+  opacity: .94;
+}
+
+.priceTicks {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+}
+
+.volume {
+  border-block-end: 1px solid #b0c6da4d;
+  background-image: repeating-linear-gradient(0deg, transparent 0 44%, #b0c6da22 44% 45%);
+
+  i {
+    bottom: 0;
+    width: 65%;
+    opacity: .63;
+  }
+}
+
+.time { padding-right: 3em; }
+
+.compute {
+  background:
+    radial-gradient(ellipse at 75% 38%, #482934, transparent 74%),
+    repeating-linear-gradient(0deg, transparent 0 35px, #ba8ca20c 35px 36px),
+    repeating-linear-gradient(90deg, #1d1d2c 0 35px, #342639 35px 36px);
+  color: #bea4bb;
+  font-size: clamp(10px, 1.1vw, 16px);
+}
+
+.trace,
+.research {
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid #c795ac62;
+  border-radius: 6px;
+  background: #181925a8;
+}
+
+.trace {
+  top: 7%;
+  left: 31%;
+  right: 4.5%;
+  padding-bottom: .65em;
+  mask-image: linear-gradient(90deg, #0008, #000 36%);
+}
+
+.paneTitle {
+  padding: .62em 1.1em;
+  border-bottom: 1px solid #b7829c4b;
+  background: #eaa0ad12;
+  color: #f7b6c4;
+}
+
+.code {
+  margin: 0;
+  padding: .6em 1em;
+  font: inherit;
+  line-height: 1.65;
+
+  span { display: block; }
+
+  span:nth-child(4n + 1) { color: #e7abac; }
+
+  i {
+    display: inline-block;
+    min-width: 3.3em;
+    color: #907894;
+    font-style: normal;
+  }
+}
+
+.research {
+  bottom: 6%;
+  right: 4.5%;
+  width: min(55%, 39em);
+  padding-bottom: .6em;
+  mask-image: linear-gradient(90deg, #0006, #000 26%);
+
+  span {
+    display: block;
+    padding: .2em 1.15em;
+    white-space: nowrap;
+  }
+
+  span:first-of-type {
+    padding-top: .8em;
+    color: #e4d5e2;
+  }
+}
+
+@media (max-width: 812px) {
+  .chart {
+    inset: 4% -12% 8% -8%;
+    mask-image: none;
+  }
+
+  .chartCaption,
+  .time { padding-inline: 11%; }
+
+  .priceTicks { display: none; }
+
+  .price,
+  .volume { padding-right: 0; }
+
+  .trace {
+    inset: 3% -22% auto 19%;
+    mask-image: none;
+  }
+
+  .research {
+    right: -12%;
+    bottom: 3%;
+    width: 76%;
+  }
+}
+
+@media (forced-colors: active) {
+  .market,
+  .compute { display: none; }
+}
