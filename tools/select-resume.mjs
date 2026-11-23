@@ -38,9 +38,15 @@ const withExperience = template.slice(0, start) +
   template.slice(end + endMarker.length);
 
 const variantBlock = /^<!-- variant:(sharonbasovich|sharonb) -->\r?\n([\s\S]*?)^<!-- \/variant:\1 -->\r?\n/gm;
-const html = withExperience.replace(variantBlock, (_, name, content) => name === variant ? content : '');
+let html = withExperience.replace(variantBlock, (_, name, content) => name === variant ? content : '');
 if (/<!-- \/?variant:/.test(html)) {
   throw new Error('The clean template contains an invalid or unclosed variant block.');
+}
+
+const defaultDownload = 'Sharon_Basovich_Resume.pdf';
+const download = variant === 'sharonb' ? 'Sharon_Basovich.pdf' : defaultDownload;
+if (download !== defaultDownload) {
+  html = html.replaceAll(`href="${defaultDownload}"`, `href="/${download}"`);
 }
 
 const source = join(projectRoot, 'resumes', variants[variant]);
@@ -51,7 +57,7 @@ if (pdf.subarray(0, 5).toString('ascii') !== '%PDF-') {
 
 // Validate all inputs above before replacing any generated output.
 writeFileSync(join(outputRoot, 'index.html'), html, 'utf8');
-for (const name of ['Sharon_Basovich_Resume.pdf', 'resume.pdf']) {
+for (const name of new Set([download, defaultDownload, 'resume.pdf'])) {
   writeFileSync(join(outputRoot, name), pdf);
 }
 
