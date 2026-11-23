@@ -180,7 +180,7 @@ export async function createLionsRobotScene(canvas) {
           renderer.setSize(width, height, false);
         }
         gridReveal.value = MathUtils.smoothstep(progress, 0.035, 0.34);
-        modelReveal.value = MathUtils.smoothstep(progress, 0.10, 0.48);
+        modelReveal.value = MathUtils.smoothstep(progress, 0.10, 0.76);
         pivot.rotation.y = INITIAL_YAW + 2.45 * MathUtils.smoothstep(progress, 0.23, 1);
         renderer.render(scene, camera);
         return modelReveal.value;
