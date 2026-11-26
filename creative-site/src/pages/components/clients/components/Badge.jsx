@@ -4,6 +4,7 @@ import { Environment, RoundedBox, useTexture } from '@react-three/drei';
 import { Component, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import SandTitle from '@src/components/dom/contact/SandTitle';
+import BadgeCharms from './BadgeCharms';
 import styles from './badge.module.scss';
 
 const { clamp } = THREE.MathUtils;
@@ -38,7 +39,11 @@ function BadgePoster({ name }) {
     <div className={styles.poster} aria-hidden="true">
       <span className={styles.posterBand} style={{ backgroundImage: `url("/sharon/badges/strap-${name}.svg")` }} />
       <span className={styles.posterClip} />
-      <Image unoptimized alt="" width={810} height={1100} src={`/sharon/badges/${name}.svg`} loading={name === 'abstract' ? 'eager' : 'lazy'} />
+      <Image unoptimized alt="" width={810} height={1100} className={styles.posterCard} src={`/sharon/badges/${name}.svg`} loading={name === 'abstract' ? 'eager' : 'lazy'} />
+      <span className={styles.posterChain} data-side="left" />
+      <span className={styles.posterChain} data-side="right" />
+      <Image unoptimized alt="" width={320} height={232} className={styles.posterSkyline} src="/sharon/charms/skyline.webp" loading="lazy" />
+      <Image unoptimized alt="" width={320} height={320} className={styles.posterSwitch} src="/sharon/charms/switch.webp" loading="lazy" />
     </div>
   );
 }
@@ -87,6 +92,8 @@ function BadgeScene({ input, name, progressRef, onReady }) {
     pointerId: null,
     kick: 0,
     time: 0,
+    charmFit: 1,
+    scrollMotion: 0,
   });
   const ribbon = useMemo(makeRibbon, []);
   const curve = useMemo(() => new THREE.CubicBezierCurve3(...Array.from({ length: 4 }, () => new THREE.Vector3())), []);
@@ -121,7 +128,8 @@ function BadgeScene({ input, name, progressRef, onReady }) {
     const drop = progressRef?.current.drop ?? (name === 'abstract' ? c.entrance : 1);
     const dropOffset = (1 - drop) * DROP_DISTANCE * viewHeight;
     const halfW = viewHeight * aspect * 0.5;
-    const moveX = Math.min(1.32, Math.max(0.28, halfW - 1.03));
+    p.charmFit = 0.79 + 0.21 * THREE.MathUtils.smoothstep(halfW, 1.77, 2.6);
+    const moveX = clamp(halfW - 1.9 * p.charmFit, 0.24, 1.32);
     if (state.camera.isPerspectiveCamera) {
       const fov = THREE.MathUtils.radToDeg(2 * Math.atan(viewHeight / 20));
       if (Math.abs(state.camera.fov - fov) > 0.001) {
@@ -131,6 +139,7 @@ function BadgeScene({ input, name, progressRef, onReady }) {
     }
     c.scroll *= Math.exp(-4.3 * dt);
     const scrollMotion = c.scroll * drop;
+    p.scrollMotion = scrollMotion;
     let goalX = c.inside ? c.x * moveX * 0.88 : Math.sin(p.time * 0.72) * 0.095;
     let goalY = CARD_Y + (c.inside ? c.y * 0.25 : 0);
     if (c.dragging) {
@@ -258,6 +267,7 @@ function BadgeScene({ input, name, progressRef, onReady }) {
         <RoundedBox args={[0.205, 0.14, 0.095]} position={[0, EYE_Y + 0.025, -0.012]} radius={0.022} smoothness={3}>
           <meshStandardMaterial color="#5b6269" roughness={0.32} metalness={0.78} />
         </RoundedBox>
+        <BadgeCharms track={track} />
       </group>
     </>
   );
@@ -351,7 +361,7 @@ export default function Badge({ name = 'rbc', progressRef }) {
         <button
           type="button"
           className={styles.badgeControl}
-          aria-label="Move the badge by dragging or using the arrow keys. Press space or enter to flick it."
+          aria-label="Move the badge and keychains by dragging or using the arrow keys. Press space or enter to flick them."
           onClick={(event) => {
             if (event.detail === 0) input.current.kickTurn = 1.25;
           }}
