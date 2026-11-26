@@ -116,7 +116,7 @@ export default function Home() {
             <div><strong>1,200</strong><span>repos impacted at RBC</span></div>
             <div><strong>70 km</strong><span>high-altitude radio link</span></div>
             <div><strong>$140k</strong><span>robotics budget managed</span></div>
-            <div><strong>13×</strong><span>hackathon award winner</span></div>
+            <div><strong>14×</strong><span>hackathon award winner</span></div>
           </div>
         </section>
 

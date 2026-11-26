@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '@src/store';
 
-const quote = "I've won 13 hackathons. I'm a robotics world champion, and I'm relentlessly curious.";
+const quote = "I've won 14 hackathons. I'm a robotics world champion, and I'm relentlessly curious.";
 
 function Quote() {
   const [isLoading] = useStore(useShallow((state) => [state.isLoading]));
